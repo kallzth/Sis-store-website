@@ -1,5 +1,9 @@
 Key Features of Sis store  
-Visit the the following site,  https://kallzth.github.io/Sis-store-website/ 
+
+Visit the the following site, 
+
+https://kallzth.github.io/Sis-store-website/ 
+
 🛍️ Interactive Shopping Experience
 
 Size recommendation tool based on user measurements
