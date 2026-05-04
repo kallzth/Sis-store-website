@@ -396,11 +396,11 @@
         <input type="text" id="p-name" placeholder="e.g. Men's Denim Jacket">
       </div>
       <div class="form-group">
-        <label>Price ($)</label>
+        <label>Price (ETB)</label>
         <input type="number" id="p-price" placeholder="29.99" step="0.01">
       </div>
       <div class="form-group">
-        <label>Original Price ($) <span style="color:var(--muted)">(optional)</span></label>
+        <label>Original Price (ETB) <span style="color:var(--muted)">(optional)</span></label>
         <input type="number" id="p-original-price" placeholder="49.99" step="0.01">
       </div>
       <div class="form-group">
@@ -624,7 +624,7 @@
           <td><img class="product-thumb" src="${p.image || 'https://via.placeholder.com/44'}" onerror="this.src='https://via.placeholder.com/44'" alt="${p.name}"></td>
           <td><strong>${p.name}</strong>${p.featured === 'true' || p.featured === true ? ' <span class="badge badge-purple">Featured</span>' : ''}</td>
           <td>${p.category || '—'}</td>
-          <td>$${parseFloat(p.price||0).toFixed(2)}${p.originalPrice ? `<br><span style="color:var(--muted);text-decoration:line-through;font-size:12px">$${parseFloat(p.originalPrice).toFixed(2)}</span>` : ''}</td>
+          <td>ETB ${parseFloat(p.price||0).toFixed(2)}${p.originalPrice ? `<br><span style="color:var(--muted);text-decoration:line-through;font-size:12px">ETB ${parseFloat(p.originalPrice).toFixed(2)}</span>` : ''}</td>
           <td>${p.sellerName || '<span style="color:var(--muted)">Store</span>'}</td>
           <td><span class="badge ${p.status === 'active' ? 'badge-green' : p.status === 'out_of_stock' ? 'badge-red' : 'badge-yellow'}">${p.status || 'active'}</span></td>
           <td style="display:flex;gap:6px">
@@ -845,7 +845,7 @@
           <td style="font-family:monospace;font-size:12px">#${o.id.slice(-6).toUpperCase()}</td>
           <td>${o.customerName || '—'}<br><span style="color:var(--muted);font-size:12px">${o.customerPhone || ''}</span></td>
           <td>${o.productName || '—'}</td>
-          <td>$${parseFloat(o.amount||0).toFixed(2)}</td>
+          <td>ETB ${parseFloat(o.amount||0).toFixed(2)}</td>
           <td><span class="badge ${o.status === 'completed' ? 'badge-green' : o.status === 'cancelled' ? 'badge-red' : 'badge-yellow'}">${o.status || 'pending'}</span></td>
           <td style="font-size:12px">${o.createdAt ? new Date(o.createdAt).toLocaleDateString() : '—'}</td>
           <td style="display:flex;gap:6px">
@@ -870,7 +870,7 @@
         <tr>
           <td>${o.customerName || '—'}</td>
           <td>${o.productName || '—'}</td>
-          <td>$${parseFloat(o.amount||0).toFixed(2)}</td>
+          <td>ETB ${parseFloat(o.amount||0).toFixed(2)}</td>
           <td><span class="badge ${o.status === 'completed' ? 'badge-green' : o.status === 'cancelled' ? 'badge-red' : 'badge-yellow'}">${o.status || 'pending'}</span></td>
         </tr>`).join('')}
       </tbody>

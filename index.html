@@ -5,7 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sisay Store | Trendy Fashion Clothing</title>
 <meta name="description" content="Shop the latest fashion trends at Sisay Store — Men's, Women's, Accessories and Shoes.">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=block" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
 :root {
@@ -46,8 +48,31 @@ img { max-width: 100%; display: block; }
 .nav-icon-btn:hover { border-color: var(--primary); color: var(--primary); }
 .cart-badge { position: absolute; top: -4px; right: -4px; background: var(--primary); color: #fff; font-size: 10px; font-weight: 700; width: 18px; height: 18px; border-radius: 50%; display: none; align-items: center; justify-content: center; }
 
-/* FLASH BANNER */
-.flash-banner { background: linear-gradient(90deg, var(--secondary), var(--primary)); padding: 10px; text-align: center; font-size: 13px; font-weight: 600; letter-spacing: 0.5px; }
+/* FLASH BANNER — sticky below navbar */
+.flash-banner {
+  position: sticky; top: 64px; z-index: 490;
+  background: linear-gradient(90deg, #1a0030 0%, #2d0050 40%, #1a0030 100%);
+  border-bottom: 1px solid rgba(255,107,152,0.25);
+  padding: 11px 24px;
+  display: flex; align-items: center; justify-content: center; gap: 20px;
+  font-size: 13px; font-weight: 600; letter-spacing: 0.4px;
+  color: rgba(255,255,255,0.9); flex-wrap: wrap;
+}
+.flash-pill {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(255,107,152,0.15); border: 1px solid rgba(255,107,152,0.35);
+  padding: 4px 14px; border-radius: 20px;
+  color: var(--primary); font-weight: 800; font-size: 12px;
+  letter-spacing: 0.5px; text-transform: uppercase;
+}
+.flash-dot {
+  width: 7px; height: 7px; background: var(--primary); border-radius: 50%;
+  box-shadow: 0 0 6px var(--primary); animation: dotBlink 1.2s ease-in-out infinite;
+}
+.flash-sep { color: rgba(255,255,255,0.2); font-size: 16px; }
+.flash-time { color: var(--primary); font-weight: 800; font-family: 'Syne', sans-serif; font-size: 14px; }
+.flash-free { color: rgba(255,255,255,0.6); font-size: 12px; font-weight: 500; }
+@keyframes dotBlink { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
 /* HERO */
 .hero { position: relative; overflow: hidden; background: radial-gradient(ellipse at 30% 60%, #2a0a4a 0%, var(--dark) 60%); min-height: 500px; display: flex; align-items: center; padding: 60px 40px; }
@@ -86,7 +111,7 @@ img { max-width: 100%; display: block; }
 .deal-section { background: var(--card); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); display: none; }
 .deal-inner { max-width: 1200px; margin: 0 auto; padding: 48px 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
 .deal-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,107,152,0.12); border: 1px solid rgba(255,107,152,0.3); color: var(--primary); padding: 6px 14px; border-radius: 30px; font-size: 12px; font-weight: 700; margin-bottom: 18px; text-transform: uppercase; letter-spacing: 1px; }
-.deal-title { font-family: 'Syne', sans-serif; font-size: 30px; font-weight: 800; margin-bottom: 12px; }
+.deal-title { font-family: 'Syne', sans-serif !important; font-size: 30px; font-weight: 800; margin-bottom: 12px; }
 .deal-prices { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
 .deal-price { font-family: 'Syne', sans-serif; font-size: 34px; font-weight: 800; color: var(--primary); }
 .deal-old { font-size: 18px; color: var(--muted); text-decoration: line-through; }
@@ -122,12 +147,12 @@ img { max-width: 100%; display: block; }
 .product-quick { position: absolute; bottom: 10px; left: 10px; right: 10px; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); border-radius: 8px; padding: 10px; text-align: center; font-size: 13px; font-weight: 600; color: #fff; transform: translateY(10px); opacity: 0; transition: all 0.3s; }
 .product-card:hover .product-quick { transform: translateY(0); opacity: 1; }
 .product-info { padding: 14px 16px; }
-.product-seller { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
-.product-name { font-weight: 600; font-size: 14px; margin-bottom: 8px; line-height: 1.3; }
+.product-seller { font-family: 'DM Sans', sans-serif; font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+.product-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px; margin-bottom: 8px; line-height: 1.3; }
 .product-prices { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-.product-price { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800; color: var(--primary); }
-.product-old { font-size: 13px; color: var(--muted); text-decoration: line-through; }
-.product-stars { font-size: 12px; color: #f39c12; margin-bottom: 12px; }
+.product-price { font-family: 'Syne', sans-serif !important; font-size: 18px; font-weight: 800; color: var(--primary); }
+.product-old { font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--muted); text-decoration: line-through; }
+.product-stars { font-family: 'DM Sans', sans-serif; font-size: 12px; color: #f39c12; margin-bottom: 12px; }
 .product-stars span { color: var(--muted); }
 .btn-add { width: 100%; background: var(--card2); border: 1px solid var(--border); color: var(--text); padding: 10px; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif; display: flex; align-items: center; justify-content: center; gap: 8px; }
 .btn-add:hover { background: var(--primary); border-color: var(--primary); color: #fff; }
@@ -210,7 +235,7 @@ footer { padding: 48px 40px 24px; border-top: 1px solid var(--border); }
 .modal-main-img img { width: 100%; height: 100%; object-fit: cover; }
 .modal-right { padding: 32px 32px 32px 8px; }
 .m-seller { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
-.m-name { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; margin-bottom: 10px; line-height: 1.2; }
+.m-name { font-family: 'Syne', sans-serif !important; font-size: 22px; font-weight: 800; margin-bottom: 10px; line-height: 1.2; }
 .m-prices { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
 .m-price { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; color: var(--primary); }
 .m-old { font-size: 16px; color: var(--muted); text-decoration: line-through; }
@@ -253,8 +278,6 @@ footer { padding: 48px 40px 24px; border-top: 1px solid var(--border); }
 </head>
 <body>
 
-<div class="flash-banner">⚡ FLASH SALE: 50% OFF SELECTED ITEMS &nbsp;|&nbsp; ENDS IN: <strong id="countdown">—</strong> &nbsp;|&nbsp; FREE DELIVERY OVER $50 ⚡</div>
-
 <nav class="navbar">
   <div class="nav-logo">Sisay Store</div>
   <div class="nav-links">
@@ -280,6 +303,14 @@ footer { padding: 48px 40px 24px; border-top: 1px solid var(--border); }
     </div>
   </div>
 </nav>
+
+<!-- FLASH BANNER -->
+<div class="flash-banner">
+  <div class="flash-pill"><span class="flash-dot"></span> Flash Sale</div>
+  <span>50% OFF selected items — ends in <span class="flash-time" id="countdown">—</span></span>
+  <span class="flash-sep">|</span>
+  <span class="flash-free">🚚 Free delivery over ETB 500</span>
+</div>
 
 <!-- HERO -->
 <div class="hero">
@@ -481,7 +512,7 @@ firebase.initializeApp({
 const db = firebase.firestore();
 
 // ── CONFIG ── update this to your brother's WhatsApp number
-const WA_NUMBER = '+251982602264';
+const WA_NUMBER = '251912345678';
 
 // ── STATE ──
 let allProducts = [], filtered = [];
@@ -531,8 +562,8 @@ function renderProducts(list) {
         ${p.sellerName ? `<div class="product-seller"><i class="fas fa-store"></i> ${p.sellerName}</div>` : ''}
         <div class="product-name">${p.name}</div>
         <div class="product-prices">
-          <div class="product-price">$${parseFloat(p.price).toFixed(2)}</div>
-          ${p.originalPrice ? `<div class="product-old">$${parseFloat(p.originalPrice).toFixed(2)}</div>` : ''}
+          <div class="product-price">ETB ${parseFloat(p.price).toFixed(2)}</div>
+          ${p.originalPrice ? `<div class="product-old">ETB ${parseFloat(p.originalPrice).toFixed(2)}</div>` : ''}
         </div>
         <div class="product-stars">★★★★☆ <span>(${20+Math.floor(p.name.length*3)})</span></div>
         <button class="btn-add" onclick="event.stopPropagation();quickAdd('${p.id}')"><i class="fas fa-plus"></i> Add to Cart</button>
@@ -547,12 +578,12 @@ function showDeal(p) {
   _deal = p;
   document.getElementById('deal-section').style.display = 'block';
   document.getElementById('deal-name').textContent = p.name;
-  document.getElementById('deal-price').textContent = '$'+parseFloat(p.price).toFixed(2);
+  document.getElementById('deal-price').textContent = 'ETB '+parseFloat(p.price).toFixed(2);
   document.getElementById('deal-img').src = p.image || '';
   document.getElementById('deal-desc').textContent = p.description || 'Limited time offer — grab it before it\'s gone!';
   if (p.originalPrice) {
     const d = Math.round((1-p.price/p.originalPrice)*100);
-    document.getElementById('deal-old').textContent = '$'+parseFloat(p.originalPrice).toFixed(2);
+    document.getElementById('deal-old').textContent = 'ETB '+parseFloat(p.originalPrice).toFixed(2);
     document.getElementById('deal-disc').textContent = '-'+d+'%';
     document.getElementById('deal-disc-badge').textContent = '-'+d+'%';
   }
@@ -599,8 +630,8 @@ function openModal(id) {
   modalProduct = p; selSize = '';
   document.getElementById('m-img').src = p.image||'';
   document.getElementById('m-name').textContent = p.name;
-  document.getElementById('m-price').textContent = '$'+parseFloat(p.price).toFixed(2);
-  document.getElementById('m-old').textContent = p.originalPrice?'$'+parseFloat(p.originalPrice).toFixed(2):'';
+  document.getElementById('m-price').textContent = 'ETB '+parseFloat(p.price).toFixed(2);
+  document.getElementById('m-old').textContent = p.originalPrice?'ETB '+parseFloat(p.originalPrice).toFixed(2):'';
   document.getElementById('m-desc').textContent = p.description||'A great product from our collection.';
   document.getElementById('m-seller').textContent = p.sellerName?'🏪 '+p.sellerName:'';
   const sizes = p.sizes?.length ? p.sizes : ['S','M','L','XL','XXL'];
@@ -613,7 +644,7 @@ function closeModal(){document.getElementById('product-modal').classList.remove(
 function addModalToCart(){if(modalProduct){addToCart(modalProduct,selSize);closeModal();}}
 function buyNowWA(){
   if(!modalProduct) return;
-  const msg=`Hi! I want to buy:\n\n*${modalProduct.name}*${selSize?' (Size: '+selSize+')':''}\nPrice: $${parseFloat(modalProduct.price).toFixed(2)}\n\nPlease confirm availability!`;
+  const msg=`Hi! I want to buy:\n\n*${modalProduct.name}*${selSize?' (Size: '+selSize+')':''}\nPrice: ETB ${parseFloat(modalProduct.price).toFixed(2)}\n\nPlease confirm availability!`;
   window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
 }
 document.getElementById('product-modal').addEventListener('click',function(e){if(e.target===this)closeModal();});
@@ -647,7 +678,7 @@ function renderCart(){
     <div class="cart-info">
       <div class="cart-name">${i.name}</div>
       <div class="cart-meta">${i.size?'Size: '+i.size:''}${i.sellerName?(i.size?' · ':'')+' 🏪 '+i.sellerName:''}</div>
-      <div class="cart-price">$${(i.price*i.qty).toFixed(2)}</div>
+      <div class="cart-price">ETB ${(i.price*i.qty).toFixed(2)}</div>
       <div class="cart-qty-row">
         <button class="qty-btn" onclick="changeQty('${i.id}','${i.size}',-1)">−</button>
         <span class="qty-n">${i.qty}</span>
@@ -656,14 +687,14 @@ function renderCart(){
       </div>
     </div>
   </div>`).join('');
-  document.getElementById('cart-total').textContent='$'+total.toFixed(2);
+  document.getElementById('cart-total').textContent='ETB '+total.toFixed(2);
   f.style.display='block';
 }
 function checkoutWA(){
   if(!cart.length) return;
   const total=cart.reduce((s,i)=>s+i.price*i.qty,0);
-  const lines=cart.map(i=>`• ${i.name}${i.size?' ('+i.size+')':''} ×${i.qty} = $${(i.price*i.qty).toFixed(2)}`).join('\n');
-  const msg=`Hello! I'd like to place an order:\n\n${lines}\n\n*Total: $${total.toFixed(2)}*\n\nPlease confirm and send delivery info. Thank you!`;
+  const lines=cart.map(i=>`• ${i.name}${i.size?' ('+i.size+')':''} ×${i.qty} = ETB ${(i.price*i.qty).toFixed(2)}`).join('\n');
+  const msg=`Hello! I'd like to place an order:\n\n${lines}\n\n*Total: ETB ${total.toFixed(2)}*\n\nPlease confirm and send delivery info. Thank you!`;
   window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
   db.collection('orders').add({items:cart,amount:total,status:'pending',createdAt:new Date().toISOString()}).catch(()=>{});
 }
