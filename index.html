@@ -76,7 +76,7 @@ img { max-width: 100%; display: block; }
 
 /* HERO */
 .hero { position: relative; overflow: hidden; background: radial-gradient(ellipse at 30% 60%, #2a0a4a 0%, var(--dark) 60%); min-height: 500px; display: flex; align-items: center; padding: 60px 40px; }
-.hero::after { content: ''; position: absolute; right: 0; top: 0; bottom: 0; width: 50%; background: url('https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80') center/cover no-repeat; mask-image: linear-gradient(to right, transparent 0%, black 40%); -webkit-mask-image: linear-gradient(to right, transparent 0%, black 40%); opacity: 0.3; }
+.hero::after { content: ''; position: absolute; right: 0; top: 0; bottom: 0; width: 50%; background: url('https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=900&q=85') center top/cover no-repeat; mask-image: linear-gradient(to right, transparent 0%, black 35%); -webkit-mask-image: linear-gradient(to right, transparent 0%, black 35%); opacity: 0.45; }
 .hero-content { position: relative; z-index: 1; max-width: 540px; }
 .hero-tag { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,107,152,0.12); border: 1px solid rgba(255,107,152,0.3); color: var(--primary); padding: 7px 16px; border-radius: 30px; font-size: 12px; font-weight: 600; margin-bottom: 24px; letter-spacing: 0.5px; }
 .hero h1 { font-family: 'Syne', sans-serif; font-size: clamp(34px, 5vw, 58px); font-weight: 800; line-height: 1.1; margin-bottom: 16px; }
@@ -133,11 +133,11 @@ img { max-width: 100%; display: block; }
 .sort-select { background: var(--card); border: 1px solid var(--border); color: var(--text); padding: 9px 14px; border-radius: 10px; font-size: 13px; outline: none; font-family: 'DM Sans', sans-serif; cursor: pointer; }
 .sort-select option { background: var(--card2); }
 
-.products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 20px; }
+.products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 20px; }
 .product-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; transition: transform 0.3s, box-shadow 0.3s; cursor: pointer; }
 .product-card:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(0,0,0,0.4); }
 .product-img { position: relative; aspect-ratio: 3/4; overflow: hidden; }
-.product-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s; }
+.product-img img { width: 100%; height: 100%; object-fit: cover; object-position: center top; transition: transform 0.4s; }
 .product-card:hover .product-img img { transform: scale(1.06); }
 .product-badge { position: absolute; top: 10px; left: 10px; background: var(--primary); color: #fff; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 6px; }
 .product-badge.sale { background: var(--secondary); }
@@ -336,10 +336,10 @@ footer { padding: 48px 40px 24px; border-top: 1px solid var(--border); }
     <div><div class="section-title">Shop by Category</div><div class="section-sub">Find what you're looking for</div></div>
   </div>
   <div class="cat-grid">
-    <div class="cat-card" onclick="filterByCategory('men')"><img src="https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=400&q=80" alt="Men" loading="lazy"><div class="cat-overlay"><div class="cat-name">Men's Clothing</div></div></div>
-    <div class="cat-card" onclick="filterByCategory('women')"><img src="https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=400&q=80" alt="Women" loading="lazy"><div class="cat-overlay"><div class="cat-name">Women's Clothing</div></div></div>
-    <div class="cat-card" onclick="filterByCategory('accessories')"><img src="https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=400&q=80" alt="Accessories" loading="lazy"><div class="cat-overlay"><div class="cat-name">Accessories</div></div></div>
-    <div class="cat-card" onclick="filterByCategory('shoes')"><img src="https://images.unsplash.com/photo-1560769629-975ec94e6a86?w=400&q=80" alt="Shoes" loading="lazy"><div class="cat-overlay"><div class="cat-name">Shoes</div></div></div>
+    <div class="cat-card" onclick="filterByCategory('men')"><img src="https://images.unsplash.com/photo-1617137968427-85924c800a22?w=400&q=80" alt="Men" loading="lazy"><div class="cat-overlay"><div class="cat-name">Men's Clothing</div></div></div>
+    <div class="cat-card" onclick="filterByCategory('women')"><img src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=400&q=80" alt="Women" loading="lazy"><div class="cat-overlay"><div class="cat-name">Women's Clothing</div></div></div>
+    <div class="cat-card" onclick="filterByCategory('accessories')"><img src="https://images.unsplash.com/photo-1606760227091-3dd870d97f1d?w=400&q=80" alt="Accessories" loading="lazy"><div class="cat-overlay"><div class="cat-name">Accessories</div></div></div>
+    <div class="cat-card" onclick="filterByCategory('shoes')"><img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&q=80" alt="Shoes" loading="lazy"><div class="cat-overlay"><div class="cat-name">Shoes</div></div></div>
   </div>
 </div>
 
@@ -448,10 +448,11 @@ footer { padding: 48px 40px 24px; border-top: 1px solid var(--border); }
   </div>
   <div class="footer-bottom">
     <p>© 2025 Sisay Store. All Rights Reserved.</p>
-    <div class="payment-icons">
-      <img src="https://cdn-icons-png.flaticon.com/512/196/196578.png" alt="Visa">
-      <img src="https://cdn-icons-png.flaticon.com/512/196/196561.png" alt="Mastercard">
-      <img src="https://cdn-icons-png.flaticon.com/512/196/196566.png" alt="PayPal">
+    <div class="payment-icons" style="display:flex;align-items:center;gap:10px">
+      <span style="background:var(--card2);border:1px solid var(--border);color:var(--muted);padding:5px 12px;border-radius:6px;font-size:12px;font-weight:700">Telebirr</span>
+      <span style="background:var(--card2);border:1px solid var(--border);color:var(--muted);padding:5px 12px;border-radius:6px;font-size:12px;font-weight:700">CBE Birr</span>
+      <span style="background:var(--card2);border:1px solid var(--border);color:var(--muted);padding:5px 12px;border-radius:6px;font-size:12px;font-weight:700">Cash</span>
+      <span style="background:var(--card2);border:1px solid var(--border);color:var(--muted);padding:5px 12px;border-radius:6px;font-size:12px;font-weight:700">WhatsApp Pay</span>
     </div>
   </div>
 </footer>
@@ -546,9 +547,11 @@ function renderProducts(list) {
     g.innerHTML = `<div class="empty-state"><i class="fas fa-search"></i><p>No products found.<br><small>Try another category or <a href="seller-register.html" style="color:var(--primary)">become a seller</a>!</small></p></div>`;
     return;
   }
-  g.innerHTML = list.map(p => {
-    const disc = p.originalPrice ? Math.round((1 - p.price/p.originalPrice)*100) : 0;
-    const badge = (p.featured==='true'||p.featured===true) ? `<div class="product-badge">Featured</div>` : disc>0 ? `<div class="product-badge sale">-${disc}%</div>` : '';
+  const cards = list.map(p => {
+    const disc = p.originalPrice && parseFloat(p.originalPrice) > parseFloat(p.price)
+      ? Math.round((1 - p.price/p.originalPrice)*100) : 0;
+    const badge = (p.featured==='true'||p.featured===true) ? `<div class="product-badge">Featured</div>`
+      : disc>0 ? `<div class="product-badge sale">-${disc}%</div>` : '';
     const hearts = wishlist.includes(p.id) ? 'fas' : 'far';
     const img = p.image || 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80';
     return `<div class="product-card" onclick="openModal('${p.id}')">
@@ -563,13 +566,38 @@ function renderProducts(list) {
         <div class="product-name">${p.name}</div>
         <div class="product-prices">
           <div class="product-price">ETB ${parseFloat(p.price).toFixed(2)}</div>
-          ${p.originalPrice ? `<div class="product-old">ETB ${parseFloat(p.originalPrice).toFixed(2)}</div>` : ''}
+          ${p.originalPrice && parseFloat(p.originalPrice) > parseFloat(p.price) ? `<div class="product-old">ETB ${parseFloat(p.originalPrice).toFixed(2)}</div>` : ''}
         </div>
         <div class="product-stars">★★★★☆ <span>(${20+Math.floor(p.name.length*3)})</span></div>
         <button class="btn-add" onclick="event.stopPropagation();quickAdd('${p.id}')"><i class="fas fa-plus"></i> Add to Cart</button>
       </div>
     </div>`;
-  }).join('');
+  });
+
+  // Fill grid with "coming soon" cards if fewer than 4 products
+  const fillerCount = Math.max(0, 4 - list.length);
+  const fillerImgs = [
+    'https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?w=400&q=70',
+    'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=400&q=70',
+    'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=400&q=70',
+    'https://images.unsplash.com/photo-1485230895905-ec40ba36b9bc?w=400&q=70',
+  ];
+  const fillers = Array.from({length: fillerCount}, (_, i) => `
+    <div class="product-card coming-soon-card" style="opacity:0.55;cursor:default">
+      <div class="product-img" style="position:relative">
+        <img src="${fillerImgs[i % fillerImgs.length]}" alt="Coming soon" loading="lazy" style="filter:blur(1px) grayscale(0.3)">
+        <div style="position:absolute;inset:0;background:rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px">
+          <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:#fff;text-align:center;padding:0 16px">More Coming Soon</div>
+          <a href="seller-register.html" onclick="event.stopPropagation()" style="background:var(--primary);color:#fff;padding:8px 16px;border-radius:20px;font-size:12px;font-weight:700;text-decoration:none">Sell With Us →</a>
+        </div>
+      </div>
+      <div class="product-info">
+        <div class="product-name" style="color:var(--muted)">New product arriving</div>
+        <div class="product-prices"><div class="product-price" style="color:var(--muted);font-size:14px">—</div></div>
+      </div>
+    </div>`);
+
+  g.innerHTML = [...cards, ...fillers].join('');
 }
 
 // ── DEAL ──
@@ -581,11 +609,17 @@ function showDeal(p) {
   document.getElementById('deal-price').textContent = 'ETB '+parseFloat(p.price).toFixed(2);
   document.getElementById('deal-img').src = p.image || '';
   document.getElementById('deal-desc').textContent = p.description || 'Limited time offer — grab it before it\'s gone!';
-  if (p.originalPrice) {
+  if (p.originalPrice && parseFloat(p.originalPrice) > parseFloat(p.price)) {
     const d = Math.round((1-p.price/p.originalPrice)*100);
     document.getElementById('deal-old').textContent = 'ETB '+parseFloat(p.originalPrice).toFixed(2);
     document.getElementById('deal-disc').textContent = '-'+d+'%';
+    document.getElementById('deal-disc').style.display = 'inline-block';
     document.getElementById('deal-disc-badge').textContent = '-'+d+'%';
+    document.getElementById('deal-disc-badge').style.display = 'block';
+  } else {
+    document.getElementById('deal-disc').style.display = 'none';
+    document.getElementById('deal-disc-badge').style.display = 'none';
+    document.getElementById('deal-old').textContent = '';
   }
 }
 function addDealToCart() { if (_deal) quickAdd(_deal.id); }
