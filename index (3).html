@@ -248,6 +248,46 @@ footer { padding: 48px 40px 24px; border-top: 1px solid var(--border); }
 .modal-x { position: absolute; top: 14px; right: 14px; width: 34px; height: 34px; background: var(--card2); border: 1px solid var(--border); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 15px; color: var(--muted); transition: all 0.2s; }
 .modal-x:hover { color: var(--text); }
 
+
+/* CONTACT MODAL */
+.contact-modal {
+  background: var(--card); border: 1px solid var(--border); border-radius: 20px;
+  width: 540px; max-width: 95vw; max-height: 90vh; overflow-y: auto;
+  animation: mIn 0.3s ease; position: relative; padding: 32px;
+}
+.contact-top { margin-bottom: 24px; }
+.contact-title { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; margin-bottom: 6px; }
+.contact-sub { color: var(--muted); font-size: 14px; }
+/* Quick contact channel cards */
+.contact-channels { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 24px; }
+.contact-channel { display: flex; flex-direction: column; align-items: center; gap: 8px; background: var(--card2); border: 1px solid var(--border); border-radius: 14px; padding: 16px 8px; text-decoration: none; color: var(--text); transition: all 0.2s; text-align: center; }
+.contact-channel:hover { border-color: var(--primary); transform: translateY(-3px); box-shadow: 0 8px 20px rgba(255,107,152,0.12); }
+.channel-icon { width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+.channel-label { font-size: 12px; font-weight: 700; }
+.channel-val { font-size: 11px; color: var(--muted); }
+/* Divider */
+.contact-divider { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; color: var(--muted); font-size: 12px; }
+.contact-divider span { white-space: nowrap; }
+.contact-divider::before, .contact-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+/* Form fields */
+.cf-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.cf-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+.cf-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+.cf-input { background: var(--card2); border: 1px solid var(--border); color: var(--text); padding: 12px 14px; border-radius: 10px; font-size: 14px; font-family: 'DM Sans', sans-serif; outline: none; transition: border 0.2s; width: 100%; }
+.cf-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(255,107,152,0.08); }
+.cf-textarea { resize: vertical; min-height: 100px; }
+.btn-send { width: 100%; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: #fff; border: none; padding: 14px; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif; display: flex; align-items: center; justify-content: center; gap: 8px; transition: opacity 0.2s; }
+.btn-send:hover { opacity: 0.88; }
+.btn-send:disabled { opacity: 0.6; cursor: not-allowed; }
+/* Success icon */
+.contact-success-icon { width: 72px; height: 72px; background: rgba(46,204,113,0.15); border: 2px solid var(--green); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; color: var(--green); margin: 0 auto 20px; animation: popIn 0.5s cubic-bezier(0.175,0.885,0.32,1.275); }
+@keyframes popIn { from{transform:scale(0);opacity:0} to{transform:scale(1);opacity:1} }
+@media (max-width: 600px) {
+  .contact-channels { grid-template-columns: repeat(2,1fr); }
+  .cf-grid { grid-template-columns: 1fr; }
+  .contact-modal { padding: 20px; }
+}
+
 /* TOAST */
 #toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--card2); border: 1px solid var(--border); color: var(--text); padding: 13px 22px; border-radius: 12px; font-size: 14px; z-index: 9999; opacity: 0; transition: all 0.3s; display: flex; align-items: center; gap: 10px; white-space: nowrap; box-shadow: 0 20px 40px rgba(0,0,0,0.5); pointer-events: none; }
 #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
@@ -434,10 +474,10 @@ footer { padding: 48px 40px 24px; border-top: 1px solid var(--border); }
     </div>
     <div class="footer-col">
       <h4>Help</h4>
-      <a href="#">Contact Us</a>
-      <a href="#">FAQs</a>
-      <a href="#">Shipping & Returns</a>
-      <a href="#">Size Guide</a>
+      <a onclick="openContact()" style="cursor:pointer">Contact Us</a>
+      <a href="faq.html">FAQs</a>
+      <a href="shipping.html">Shipping & Returns</a>
+      <a href="size-guide.html">Size Guide</a>
     </div>
     <div class="footer-col">
       <h4>Sell</h4>
@@ -448,14 +488,15 @@ footer { padding: 48px 40px 24px; border-top: 1px solid var(--border); }
   </div>
   <div class="footer-bottom">
     <p>© 2025 Sisay Store. All Rights Reserved.</p>
-    <div class="payment-icons" style="display:flex;align-items:center;gap:10px">
-      <span style="background:var(--card2);border:1px solid var(--border);color:var(--muted);padding:5px 12px;border-radius:6px;font-size:12px;font-weight:700">Telebirr</span>
-      <span style="background:var(--card2);border:1px solid var(--border);color:var(--muted);padding:5px 12px;border-radius:6px;font-size:12px;font-weight:700">CBE Birr</span>
-      <span style="background:var(--card2);border:1px solid var(--border);color:var(--muted);padding:5px 12px;border-radius:6px;font-size:12px;font-weight:700">Cash</span>
-      <span style="background:var(--card2);border:1px solid var(--border);color:var(--muted);padding:5px 12px;border-radius:6px;font-size:12px;font-weight:700">WhatsApp Pay</span>
+    <div class="payment-icons">
+      <img src="https://cdn-icons-png.flaticon.com/512/196/196578.png" alt="Visa">
+      <img src="https://cdn-icons-png.flaticon.com/512/196/196561.png" alt="Mastercard">
+      <img src="https://cdn-icons-png.flaticon.com/512/196/196566.png" alt="PayPal">
     </div>
   </div>
 </footer>
+
+
 
 <!-- CART DRAWER -->
 <div class="cart-overlay" id="cart-overlay" onclick="closeCart()"></div>
@@ -492,6 +533,88 @@ footer { padding: 48px 40px 24px; border-top: 1px solid var(--border); }
           <button class="btn-wa" onclick="buyNowWA()" style="border-radius:12px;font-size:14px;padding:13px"><i class="fab fa-whatsapp" style="font-size:18px"></i> Buy Now via WhatsApp</button>
         </div>
       </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- CONTACT MODAL -->
+<div class="modal-bg" id="contact-modal">
+  <div class="contact-modal">
+    <div class="modal-x" onclick="closeContact()"><i class="fas fa-times"></i></div>
+
+    <!-- FORM SCREEN -->
+    <div id="contact-form-screen">
+      <div class="contact-top">
+        <div class="contact-title">Get in Touch 👋</div>
+        <div class="contact-sub">We usually respond within a few hours</div>
+      </div>
+
+      <!-- Quick contact channels -->
+      <div class="contact-channels">
+        <a class="contact-channel" href="https://wa.me/251912345678" target="_blank">
+          <div class="channel-icon" style="background:rgba(37,211,102,0.15)"><i class="fab fa-whatsapp" style="color:#25D366"></i></div>
+          <div class="channel-label">WhatsApp</div>
+          <div class="channel-val">Chat now</div>
+        </a>
+        <a class="contact-channel" href="tel:+251912345678">
+          <div class="channel-icon" style="background:rgba(255,107,152,0.12)"><i class="fas fa-phone" style="color:var(--primary)"></i></div>
+          <div class="channel-label">Phone</div>
+          <div class="channel-val">Call us</div>
+        </a>
+        <a class="contact-channel" href="mailto:hello@sisaystore.com">
+          <div class="channel-icon" style="background:rgba(95,39,205,0.15)"><i class="fas fa-envelope" style="color:#a78bfa"></i></div>
+          <div class="channel-label">Email</div>
+          <div class="channel-val">hello@sisaystore</div>
+        </a>
+        <a class="contact-channel" href="https://t.me/sisaystore" target="_blank">
+          <div class="channel-icon" style="background:rgba(0,136,204,0.15)"><i class="fab fa-telegram" style="color:#0088cc"></i></div>
+          <div class="channel-label">Telegram</div>
+          <div class="channel-val">@sisaystore</div>
+        </a>
+      </div>
+
+      <div class="contact-divider"><span>or send a message below</span></div>
+
+      <!-- Form fields -->
+      <div class="cf-grid">
+        <div class="cf-group">
+          <label class="cf-label">Your Name <span style="color:var(--primary)">*</span></label>
+          <input class="cf-input" id="cf-name" type="text" placeholder="Abebe Kebede">
+        </div>
+        <div class="cf-group">
+          <label class="cf-label">Phone or Email <span style="color:var(--primary)">*</span></label>
+          <input class="cf-input" id="cf-contact" type="text" placeholder="+251912... or email@...">
+        </div>
+      </div>
+      <div class="cf-group">
+        <label class="cf-label">Topic</label>
+        <select class="cf-input" id="cf-subject">
+          <option value="">Select a topic...</option>
+          <option>Order question</option>
+          <option>Return or exchange</option>
+          <option>Product enquiry</option>
+          <option>Seller / partnership</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="cf-group">
+        <label class="cf-label">Message <span style="color:var(--primary)">*</span></label>
+        <textarea class="cf-input cf-textarea" id="cf-message" placeholder="Tell us how we can help..."></textarea>
+      </div>
+      <button class="btn-send" onclick="sendContactMessage()">
+        <i class="fas fa-paper-plane"></i> Send Message
+      </button>
+    </div>
+
+    <!-- SUCCESS SCREEN -->
+    <div id="contact-success-screen" style="display:none;text-align:center;padding:40px 20px">
+      <div class="contact-success-icon"><i class="fas fa-check"></i></div>
+      <div class="contact-title" style="margin-bottom:10px">Message Sent! 🎉</div>
+      <div class="contact-sub" style="margin-bottom:28px">We've received your message and will reply via your phone or email soon.</div>
+      <button class="btn-send" onclick="closeContact()" style="width:auto;padding:12px 32px">
+        <i class="fas fa-arrow-left"></i> Back to Store
+      </button>
     </div>
   </div>
 </div>
@@ -783,6 +906,45 @@ function toast(msg){
   t.className='show';
   setTimeout(()=>t.className='',3000);
 }
+
+
+// ── CONTACT ──
+function openContact() {
+  document.getElementById('contact-modal').classList.add('open');
+  document.getElementById('cf-name').value='';
+  document.getElementById('cf-contact').value='';
+  document.getElementById('cf-subject').value='';
+  document.getElementById('cf-message').value='';
+  document.getElementById('contact-success-screen').style.display='none';
+  document.getElementById('contact-form-screen').style.display='block';
+  document.body.style.overflow = 'hidden';
+}
+function closeContact() {
+  document.getElementById('contact-modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+async function sendContactMessage() {
+  const name = document.getElementById('cf-name').value.trim();
+  const contact = document.getElementById('cf-contact').value.trim();
+  const subject = document.getElementById('cf-subject').value;
+  const message = document.getElementById('cf-message').value.trim();
+  if (!name) return toast('Please enter your name');
+  if (!contact) return toast('Please enter your phone or email');
+  if (!message) return toast('Please write a message');
+  const btn = document.querySelector('.btn-send');
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+  btn.disabled = true;
+  try {
+    await db.collection('messages').add({ name, contact, subject, message, status:'unread', createdAt: new Date().toISOString() });
+  } catch(e) {}
+  document.getElementById('contact-form-screen').style.display='none';
+  document.getElementById('contact-success-screen').style.display='block';
+  btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Message';
+  btn.disabled = false;
+}
+document.getElementById('contact-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeContact();
+});
 
 // ── INIT ──
 updateBadges();
