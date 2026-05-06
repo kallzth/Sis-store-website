@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FAQs — Sisay Store</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=block" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+:root {
+  --primary: #FF6B98; --secondary: #5F27CD; --dark: #111114;
+  --card: #1c1c22; --card2: #242430; --border: #2a2a38;
+  --text: #f0f0f5; --muted: #7777aa; --green: #2ECC71;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: var(--dark); color: var(--text); font-family: 'DM Sans', sans-serif; }
+a { text-decoration: none; color: inherit; }
+
+nav { display: flex; align-items: center; justify-content: space-between; padding: 0 40px; height: 64px; background: rgba(17,17,20,0.97); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
+.nav-logo { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; color: var(--primary); }
+.nav-back { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 14px; transition: color 0.2s; }
+.nav-back:hover { color: var(--text); }
+
+.page-hero { background: radial-gradient(ellipse at 30% 50%, #2a0a4a 0%, var(--dark) 60%); padding: 64px 40px 48px; text-align: center; border-bottom: 1px solid var(--border); }
+.hero-tag { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,107,152,0.12); border: 1px solid rgba(255,107,152,0.3); color: var(--primary); padding: 7px 16px; border-radius: 30px; font-size: 12px; font-weight: 600; margin-bottom: 20px; }
+.page-hero h1 { font-family: 'Syne', sans-serif; font-size: clamp(28px,5vw,46px); font-weight: 800; margin-bottom: 12px; }
+.page-hero p { color: var(--muted); font-size: 15px; max-width: 460px; margin: 0 auto 28px; line-height: 1.6; }
+
+.faq-search-wrap { max-width: 460px; margin: 0 auto; position: relative; }
+.faq-search-wrap i { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--muted); }
+.faq-search { width: 100%; background: var(--card); border: 1px solid var(--border); color: var(--text); padding: 14px 16px 14px 42px; border-radius: 12px; font-size: 14px; font-family: 'DM Sans', sans-serif; outline: none; transition: border 0.2s; }
+.faq-search:focus { border-color: var(--primary); }
+
+.faq-wrap { max-width: 820px; margin: 0 auto; padding: 52px 40px 80px; }
+
+.cat-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 40px; }
+.cat-tab { padding: 8px 20px; border-radius: 30px; font-size: 13px; font-weight: 600; background: var(--card); border: 1px solid var(--border); color: var(--muted); cursor: pointer; transition: all 0.2s; }
+.cat-tab.active, .cat-tab:hover { background: var(--primary); border-color: var(--primary); color: #fff; }
+
+.faq-group { margin-bottom: 44px; }
+.faq-group-title { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+
+.faq-item { background: var(--card); border: 1px solid var(--border); border-radius: 14px; margin-bottom: 8px; overflow: hidden; transition: border-color 0.2s; }
+.faq-item.open { border-color: rgba(255,107,152,0.35); }
+.faq-q { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px; cursor: pointer; gap: 14px; user-select: none; }
+.faq-q-text { font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 15px; line-height: 1.4; }
+.faq-icon { width: 28px; height: 28px; border-radius: 50%; background: var(--card2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 12px; color: var(--muted); flex-shrink: 0; transition: all 0.3s; }
+.faq-item.open .faq-icon { background: var(--primary); border-color: var(--primary); color: #fff; transform: rotate(45deg); }
+.faq-a { max-height: 0; overflow: hidden; transition: max-height 0.35s ease, padding 0.3s ease; padding: 0 20px; }
+.faq-item.open .faq-a { max-height: 500px; padding: 0 20px 20px; }
+.faq-a-inner { color: var(--muted); font-size: 14px; line-height: 1.85; border-top: 1px solid var(--border); padding-top: 16px; }
+.faq-a-inner a { color: var(--primary); text-decoration: underline; }
+.faq-a-inner strong { color: var(--text); }
+
+.highlight { background: rgba(255,107,152,0.2); border-radius: 3px; padding: 0 2px; color: var(--text); }
+
+.no-results { text-align: center; padding: 60px 20px; color: var(--muted); display: none; }
+.no-results i { font-size: 36px; display: block; margin-bottom: 12px; opacity: 0.4; }
+
+.faq-cta { background: linear-gradient(135deg, #1a0a2e, var(--card)); border: 1px solid var(--border); border-radius: 20px; padding: 40px; text-align: center; margin-top: 8px; }
+.faq-cta h3 { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; margin-bottom: 10px; }
+.faq-cta p { color: var(--muted); margin-bottom: 24px; font-size: 14px; }
+.cta-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; border-radius: 12px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; border: none; font-family: 'DM Sans', sans-serif; text-decoration: none; }
+.btn-wa { background: #25D366; color: #fff; }
+.btn-wa:hover { opacity: 0.88; }
+.btn-outline { background: var(--card2); color: var(--text); border: 1px solid var(--border); }
+.btn-outline:hover { border-color: var(--primary); color: var(--primary); }
+
+.page-footer { border-top: 1px solid var(--border); padding: 24px 40px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+.page-footer p { color: var(--muted); font-size: 13px; }
+.footer-links { display: flex; gap: 20px; flex-wrap: wrap; }
+.footer-links a { color: var(--muted); font-size: 13px; transition: color 0.2s; }
+.footer-links a:hover { color: var(--primary); }
+
+@media (max-width: 600px) {
+  nav { padding: 0 16px; }
+  .page-hero { padding: 40px 20px 32px; }
+  .faq-wrap { padding: 32px 16px 60px; }
+  .page-footer { padding: 20px 16px; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">Sisay Store</div>
+  <a href="./" class="nav-back"><i class="fas fa-arrow-left"></i> Back to Store</a>
+</nav>
+
+<div class="page-hero">
+  <div class="hero-tag"><i class="fas fa-question-circle"></i> Help Center</div>
+  <h1>Frequently Asked Questions</h1>
+  <p>Everything you need to know about shopping, orders and selling on Sisay Store.</p>
+  <div class="faq-search-wrap">
+    <i class="fas fa-search"></i>
+    <input class="faq-search" type="text" placeholder="Search questions..." oninput="searchFAQ(this.value)">
+  </div>
+</div>
+
+<div class="faq-wrap">
+  <div class="cat-tabs">
+    <div class="cat-tab active" onclick="filterCat('all',this)">All Questions</div>
+    <div class="cat-tab" onclick="filterCat('ordering',this)">Ordering</div>
+    <div class="cat-tab" onclick="filterCat('delivery',this)">Delivery</div>
+    <div class="cat-tab" onclick="filterCat('returns',this)">Returns</div>
+    <div class="cat-tab" onclick="filterCat('sellers',this)">Sellers</div>
+    <div class="cat-tab" onclick="filterCat('account',this)">Account</div>
+  </div>
+
+  <div id="no-results" class="no-results">
+    <i class="fas fa-search"></i>
+    <p>No questions match your search.<br><small>Try different keywords or <a href="https://wa.me/251912345678" style="color:var(--primary)">chat with us on WhatsApp</a>.</small></p>
+  </div>
+
+  <!-- ORDERING -->
+  <div class="faq-group" data-cat="ordering">
+    <div class="faq-group-title"><i class="fas fa-shopping-bag"></i> Ordering</div>
+    <div class="faq-item" data-cat="ordering">
+      <div class="faq-q" onclick="toggleFAQ(this)"><div class="faq-q-text">How do I place an order?</div><div class="faq-icon"><i class="fas fa-plus"></i></div></div>
+      <div class="faq-a"><div class="faq-a-inner">Browse our products, click any item to view details, select your size, then click <strong>"Add to Cart"</strong> or <strong>"Buy Now via WhatsApp"</strong>. When ready, open your cart and tap <strong>"Order via WhatsApp"</strong> — your full order is sent directly to us and we confirm within a few hours.</div></div>
+    </div>
+    <div class="faq-item" data-cat="ordering">
+      <div class="faq-q" onclick="toggleFAQ(this)"><div class="faq-q-text">Do I need an account to shop?</div><div class="faq-icon"><i class="fas fa-plus"></i></div></div>
+      <div class="faq-a"><div class="faq-a-inner">No account needed! Simply browse, add to cart and checkout via WhatsApp. Your cart is saved in your browser so you can continue shopping later.</div></div>
+    </div>
+    <div class="faq-item" data-cat="ordering">
+      <div class="faq-q" onclick="toggleFAQ(this)"><div class="faq-q-text">What payment methods do you accept?</div><div class="faq-icon"><i class="fas fa-plus"></i></div></div>
+      <div class="faq-a"><div class="faq-a-inner">We currently accept <strong>Telebirr</strong>, <strong>CBE Birr</strong>, <strong>cash on delivery</strong> and <strong>bank transfer</strong>. Payment details are shared with you once your order is confirmed via WhatsApp.</div></div>
+    </div>
+    <div class="faq-item" data-cat="ordering">
+      <div class="faq-q" onclick="toggleFAQ(this)"><div class="faq-q-text">Can I order multiple items at once?</div><div class="faq-icon"><i class="fas fa-plus"></i></div></div>
+      <div class="faq-a"><div class="faq-a-inner">Absolutely. Add as many items as you want to your cart and checkout once. Your full order summary with all items and the total is sent in one WhatsApp message.</div></div>
+    </div>
+    <div class="faq-item" data-cat="ordering">
+      <div class="faq-q" onclick="toggleFAQ(this)"><div class="faq-q-text">Can I order by phone instead of WhatsApp?</div><div class="faq-icon"><i class="fas fa-plus"></i></div></div>
+      <div class="faq-a"><div class="faq-a-inner">Yes! Call or text us at <strong>+251 912 345 678</strong> and we'll take your order over the phone. WhatsApp is preferred so we can share photos and confirm details easily.</div></div>
+    </div>
+  </div>
+
+  <!-- DELIVERY -->
+  <div class="faq-group" data-cat="delivery">
+    <div class="faq-group-title"><i class="fas fa-truck"></i> Delivery</div>
+    <div class="faq-item" data-cat="delivery">
+      <div class="faq-q" onclick="toggleFAQ(this)"><div class="faq-q-text">How long does delivery take?</div><div class="faq-icon"><i class="fas fa-plus"></i></div></div>
+      <div class="faq-a"><div class="faq-a-inner">Delivery within <strong>Addis Ababa</strong> typically takes <strong>1–2 business days</strong>. For other cities it can take <strong>3–5 business days</strong>. We'll give you an estimated date when we confirm your order.</div></div>
+    </div>
+    <div class="faq-item" data-cat="delivery">
+      <div class="faq-q" onclick="toggleFAQ(this)"><div class="faq-q-text">How much does delivery cost?</div><div class="faq-icon"><i class="fas fa-plus"></i></div></div>
+      <div class="faq-a"><div class="faq-a-inner">Delivery is <strong>free for orders over ETB 500</strong>. For smaller orders a flat fee of <strong>ETB 50–100</strong> applies depending on your location. The exact fee is confirmed before you pay.</div></div>
+    </div>
+    <div class="faq-item" data-cat="delivery">
+      <div class="faq-q" onclick="toggleFAQ(this)"><div class="faq-q-text">Do you deliver outside Addis Ababa?</div><div class="faq-icon"><i class="fas fa-plus"></i></div></div>
+      <div class="faq-a"><div class="faq-a-inner">Yes! We deliver to most major cities in Ethiopia including Dire Dawa, Hawassa, Bahir Dar, Mekelle and more via courier. Contact us for availability in your specific area.</div></div>
+    </div>
+    <div class="faq-item" data-cat="delivery">
+      <div class="faq-q" onclick="toggleFAQ(this)"><div class="faq-q-text">How do I track my order?</div><div class="faq-icon"><i class="fas fa-plus"></i></div></div>
+      <div class="faq-a"><div class="faq-a-inner">Once dispatched we'll send you a tracking update via WhatsApp. For Addis Ababa deliveries our delivery person contacts you directly. For other cities a courier tracking number is provided.</div></div>
+    </div>
+  </div>
+
+  <!-- RETURNS -->
+  <div class="faq-group" data-cat="returns">
+    <div class="faq-group-title"><i class="fas fa-undo"></i> Returns & Exchanges</div>
+    <div class="faq-item" data-cat="returns">
+      <div class="faq-q" onclick="toggleFAQ(this)"><div class="faq-q-text">What is your return policy?</div><div class="faq-icon"><i class="fas fa-plus"></i></div></div>
+      <div class="faq-a"><div class="faq-a-inner">We accept returns within <strong>7 days</strong> of delivery for items that are unused, unwashed and in original condition with tags attached. Sale items are final and cannot be returned. See our <a href="./shipping.html">Shipping & Returns page</a> for full details.</div></div>
+    </div>
+    <div class="faq-item" data-cat="returns">
+      <div class="faq-q" onclick="toggleFAQ(this)"><div class="faq-q-text">How do I exchange for a different size?</div><div class="faq-icon"><i class="fas fa-plus"></i></div></div>
+      <div class="faq-a"><div class="faq-a-inner">Message us on WhatsApp within 7 days of receiving your order with your order details and the size you need. We'll arrange a swap if the size is available — exchange delivery is free.</div></div>
+    </div>
+    <div class="faq-item" data-cat="returns">
+      <div class="faq-q" onclick="toggleFAQ(this)"><div class="faq-q-text">What if I receive a damaged or wrong item?</div><div class="faq-icon"><i class="fas fa-plus"></i></div></div>
+      <div class="faq-a"><div class="faq-a-inner">We're sorry! Take a photo of the item and send it to us on WhatsApp within <strong>48 hours</strong> of delivery. We'll arrange a replacement or full refund immediately — no questions asked.</div></div>
+    </div>
+    <div class="faq-item" data-cat="returns">
+      <div class="faq-q" onclick="toggleFAQ(this)"><div class="faq-q-text">How long does a refund take?</div><div class="faq-icon"><i class="fas fa-plus"></i></div></div>
+      <div class="faq-a"><div class="faq-a-inner">Refunds are processed within <strong>2–3 business days</strong> after we receive the returned item, sent back via the same payment method you used (Telebirr, CBE Birr, or bank transfer).</div></div>
+    </div>
+  </div>
+
+  <!-- SELLERS -->
+  <div class="faq-group" data-cat="sellers">
+    <div class="faq-group-title"><i class="fas fa-store"></i> Selling on Sisay Store</div>
+    <div class="faq-item" data-cat="sellers">
+      <div class="faq-q" onclick="toggleFAQ(this)"><div class="faq-q-text">How do I become a seller?</div><div class="faq-icon"><i class="fas fa-plus"></i></div></div>
+      <div class="faq-a"><div class="faq-a-inner">It's free and simple! Fill in our <a href="./seller-register.html">Seller Registration form</a>. Our team reviews your application within <strong>24 hours</strong> and contacts you via WhatsApp to get you started.</div></div>
+    </div>
+    <div class="faq-item" data-cat="sellers">
+      <div class="faq-q" onclick="toggleFAQ(this)"><div class="faq-q-text">Is there a fee to list products?</div><div class="faq-icon"><i class="fas fa-plus"></i></div></div>
+      <div class="faq-a"><div class="faq-a-inner"><strong>No listing fees.</strong> It's completely free to join and list your products. We only charge a small commission on successful sales — the rate is agreed during your onboarding.</div></div>
+    </div>
+    <div class="faq-item" data-cat="sellers">
+      <div class="faq-q" onclick="toggleFAQ(this)"><div class="faq-q-text">How do customers order from my shop?</div><div class="faq-icon"><i class="fas fa-plus"></i></div></div>
+      <div class="faq-a"><div class="faq-a-inner">When a customer clicks "Order via WhatsApp", their full order details are sent directly to <strong>your WhatsApp number</strong>. You confirm, handle payment and arrange delivery directly with the customer.</div></div>
+    </div>
+    <div class="faq-item" data-cat="sellers">
+      <div class="faq-q" onclick="toggleFAQ(this)"><div class="faq-q-text">Who adds my products to the site?</div><div class="faq-icon"><i class="fas fa-plus"></i></div></div>
+      <div class="faq-a"><div class="faq-a-inner">Our admin team adds your products after your registration is approved. Just send us your product photos, names, prices and descriptions via WhatsApp and we'll have them live within 24 hours.</div></div>
+    </div>
+    <div class="faq-item" data-cat="sellers">
+      <div class="faq-q" onclick="toggleFAQ(this)"><div class="faq-q-text">Can I update or remove my products?</div><div class="faq-icon"><i class="fas fa-plus"></i></div></div>
+      <div class="faq-a"><div class="faq-a-inner">Yes — message us on WhatsApp any time and we'll update prices, photos or descriptions, or remove out-of-stock items. Updates are done within a few hours.</div></div>
+    </div>
+  </div>
+
+  <!-- ACCOUNT -->
+  <div class="faq-group" data-cat="account">
+    <div class="faq-group-title"><i class="fas fa-user"></i> Account & Privacy</div>
+    <div class="faq-item" data-cat="account">
+      <div class="faq-q" onclick="toggleFAQ(this)"><div class="faq-q-text">Is my personal information safe?</div><div class="faq-icon"><i class="fas fa-plus"></i></div></div>
+      <div class="faq-a"><div class="faq-a-inner">Yes. We only collect your name and contact info for order fulfilment. We never share your information with third parties or use it for advertising.</div></div>
+    </div>
+    <div class="faq-item" data-cat="account">
+      <div class="faq-q" onclick="toggleFAQ(this)"><div class="faq-q-text">Is it safe to order online?</div><div class="faq-icon"><i class="fas fa-plus"></i></div></div>
+      <div class="faq-a"><div class="faq-a-inner">Absolutely. Orders go through WhatsApp which is end-to-end encrypted. We never ask for passwords or sensitive financial information. Payment is confirmed directly between you and our team.</div></div>
+    </div>
+    <div class="faq-item" data-cat="account">
+      <div class="faq-q" onclick="toggleFAQ(this)"><div class="faq-q-text">How do I save items for later?</div><div class="faq-icon"><i class="fas fa-plus"></i></div></div>
+      <div class="faq-a"><div class="faq-a-inner">Tap the <strong>heart icon ❤️</strong> on any product to add it to your wishlist. Your wishlist is saved in your browser — click the heart in the top navigation bar to view saved items anytime.</div></div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="faq-cta">
+    <h3>Still have a question?</h3>
+    <p>Our team is ready to help. Reach out any time and we'll get back to you quickly.</p>
+    <div class="cta-btns">
+      <a href="https://wa.me/251912345678" target="_blank" class="btn btn-wa"><i class="fab fa-whatsapp"></i> Chat on WhatsApp</a>
+      <a href="./" class="btn btn-outline"><i class="fas fa-store"></i> Back to Store</a>
+    </div>
+  </div>
+</div>
+
+<div class="page-footer">
+  <p>© 2025 Sisay Store. All Rights Reserved.</p>
+  <div class="footer-links">
+    <a href="./faq.html">FAQs</a>
+    <a href="./shipping.html">Shipping & Returns</a>
+    <a href="./size-guide.html">Size Guide</a>
+    <a href="./seller-register.html">Sell With Us</a>
+  </div>
+</div>
+
+<script>
+function toggleFAQ(el) {
+  const item = el.closest('.faq-item');
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+  if (!isOpen) item.classList.add('open');
+}
+
+function filterCat(cat, el) {
+  document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.faq-group').forEach(g => {
+    g.style.display = (cat === 'all' || g.dataset.cat === cat) ? 'block' : 'none';
+  });
+}
+
+function searchFAQ(q) {
+  const query = q.toLowerCase().trim();
+  let anyVisible = false;
+  document.querySelectorAll('.faq-item').forEach(item => {
+    const qEl = item.querySelector('.faq-q-text');
+    const aEl = item.querySelector('.faq-a-inner');
+    const match = !query || qEl.textContent.toLowerCase().includes(query) || aEl.textContent.toLowerCase().includes(query);
+    item.style.display = match ? 'block' : 'none';
+    if (match) anyVisible = true;
+    qEl.innerHTML = query && match
+      ? qEl.textContent.replace(new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi'), '<span class="highlight">$1</span>')
+      : qEl.textContent;
+  });
+  document.querySelectorAll('.faq-group').forEach(g => {
+    const vis = [...g.querySelectorAll('.faq-item')].some(i => i.style.display !== 'none');
+    g.style.display = vis ? 'block' : 'none';
+  });
+  document.getElementById('no-results').style.display = anyVisible ? 'none' : 'block';
+  document.querySelectorAll('.cat-tab').forEach((t,i) => t.classList.toggle('active', i===0));
+}
+</script>
+</body>
+</html>
