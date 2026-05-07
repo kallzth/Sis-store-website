@@ -352,6 +352,13 @@
       <div class="topbar">
         <h1>Sellers</h1>
         <div class="topbar-actions">
+          <div class="search-bar"><i class="fas fa-search"></i><input type="text" placeholder="Search sellers..." oninput="searchSellers(this.value)" style="width:200px"></div>
+          <select class="sort-select" onchange="filterSellers(this.value)" style="background:var(--card2);border:1px solid var(--border);color:var(--text);padding:9px 14px;border-radius:10px;font-size:13px;outline:none;font-family:'DM Sans',sans-serif">
+            <option value="all">All Sellers</option>
+            <option value="active">Active</option>
+            <option value="pending">Pending</option>
+            <option value="suspended">Suspended</option>
+          </select>
           <button class="btn btn-pink" onclick="openSellerModal()"><i class="fas fa-plus"></i> Add Seller</button>
         </div>
       </div>
@@ -407,24 +414,26 @@
     <!-- SETTINGS PAGE -->
     <div class="page" id="page-settings">
       <div class="topbar"><h1>Settings</h1></div>
-      <div class="card">
-        <div class="card-header"><div class="card-title">Store Settings</div></div>
+
+      <!-- STORE INFO -->
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-header"><div class="card-title"><i class="fas fa-store" style="color:var(--pink);margin-right:8px"></i> Store Information</div></div>
         <div class="form-grid">
           <div class="form-group">
             <label>Store Name</label>
             <input type="text" id="setting-name" value="Sisay Store">
           </div>
           <div class="form-group">
-            <label>WhatsApp Number (for orders)</label>
+            <label>WhatsApp Number (receives orders)</label>
             <input type="text" id="setting-whatsapp" placeholder="+251912345678">
           </div>
           <div class="form-group">
-            <label>Admin Username</label>
-            <input type="text" id="setting-username">
+            <label>Store Email</label>
+            <input type="email" id="setting-email" placeholder="hello@sisaystore.com">
           </div>
           <div class="form-group">
-            <label>Admin Password</label>
-            <input type="password" id="setting-password" placeholder="Change password">
+            <label>Store City / Location</label>
+            <input type="text" id="setting-city" placeholder="e.g. Addis Ababa">
           </div>
           <div class="form-group full">
             <label>Store Description</label>
@@ -435,12 +444,56 @@
           <button class="btn btn-pink" onclick="saveSettings()"><i class="fas fa-save"></i> Save Settings</button>
         </div>
       </div>
-      <div class="card">
-        <div class="card-header"><div class="card-title">Seller Registration Link</div></div>
-        <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Share this link with shop owners so they can register their store:</p>
-        <div style="display:flex;gap:10px;align-items:center">
-          <input type="text" id="seller-link" value="https://kallzth.github.io/Sis-store-website/seller-register.html" readonly style="flex:1">
-          <button class="btn btn-ghost" onclick="copyLink()"><i class="fas fa-copy"></i> Copy</button>
+
+      <!-- ADMIN SECURITY -->
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-header"><div class="card-title"><i class="fas fa-lock" style="color:var(--pink);margin-right:8px"></i> Admin Security</div></div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Admin Username</label>
+            <input type="text" id="setting-username">
+          </div>
+          <div class="form-group">
+            <label>New Password <span style="color:var(--muted);font-weight:400">(leave blank to keep current)</span></label>
+            <input type="password" id="setting-password" placeholder="Enter new password">
+          </div>
+        </div>
+        <div style="margin-top:20px;display:flex;gap:10px;align-items:center">
+          <button class="btn btn-pink" onclick="saveSettings()"><i class="fas fa-save"></i> Update Credentials</button>
+          <span style="font-size:12px;color:var(--muted)">Changes take effect on next login</span>
+        </div>
+      </div>
+
+      <!-- SHARE LINKS -->
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-header"><div class="card-title"><i class="fas fa-share-alt" style="color:var(--pink);margin-right:8px"></i> Share Links</div></div>
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div>
+            <label style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;font-weight:600;display:block;margin-bottom:8px">🏪 Seller Registration Link — share with shop owners</label>
+            <div style="display:flex;gap:10px;align-items:center">
+              <input type="text" id="seller-link" value="https://kallzth.github.io/Sis-store-website/seller-register.html" readonly style="flex:1">
+              <button class="btn btn-ghost" onclick="copyLink('seller-link')"><i class="fas fa-copy"></i> Copy</button>
+              <a href="https://kallzth.github.io/Sis-store-website/seller-register.html" target="_blank" class="btn btn-ghost"><i class="fas fa-external-link-alt"></i></a>
+            </div>
+          </div>
+          <div>
+            <label style="font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;font-weight:600;display:block;margin-bottom:8px">🛍️ Store Link — share with customers</label>
+            <div style="display:flex;gap:10px;align-items:center">
+              <input type="text" id="store-link" value="https://kallzth.github.io/Sis-store-website/" readonly style="flex:1">
+              <button class="btn btn-ghost" onclick="copyLink('store-link')"><i class="fas fa-copy"></i> Copy</button>
+              <a href="https://kallzth.github.io/Sis-store-website/" target="_blank" class="btn btn-ghost"><i class="fas fa-external-link-alt"></i></a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DANGER ZONE -->
+      <div class="card" style="border-color:rgba(231,76,60,0.3)">
+        <div class="card-header"><div class="card-title" style="color:#e74c3c"><i class="fas fa-exclamation-triangle" style="margin-right:8px"></i> Danger Zone</div></div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:16px">These actions are irreversible. Use with caution.</p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn btn-danger" onclick="if(confirm('Clear ALL orders? This cannot be undone.')) clearCollection('orders')"><i class="fas fa-trash"></i> Clear All Orders</button>
+          <button class="btn btn-danger" onclick="if(confirm('Clear ALL messages? This cannot be undone.')) clearCollection('messages')"><i class="fas fa-trash"></i> Clear All Messages</button>
         </div>
       </div>
     </div>
@@ -780,25 +833,54 @@
     populateSellerDropdown();
   }
 
-  function renderSellers() {
+  function renderSellers(list) {
+    list = list || allSellers;
     const container = document.getElementById('sellers-container');
-    if (allSellers.length === 0) {
-      container.innerHTML = `<div class="empty"><i class="fas fa-store"></i><p>No sellers yet. Add your first seller or share the registration link!</p></div>`;
+    if (list.length === 0) {
+      container.innerHTML = `<div class="empty" style="padding:60px 20px"><i class="fas fa-store"></i><p>No sellers found.</p></div>`;
       return;
     }
-    container.innerHTML = `<div class="seller-grid">${allSellers.map(s => `
+    container.innerHTML = `<div class="seller-grid">${list.map(s => {
+      const productCount = allProducts.filter(p => p.sellerId === s.id).length;
+      return `
       <div class="seller-card">
-        <div class="seller-avatar">🏪</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <div class="seller-avatar">🏪</div>
+          <span class="badge ${s.status==='active'?'badge-green':s.status==='pending'?'badge-yellow':'badge-red'}">${s.status||'active'}</span>
+        </div>
         <div class="seller-name">${s.name}</div>
-        <div class="seller-meta">${s.owner || ''} · ${s.phone || ''}</div>
-        <div style="margin-bottom:10px"><span class="badge ${s.status === 'active' ? 'badge-green' : s.status === 'pending' ? 'badge-yellow' : 'badge-red'}">${s.status || 'active'}</span></div>
+        <div class="seller-meta" style="margin-bottom:8px">${s.owner||'—'}</div>
+        <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:14px;font-size:12px;color:var(--muted)">
+          ${s.phone?`<div><i class="fas fa-phone" style="width:14px;color:var(--pink)"></i> ${s.phone}</div>`:''}
+          ${s.email?`<div><i class="fas fa-envelope" style="width:14px;color:var(--pink)"></i> ${s.email}</div>`:''}
+          ${s.city?`<div><i class="fas fa-map-marker-alt" style="width:14px;color:var(--pink)"></i> ${s.city}</div>`:''}
+          <div><i class="fas fa-tshirt" style="width:14px;color:var(--pink)"></i> ${productCount} product${productCount!==1?'s':''}</div>
+          ${s.commission?`<div><i class="fas fa-percent" style="width:14px;color:var(--pink)"></i> ${s.commission}% commission</div>`:''}
+        </div>
         <div class="seller-actions">
           <button class="btn btn-ghost btn-sm" onclick="openEditSeller('${s.id}')"><i class="fas fa-edit"></i> Edit</button>
-          ${s.status === 'pending' ? `<button class="btn btn-success btn-sm" onclick="approveSeller('${s.id}')"><i class="fas fa-check"></i> Approve</button>` : ''}
+          ${s.status==='pending'?`<button class="btn btn-success btn-sm" onclick="approveSeller('${s.id}')"><i class="fas fa-check"></i> Approve</button>`:''}
           <button class="btn btn-danger btn-sm" onclick="deleteSeller('${s.id}')"><i class="fas fa-trash"></i></button>
         </div>
-      </div>`).join('')}
+      </div>`;
+    }).join('')}
     </div>`;
+  }
+
+  function searchSellers(q) {
+    const lower = q.toLowerCase();
+    const filtered = allSellers.filter(s =>
+      s.name?.toLowerCase().includes(lower) ||
+      s.owner?.toLowerCase().includes(lower) ||
+      s.phone?.toLowerCase().includes(lower) ||
+      s.city?.toLowerCase().includes(lower)
+    );
+    renderSellers(filtered);
+  }
+
+  function filterSellers(status) {
+    const filtered = status === 'all' ? allSellers : allSellers.filter(s => (s.status||'active') === status);
+    renderSellers(filtered);
   }
 
   function populateSellerDropdown() {
@@ -982,6 +1064,8 @@
     const settings = JSON.parse(localStorage.getItem('sisay_settings') || '{}');
     if (settings.name) document.getElementById('setting-name').value = settings.name;
     if (settings.whatsapp) document.getElementById('setting-whatsapp').value = settings.whatsapp;
+    if (settings.email && document.getElementById('setting-email')) document.getElementById('setting-email').value = settings.email;
+    if (settings.city && document.getElementById('setting-city')) document.getElementById('setting-city').value = settings.city;
     if (settings.desc) document.getElementById('setting-desc').value = settings.desc;
     const adminUser = localStorage.getItem('sisay_admin_user') || ADMIN_CREDS.user;
     document.getElementById('setting-username').value = adminUser;
@@ -991,22 +1075,28 @@
     const settings = {
       name: document.getElementById('setting-name').value,
       whatsapp: document.getElementById('setting-whatsapp').value,
+      email: document.getElementById('setting-email')?.value || '',
+      city: document.getElementById('setting-city')?.value || '',
       desc: document.getElementById('setting-desc').value
     };
     localStorage.setItem('sisay_settings', JSON.stringify(settings));
     const newUser = document.getElementById('setting-username').value.trim();
     const newPass = document.getElementById('setting-password').value.trim();
     if (newUser) localStorage.setItem('sisay_admin_user', newUser);
-    if (newPass) localStorage.setItem('sisay_admin_pass', newPass);
-    showToast('Settings saved!', 'success');
+    if (newPass) {
+      localStorage.setItem('sisay_admin_pass', newPass);
+      document.getElementById('setting-password').value = '';
+    }
+    showToast('Settings saved successfully!', 'success');
   };
 
   // ---- UTILS ----
   window.closeModal = function(id) { document.getElementById(id).classList.remove('open'); };
 
-  window.copyLink = function() {
-    navigator.clipboard.writeText(document.getElementById('seller-link').value);
-    showToast('Link copied!', 'success');
+  window.copyLink = function(id) {
+    const el = document.getElementById(id || 'seller-link');
+    navigator.clipboard.writeText(el.value);
+    showToast('Link copied to clipboard!', 'success');
   };
 
   function showToast(msg, type = 'success') {
@@ -1154,6 +1244,18 @@
     if (days < 7) return `${days}d ago`;
     return new Date(isoStr).toLocaleDateString();
   }
+
+  // ── CLEAR COLLECTION (danger zone) ──
+  window.clearCollection = async function(colName) {
+    try {
+      const snap = await getDocs(collection(db, colName));
+      await Promise.all(snap.docs.map(d => deleteDoc(doc(db, colName, d.id))));
+      if (colName === 'orders') { allOrders = []; renderOrdersTable(); renderOverviewOrders(); }
+      if (colName === 'messages') { allMessages = []; renderMessageList([]); }
+      updateStats();
+      showToast(`All ${colName} cleared`, 'success');
+    } catch(e) { showToast('Error: ' + e.message, 'error'); }
+  };
 
   // Hook messages load into existing showPage
   const _origShowPage = window.showPage;
