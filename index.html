@@ -482,7 +482,6 @@ footer { padding: 48px 40px 24px; border-top: 1px solid var(--border); }
     <div class="footer-col">
       <h4>Sell</h4>
       <a href="seller-register.html">Become a Seller</a>
-      <a href="admin.html">Admin Login</a>
       <a href="#">Seller Guide</a>
     </div>
   </div>
@@ -622,10 +621,11 @@ footer { padding: 48px 40px 24px; border-top: 1px solid var(--border); }
 <div id="toast"></div>
 
 <!-- FIREBASE -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script>
-firebase.initializeApp({
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+import { getFirestore, collection, getDocs, addDoc, query, where } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+
+const app = initializeApp({
   apiKey: "AIzaSyApRXoQIvtPFfHCK9J0XnNZ_PwRrRm3Dd8",
   authDomain: "sisay-store-593a9.firebaseapp.com",
   projectId: "sisay-store-593a9",
@@ -633,7 +633,7 @@ firebase.initializeApp({
   messagingSenderId: "347897147293",
   appId: "1:347897147293:web:7d58f77bf3935e0ed6c974"
 });
-const db = firebase.firestore();
+const db = getFirestore(app);
 
 // ── CONFIG ── update this to your brother's WhatsApp number
 const WA_NUMBER = '251912345678';
@@ -648,8 +648,8 @@ let modalProduct = null, selSize = '';
 async function loadProducts() {
   try {
     const [pSnap, sSnap] = await Promise.all([
-      db.collection('products').where('status','==','active').get(),
-      db.collection('sellers').where('status','==','active').get()
+      getDocs(query(collection(db,'products'),where('status','==','active'))),
+      getDocs(query(collection(db,'sellers'),where('status','==','active')))
     ]);
     allProducts = pSnap.docs.map(d => ({ id: d.id, ...d.data() }));
     filtered = [...allProducts];
@@ -659,7 +659,7 @@ async function loadProducts() {
     if (flash) showDeal(flash);
     renderProducts(filtered);
   } catch(e) {
-    document.getElementById('products-grid').innerHTML = `<div class="empty-state"><i class="fas fa-tshirt"></i><p>Add products from the <a href="admin.html" style="color:var(--primary)">Admin Dashboard</a> to see them here.</p></div>`;
+    document.getElementById('products-grid').innerHTML = `<div class="empty-state"><i class="fas fa-tshirt"></i><p>New products are coming soon — check back shortly!</p></div>`;
   }
 }
 
@@ -853,7 +853,7 @@ function checkoutWA(){
   const lines=cart.map(i=>`• ${i.name}${i.size?' ('+i.size+')':''} ×${i.qty} = ETB ${(i.price*i.qty).toFixed(2)}`).join('\n');
   const msg=`Hello! I'd like to place an order:\n\n${lines}\n\n*Total: ETB ${total.toFixed(2)}*\n\nPlease confirm and send delivery info. Thank you!`;
   window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
-  db.collection('orders').add({items:cart,amount:total,status:'pending',createdAt:new Date().toISOString()}).catch(()=>{});
+  addDoc(collection(db,'orders'),{items:cart,amount:total,status:'pending',createdAt:new Date().toISOString()}).catch(()=>{});
 }
 
 // ── WISHLIST ──
@@ -878,7 +878,7 @@ function toggleWishlistView(){
 function subscribe(){
   const e=document.getElementById('nl-email').value.trim();
   if(!e||!e.includes('@')){toast('Please enter a valid email');return;}
-  db.collection('subscribers').add({email:e,createdAt:new Date().toISOString()})
+  addDoc(collection(db,'subscribers'),{email:e,createdAt:new Date().toISOString()})
     .then(()=>{toast('Subscribed! 🎉 Welcome to Sisay Store!');document.getElementById('nl-email').value='';})
     .catch(()=>toast('Subscribed! 🎉'));
 }
@@ -935,7 +935,7 @@ async function sendContactMessage() {
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
   btn.disabled = true;
   try {
-    await db.collection('messages').add({ name, contact, subject, message, status:'unread', createdAt: new Date().toISOString() });
+    await addDoc(collection(db,'messages'), { name, contact, subject, message, status:'unread', createdAt: new Date().toISOString() });
   } catch(e) {}
   document.getElementById('contact-form-screen').style.display='none';
   document.getElementById('contact-success-screen').style.display='block';
@@ -952,6 +952,33 @@ const wb=document.getElementById('wishlist-badge');
 wb.style.display=wishlist.length>0?'flex':'none'; wb.textContent=wishlist.length;
 startCountdown();
 loadProducts();
+
+// ── SECRET ADMIN ACCESS ──
+// Desktop: type "admin" anywhere on the page
+// Mobile: tap the store logo 5 times quickly
+let _secret = '';
+document.addEventListener('keydown', e => {
+  if (['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)) return;
+  _secret += e.key.toLowerCase();
+  if (_secret.length > 5) _secret = _secret.slice(-5);
+  if (_secret.endsWith('admin')) {
+    window.location.href = './admin.html';
+  }
+});
+// Mobile: tap logo 5 times
+let _tapCount = 0, _tapTimer;
+const _logo = document.querySelector('.nav-logo');
+if (_logo) {
+  _logo.addEventListener('click', () => {
+    _tapCount++;
+    clearTimeout(_tapTimer);
+    _tapTimer = setTimeout(() => { _tapCount = 0; }, 1500);
+    if (_tapCount >= 5) {
+      _tapCount = 0;
+      window.location.href = './admin.html';
+    }
+  });
+}
 </script>
 </body>
 </html>
