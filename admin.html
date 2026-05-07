@@ -633,9 +633,12 @@
   window.showPage = function(page) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    document.getElementById('page-' + page).classList.add('active');
+    const pageEl = document.getElementById('page-' + page);
+    if (pageEl) pageEl.classList.add('active');
+    // Match nav item by onclick attribute instead of text content
     document.querySelectorAll('.nav-item').forEach(n => {
-      if (n.textContent.toLowerCase().includes(page === 'overview' ? 'overview' : page)) n.classList.add('active');
+      const fn = n.getAttribute('onclick') || '';
+      if (fn.includes("'" + page + "'") || fn.includes('"' + page + '"')) n.classList.add('active');
     });
   };
 
@@ -1142,12 +1145,19 @@
     return new Date(isoStr).toLocaleDateString();
   }
 
-  // Load messages when messages page is opened
+  // Hook messages load into existing showPage
   const _origShowPage = window.showPage;
   window.showPage = function(page) {
     _origShowPage(page);
     if (page === 'messages') loadMessages();
   };
+
+  // Expose message functions to window so onclick handlers work
+  window.openMessage = openMessage;
+  window.deleteMessage = deleteMessage;
+  window.markAllRead = markAllRead;
+  window.filterMessages = filterMessages;
+  window.loadMessages = loadMessages;
 
   })(); // end async IIFE
 </script>
