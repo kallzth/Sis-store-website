@@ -239,8 +239,11 @@
   .msg-actions-bar { display:flex;gap:10px;flex-wrap:wrap; }
   .topic-badge { display:inline-block;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;background:rgba(255,107,152,0.12);color:var(--pink);border:1px solid rgba(255,107,152,0.25); }
 
+  @media (max-width: 1100px) {
+    .stats-grid { grid-template-columns: repeat(3, 1fr) !important; }
+  }
   @media (max-width: 900px) {
-    .stats-grid { grid-template-columns: 1fr 1fr; }
+    .stats-grid { grid-template-columns: 1fr 1fr !important; }
     .sidebar { width: 200px; }
     .main { margin-left: 200px; }
   }
@@ -289,30 +292,36 @@
           <span style="color:var(--muted);font-size:13px;" id="current-date"></span>
         </div>
       </div>
-      <div class="stats-grid">
-        <div class="stat-card">
+      <div class="stats-grid" style="grid-template-columns:repeat(5,1fr)">
+        <div class="stat-card" onclick="showPage('products')" style="cursor:pointer">
           <div class="stat-label">Total Products</div>
           <div class="stat-value" id="stat-products">—</div>
           <i class="fas fa-tshirt stat-icon"></i>
           <div class="mini-chart"><div class="mini-chart-fill" id="bar-products" style="width:0%"></div></div>
         </div>
-        <div class="stat-card">
+        <div class="stat-card" onclick="showPage('sellers')" style="cursor:pointer">
           <div class="stat-label">Active Sellers</div>
           <div class="stat-value" id="stat-sellers">—</div>
           <i class="fas fa-store stat-icon"></i>
           <div class="mini-chart"><div class="mini-chart-fill" id="bar-sellers" style="width:0%;background:linear-gradient(90deg,var(--purple),#a78bfa)"></div></div>
         </div>
-        <div class="stat-card">
+        <div class="stat-card" onclick="showPage('orders')" style="cursor:pointer">
           <div class="stat-label">Total Orders</div>
           <div class="stat-value" id="stat-orders">—</div>
           <i class="fas fa-shopping-bag stat-icon"></i>
           <div class="mini-chart"><div class="mini-chart-fill" id="bar-orders" style="width:0%;background:linear-gradient(90deg,var(--green),#6ee7b7)"></div></div>
         </div>
-        <div class="stat-card">
-          <div class="stat-label">Pending Approvals</div>
+        <div class="stat-card" onclick="showPage('sellers')" style="cursor:pointer">
+          <div class="stat-label">Pending Sellers</div>
           <div class="stat-value" id="stat-pending">—</div>
           <i class="fas fa-clock stat-icon"></i>
           <div class="mini-chart"><div class="mini-chart-fill" id="bar-pending" style="width:0%;background:linear-gradient(90deg,var(--yellow),#fde68a)"></div></div>
+        </div>
+        <div class="stat-card" onclick="showPage('messages')" style="cursor:pointer">
+          <div class="stat-label">Unread Messages</div>
+          <div class="stat-value" id="stat-messages">—</div>
+          <i class="fas fa-envelope stat-icon"></i>
+          <div class="mini-chart"><div class="mini-chart-fill" id="bar-messages" style="width:0%;background:linear-gradient(90deg,#0088cc,#a78bfa)"></div></div>
         </div>
       </div>
       <div class="card">
@@ -353,6 +362,14 @@
     <div class="page" id="page-orders">
       <div class="topbar">
         <h1>Orders</h1>
+        <div class="topbar-actions">
+          <select class="sort-select" onchange="filterOrders(this.value)" style="background:var(--card2);border:1px solid var(--border);color:var(--text);padding:9px 14px;border-radius:10px;font-size:13px;outline:none;font-family:'DM Sans',sans-serif">
+            <option value="all">All Orders</option>
+            <option value="pending">Pending</option>
+            <option value="completed">Completed</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+        </div>
       </div>
       <div class="card">
         <div id="orders-table"><div class="loading"><div class="spinner"></div><p>Loading orders...</p></div></div>
@@ -661,7 +678,7 @@
         <tr>
           <td><img class="product-thumb" src="${p.image || 'https://via.placeholder.com/44'}" onerror="this.src='https://via.placeholder.com/44'" alt="${p.name}"></td>
           <td><strong>${p.name}</strong>${p.featured === 'true' || p.featured === true ? ' <span class="badge badge-purple">Featured</span>' : ''}</td>
-          <td>${p.category || '—'}</td>
+          <td>${({men:"Men's Clothing",women:"Women's Clothing",accessories:"Accessories",shoes:"Shoes"}[p.category]||p.category||'—')}</td>
           <td>ETB ${parseFloat(p.price||0).toFixed(2)}${p.originalPrice ? `<br><span style="color:var(--muted);text-decoration:line-through;font-size:12px">ETB ${parseFloat(p.originalPrice).toFixed(2)}</span>` : ''}</td>
           <td>${p.sellerName || '<span style="color:var(--muted)">Store</span>'}</td>
           <td><span class="badge ${p.status === 'active' ? 'badge-green' : p.status === 'out_of_stock' ? 'badge-red' : 'badge-yellow'}">${p.status || 'active'}</span></td>
@@ -870,29 +887,34 @@
     renderOrdersTable();
   }
 
-  function renderOrdersTable() {
+  function renderOrdersTable(orders) {
+    orders = orders || allOrders;
     const container = document.getElementById('orders-table');
-    if (allOrders.length === 0) {
-      container.innerHTML = `<div class="empty"><i class="fas fa-shopping-bag"></i><p>No orders yet. Orders from the store will appear here.</p></div>`;
+    if (orders.length === 0) {
+      container.innerHTML = `<div class="empty"><i class="fas fa-shopping-bag"></i><p>No orders found.</p></div>`;
       return;
     }
     container.innerHTML = `<table>
-      <thead><tr><th>Order ID</th><th>Customer</th><th>Product</th><th>Amount</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
-      <tbody>${allOrders.map(o => `
+      <thead><tr><th>Order ID</th><th>Items</th><th>Amount</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
+      <tbody>${orders.map(o => `
         <tr>
           <td style="font-family:monospace;font-size:12px">#${o.id.slice(-6).toUpperCase()}</td>
-          <td>${o.customerName || '—'}<br><span style="color:var(--muted);font-size:12px">${o.customerPhone || ''}</span></td>
-          <td>${o.productName || '—'}</td>
+          <td style="max-width:240px;font-size:13px">${Array.isArray(o.items)?o.items.map(i=>`${i.name}${i.size?' ('+i.size+')':''} ×${i.qty}`).join(', '):(o.productName||'—')}</td>
           <td>ETB ${parseFloat(o.amount||0).toFixed(2)}</td>
-          <td><span class="badge ${o.status === 'completed' ? 'badge-green' : o.status === 'cancelled' ? 'badge-red' : 'badge-yellow'}">${o.status || 'pending'}</span></td>
-          <td style="font-size:12px">${o.createdAt ? new Date(o.createdAt).toLocaleDateString() : '—'}</td>
+          <td><span class="badge ${o.status==='completed'?'badge-green':o.status==='cancelled'?'badge-red':'badge-yellow'}">${o.status||'pending'}</span></td>
+          <td style="font-size:12px;color:var(--muted)">${o.createdAt?new Date(o.createdAt).toLocaleDateString():'—'}</td>
           <td style="display:flex;gap:6px">
-            <button class="btn btn-success btn-sm" onclick="updateOrderStatus('${o.id}','completed')"><i class="fas fa-check"></i></button>
-            <button class="btn btn-danger btn-sm" onclick="updateOrderStatus('${o.id}','cancelled')"><i class="fas fa-times"></i></button>
+            <button class="btn btn-success btn-sm" onclick="updateOrderStatus('${o.id}','completed')" title="Mark completed"><i class="fas fa-check"></i></button>
+            <button class="btn btn-danger btn-sm" onclick="updateOrderStatus('${o.id}','cancelled')" title="Mark cancelled"><i class="fas fa-times"></i></button>
           </td>
         </tr>`).join('')}
       </tbody>
     </table>`;
+  }
+
+  function filterOrders(status) {
+    const filtered = status === 'all' ? allOrders : allOrders.filter(o => (o.status||'pending') === status);
+    renderOrdersTable(filtered);
   }
 
   function renderOverviewOrders() {
@@ -925,23 +947,34 @@
 
   // ---- STATS ----
   function updateStats() {
-    document.getElementById('stat-products').textContent = allProducts.length;
-    document.getElementById('stat-sellers').textContent = allSellers.filter(s => s.status === 'active').length;
-    document.getElementById('stat-orders').textContent = allOrders.length;
+    const activeSellers = allSellers.filter(s => s.status === 'active').length;
     const pending = allSellers.filter(s => s.status === 'pending').length;
+    document.getElementById('stat-products').textContent = allProducts.length;
+    document.getElementById('stat-sellers').textContent = activeSellers;
+    document.getElementById('stat-orders').textContent = allOrders.length;
     document.getElementById('stat-pending').textContent = pending;
-    setTimeout(() => {
-      document.getElementById('bar-products').style.width = Math.min(allProducts.length * 10, 100) + '%';
-      document.getElementById('bar-sellers').style.width = Math.min(allSellers.length * 15, 100) + '%';
-      document.getElementById('bar-orders').style.width = Math.min(allOrders.length * 8, 100) + '%';
-      document.getElementById('bar-pending').style.width = Math.min(pending * 20, 100) + '%';
-    }, 300);
-    // Also load message badge on login
+    // Load unread messages count
     getDocs(collection(db, 'messages')).then(snap => {
-        const n = snap.docs.filter(d => d.data().status === 'unread').length;
-        const badge = document.getElementById('msg-badge');
-        if (badge) { badge.style.display = n > 0 ? 'inline' : 'none'; badge.textContent = n; }
-      }).catch(()=>{});
+      const unread = snap.docs.filter(d => d.data().status === 'unread').length;
+      document.getElementById('stat-messages').textContent = unread;
+      const badge = document.getElementById('msg-badge');
+      if (badge) { badge.style.display = unread > 0 ? 'inline' : 'none'; badge.textContent = unread; }
+      setTimeout(() => {
+        document.getElementById('bar-products').style.width = Math.min(allProducts.length * 10, 100) + '%';
+        document.getElementById('bar-sellers').style.width = Math.min(activeSellers * 15, 100) + '%';
+        document.getElementById('bar-orders').style.width = Math.min(allOrders.length * 8, 100) + '%';
+        document.getElementById('bar-pending').style.width = Math.min(pending * 20, 100) + '%';
+        document.getElementById('bar-messages').style.width = Math.min(unread * 20, 100) + '%';
+      }, 300);
+    }).catch(() => {
+      document.getElementById('stat-messages').textContent = '0';
+      setTimeout(() => {
+        document.getElementById('bar-products').style.width = Math.min(allProducts.length * 10, 100) + '%';
+        document.getElementById('bar-sellers').style.width = Math.min(activeSellers * 15, 100) + '%';
+        document.getElementById('bar-orders').style.width = Math.min(allOrders.length * 8, 100) + '%';
+        document.getElementById('bar-pending').style.width = Math.min(pending * 20, 100) + '%';
+      }, 300);
+    });
   }
 
   // ---- SETTINGS ----
