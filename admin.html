@@ -260,6 +260,9 @@
     <input type="password" id="login-pass" placeholder="Password">
     <button class="btn-primary" onclick="doLogin()">Sign In</button>
     <div class="login-error" id="login-error">❌ Wrong username or password</div>
+    <a href="./" style="display:block;margin-top:20px;font-size:13px;color:var(--muted);text-align:center;text-decoration:none;transition:color 0.2s" onmouseover="this.style.color='#FF6B98'" onmouseout="this.style.color=''">
+      <i class="fas fa-arrow-left" style="margin-right:6px"></i> Back to Store
+    </a>
   </div>
 </div>
 
@@ -539,7 +542,9 @@
       </div>
       <div class="form-group full">
         <label>Image URL</label>
-        <input type="text" id="p-image" placeholder="https://images.unsplash.com/..." oninput="previewProductImage(this.value)">
+        <input type="text" id="p-image" placeholder="https://images.unsplash.com/photo-..." oninput="previewProductImage(this.value)">
+        <div style="font-size:11px;color:var(--muted);margin-top:5px">💡 Tip: Use <strong style="color:var(--text)">images.unsplash.com</strong> URLs or right-click any image online → <em>"Copy image address"</em></div>
+        <div id="img-url-hint" style="display:none;font-size:12px;color:#f39c12;margin-top:6px;padding:10px;background:rgba(243,156,18,0.08);border-radius:8px;border:1px solid rgba(243,156,18,0.2)"></div>
       </div>
       <div class="form-group full" id="img-preview-wrap" style="display:none">
         <label>Preview</label>
@@ -804,18 +809,42 @@
     document.getElementById('p-flash').value = 'false';
     document.getElementById('p-seller').value = '';
     document.getElementById('img-preview-wrap').style.display = 'none';
+    const hint = document.getElementById('img-url-hint');
+    if (hint) hint.style.display = 'none';
     document.getElementById('product-modal').classList.add('open');
   };
 
-  window.previewProductImage = function(url) {
+  window.previewProductImage = function(rawUrl) {
     const wrap = document.getElementById('img-preview-wrap');
     const img = document.getElementById('img-preview');
-    if (url.startsWith('http')) {
-      img.src = url;
-      img.onerror = () => { wrap.style.display = 'none'; };
-      img.onload = () => { wrap.style.display = 'block'; };
-    } else {
+    const hint = document.getElementById('img-url-hint');
+    if (!rawUrl || !rawUrl.startsWith('http')) { wrap.style.display = 'none'; return; }
+
+    // Auto-convert Unsplash page URLs → direct image CDN URL
+    let url = rawUrl;
+    const unsplashPhotoMatch = rawUrl.match(/unsplash\.com\/photos\/([a-zA-Z0-9_-]+)/);
+    if (unsplashPhotoMatch) {
+      url = `https://images.unsplash.com/photo-${unsplashPhotoMatch[1]}?w=400&q=80`;
+      // Update input with corrected URL
+      document.getElementById('p-image').value = url;
+    }
+
+    // Check if URL looks like a direct image
+    const isDirectImage = /\.(jpg|jpeg|png|webp|gif|avif)(\?|$)/i.test(url) || url.includes('images.unsplash.com') || url.includes('firebasestorage') || url.includes('imgur') || url.includes('cloudinary');
+
+    img.src = url;
+    img.onload = () => {
+      wrap.style.display = 'block';
+      if (hint) hint.style.display = 'none';
+    };
+    img.onerror = () => {
       wrap.style.display = 'none';
+      if (hint) { hint.style.display = 'block'; hint.textContent = '⚠️ Cannot preview — paste a direct image URL (ending in .jpg, .png, .webp) or use an Unsplash image URL like: https://images.unsplash.com/photo-...'; }
+    };
+
+    if (!isDirectImage && !unsplashPhotoMatch) {
+      wrap.style.display = 'none';
+      if (hint) { hint.style.display = 'block'; hint.textContent = '⚠️ This looks like a webpage, not a direct image. Right-click an image → "Copy image address" to get a direct URL.'; }
     }
   };
 
@@ -1069,20 +1098,34 @@
     renderOrdersTable(filtered);
   }
 
+  function getOrderCustomer(o) {
+    return o.customerName || o.customerPhone || 'WhatsApp Customer';
+  }
+  function getOrderItems(o) {
+    if (Array.isArray(o.items) && o.items.length > 0) {
+      return o.items.map(i => i.name + (i.qty > 1 ? ' ×' + i.qty : '')).join(', ');
+    }
+    return o.productName || 'WhatsApp Order';
+  }
+
   function renderOverviewOrders() {
     const container = document.getElementById('overview-orders');
     const recent = allOrders.slice(0, 5);
     if (recent.length === 0) {
-      container.innerHTML = `<div class="empty"><i class="fas fa-shopping-bag"></i><p>No orders yet.</p></div>`;
+      container.innerHTML = `<div class="empty"><i class="fas fa-shopping-bag"></i><p>No orders yet. Orders placed via WhatsApp will appear here.</p></div>`;
       return;
     }
     container.innerHTML = `<table>
-      <thead><tr><th>Customer</th><th>Product</th><th>Amount</th><th>Status</th></tr></thead>
+      <thead><tr><th>Customer</th><th>Items</th><th>Amount</th><th>Date</th><th>Status</th></tr></thead>
       <tbody>${recent.map(o => `
         <tr>
-          <td>${o.customerName || '—'}</td>
-          <td>${o.productName || '—'}</td>
-          <td>ETB ${parseFloat(o.amount||0).toFixed(2)}</td>
+          <td style="font-size:13px">
+            <div style="font-weight:600">${getOrderCustomer(o)}</div>
+            ${o.customerPhone ? `<div style="color:var(--muted);font-size:11px">${o.customerPhone}</div>` : ''}
+          </td>
+          <td style="font-size:12px;color:var(--muted);max-width:200px">${getOrderItems(o)}</td>
+          <td style="font-weight:700">ETB ${parseFloat(o.amount||0).toFixed(2)}</td>
+          <td style="font-size:11px;color:var(--muted)">${o.createdAt ? new Date(o.createdAt).toLocaleDateString() : '—'}</td>
           <td><span class="badge ${o.status === 'completed' ? 'badge-green' : o.status === 'cancelled' ? 'badge-red' : 'badge-yellow'}">${o.status || 'pending'}</span></td>
         </tr>`).join('')}
       </tbody>
