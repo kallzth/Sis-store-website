@@ -561,22 +561,9 @@
 <div id="toast"></div>
 
 <!-- FIREBASE -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script>
-  // Compat shims so the rest of the code works unchanged
-  const { initializeApp } = firebase;
-  const getFirestore = () => firebase.firestore();
-  const collection = (db, name) => db.collection(name);
-  const getDocs = (ref) => ref.get().then(snap => ({ docs: snap.docs.map(d => ({ id: d.id, data: () => d.data() })) }));
-  const addDoc = (ref, data) => ref.add(data);
-  const updateDoc = (ref, data) => ref.update(data);
-  const deleteDoc = (ref) => ref.delete();
-  const doc = (db, col, id) => db.collection(col).doc(id);
-  const onSnapshot = () => {};
-  const query = (ref) => ref;
-  const orderBy = () => null;
-  // ---- START ----
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+  import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, orderBy, where, getDoc } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
   void (async () => {
 
   const firebaseConfig = {
@@ -588,8 +575,8 @@
     appId: "1:347897147293:web:7d58f77bf3935e0ed6c974"
   };
 
-  firebase.initializeApp(firebaseConfig);
-  const db = getFirestore();
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
 
   // ---- GLOBALS ----
   let allProducts = [];
@@ -950,9 +937,8 @@
       document.getElementById('bar-pending').style.width = Math.min(pending * 20, 100) + '%';
     }, 300);
     // Also load message badge on login
-    db.collection('messages').where('status','==','unread').get()
-      .then(snap => {
-        const n = snap.size;
+    getDocs(collection(db, 'messages')).then(snap => {
+        const n = snap.docs.filter(d => d.data().status === 'unread').length;
         const badge = document.getElementById('msg-badge');
         if (badge) { badge.style.display = n > 0 ? 'inline' : 'none'; badge.textContent = n; }
       }).catch(()=>{});
@@ -1011,21 +997,13 @@
 
   async function loadMessages() {
     try {
-      const snap = await db.collection('messages').orderBy('createdAt', 'desc').get();
-      allMessages = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      const snap = await getDocs(collection(db, 'messages'));
+      allMessages = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+        .sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
       renderMessageList(allMessages);
       updateMsgBadge();
     } catch(e) {
-      // orderBy may fail without index, fallback
-      try {
-        const snap2 = await db.collection('messages').get();
-        allMessages = snap2.docs.map(d => ({ id: d.id, ...d.data() }))
-          .sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
-        renderMessageList(allMessages);
-        updateMsgBadge();
-      } catch(e2) {
-        document.getElementById('msg-list').innerHTML = `<div class="empty"><i class="fas fa-envelope"></i><p>No messages yet.</p></div>`;
-      }
+      document.getElementById('msg-list').innerHTML = `<div class="empty"><i class="fas fa-envelope"></i><p>No messages yet.</p></div>`;
     }
   }
 
@@ -1069,7 +1047,7 @@
     // Mark as read
     if (m.status === 'unread') {
       try {
-        await db.collection('messages').doc(id).update({ status: 'read' });
+        await updateDoc(doc(db, 'messages', id), { status: 'read' });
         m.status = 'read';
         updateMsgBadge();
         // Re-render list to remove unread dot
@@ -1106,7 +1084,7 @@
   async function deleteMessage(id) {
     if (!confirm('Delete this message?')) return;
     try {
-      await db.collection('messages').doc(id).delete();
+      await deleteDoc(doc(db, 'messages', id));
       allMessages = allMessages.filter(m => m.id !== id);
       activeMessageId = null;
       document.getElementById('msg-detail').innerHTML = `
@@ -1124,7 +1102,7 @@
     const unread = allMessages.filter(m => m.status === 'unread');
     if (!unread.length) { showToast('No unread messages', 'success'); return; }
     try {
-      await Promise.all(unread.map(m => db.collection('messages').doc(m.id).update({ status: 'read' })));
+      await Promise.all(unread.map(m => updateDoc(doc(db, 'messages', m.id), { status: 'read' })));
       unread.forEach(m => m.status = 'read');
       filterMessages(messagesFilter);
       updateMsgBadge();
