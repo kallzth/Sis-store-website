@@ -1087,8 +1087,7 @@
           <div class="msg-meta"><i class="fas fa-clock"></i> ${m.createdAt ? new Date(m.createdAt).toLocaleString() : '—'}</div>
         </div>
       </div>
-      <div class="msg-body">${(m.message || '').replace(/
-/g, '<br>')}</div>
+      <div class="msg-body">${(m.message || '').split('\n').join('<br>')}</div>
       <div class="msg-actions-bar">
         ${m.contact && m.contact.includes('+') ?
           `<a href="https://wa.me/${m.contact.replace(/[^0-9]/g,'')}" target="_blank" class="btn btn-success btn-sm" style="text-decoration:none">
