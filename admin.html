@@ -220,6 +220,25 @@
   .mini-chart { height: 6px; background: var(--card2); border-radius: 3px; overflow: hidden; margin-top: 10px; }
   .mini-chart-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--pink), var(--purple)); transition: width 0.6s ease; }
 
+  /* MESSAGES */
+  .sort-select { background:var(--card2);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:8px;font-size:13px;outline:none;font-family:'DM Sans',sans-serif;cursor:pointer; }
+  .msg-item { padding:16px 20px;border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.15s;position:relative; }
+  .msg-item:hover { background:rgba(255,255,255,0.03); }
+  .msg-item.active { background:rgba(255,107,152,0.08);border-left:3px solid var(--pink); }
+  .msg-item.unread .msg-item-name { color:var(--text);font-weight:700; }
+  .msg-item.unread::after { content:'';position:absolute;top:18px;right:16px;width:8px;height:8px;background:var(--pink);border-radius:50%; }
+  .msg-item-name { font-size:14px;font-weight:500;margin-bottom:3px;color:var(--muted); }
+  .msg-item-subject { font-size:12px;color:var(--muted);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:260px; }
+  .msg-item-time { font-size:11px;color:var(--muted);opacity:0.6; }
+  .msg-detail-header { padding-bottom:20px;border-bottom:1px solid var(--border);margin-bottom:24px; }
+  .msg-detail-name { font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:8px; }
+  .msg-meta-row { display:flex;flex-wrap:wrap;gap:16px;margin-bottom:12px; }
+  .msg-meta { display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted); }
+  .msg-meta i { color:var(--pink);font-size:12px; }
+  .msg-body { font-size:14px;line-height:1.8;color:var(--muted);background:var(--card2);border-radius:12px;padding:20px;margin-bottom:24px; }
+  .msg-actions-bar { display:flex;gap:10px;flex-wrap:wrap; }
+  .topic-badge { display:inline-block;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;background:rgba(255,107,152,0.12);color:var(--pink);border:1px solid rgba(255,107,152,0.25); }
+
   @media (max-width: 900px) {
     .stats-grid { grid-template-columns: 1fr 1fr; }
     .sidebar { width: 200px; }
@@ -252,6 +271,7 @@
     <div class="nav-item" onclick="showPage('sellers')"><i class="fas fa-store"></i> Sellers</div>
     <div class="nav-item" onclick="showPage('orders')"><i class="fas fa-shopping-bag"></i> Orders</div>
     <div class="nav-section">Settings</div>
+    <div class="nav-item" onclick="showPage('messages')"><i class="fas fa-envelope"></i> Messages <span id="msg-badge" style="display:none;background:var(--pink);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;margin-left:auto">0</span></div>
     <div class="nav-item" onclick="showPage('settings')"><i class="fas fa-cog"></i> Settings</div>
     <div class="sidebar-footer">
       <div class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</div>
@@ -336,6 +356,34 @@
       </div>
       <div class="card">
         <div id="orders-table"><div class="loading"><div class="spinner"></div><p>Loading orders...</p></div></div>
+      </div>
+    </div>
+
+    <!-- MESSAGES PAGE -->
+    <div class="page" id="page-messages">
+      <div class="topbar">
+        <h1>Messages <span id="unread-count" style="color:var(--muted);font-size:16px;font-weight:400"></span></h1>
+        <div class="topbar-actions">
+          <button class="btn btn-ghost btn-sm" onclick="markAllRead()"><i class="fas fa-check-double"></i> Mark All Read</button>
+          <select class="sort-select" onchange="filterMessages(this.value)" style="background:var(--card2);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:8px;font-size:13px;outline:none;font-family:'DM Sans',sans-serif">
+            <option value="all">All Messages</option>
+            <option value="unread">Unread Only</option>
+            <option value="read">Read</option>
+          </select>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:320px 1fr;gap:20px;height:calc(100vh - 140px)">
+        <!-- MESSAGE LIST -->
+        <div class="card" style="padding:0;overflow-y:auto;height:100%">
+          <div id="msg-list"><div class="loading"><div class="spinner"></div><p>Loading messages...</p></div></div>
+        </div>
+        <!-- MESSAGE DETAIL -->
+        <div class="card" id="msg-detail" style="height:100%;overflow-y:auto">
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--muted);text-align:center;gap:12px">
+            <i class="fas fa-envelope-open" style="font-size:40px;opacity:0.3"></i>
+            <p style="font-size:14px">Select a message to read it</p>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -898,6 +946,13 @@
       document.getElementById('bar-orders').style.width = Math.min(allOrders.length * 8, 100) + '%';
       document.getElementById('bar-pending').style.width = Math.min(pending * 20, 100) + '%';
     }, 300);
+    // Also load message badge on login
+    db.collection('messages').where('status','==','unread').get()
+      .then(snap => {
+        const n = snap.size;
+        const badge = document.getElementById('msg-badge');
+        if (badge) { badge.style.display = n > 0 ? 'inline' : 'none'; badge.textContent = n; }
+      }).catch(()=>{});
   }
 
   // ---- SETTINGS ----
@@ -945,6 +1000,155 @@
   document.querySelectorAll('.modal-overlay').forEach(el => {
     el.addEventListener('click', e => { if (e.target === el) el.classList.remove('open'); });
   });
+
+  // ── MESSAGES ──
+  let allMessages = [];
+  let activeMessageId = null;
+  let messagesFilter = 'all';
+
+  async function loadMessages() {
+    try {
+      const snap = await db.collection('messages').orderBy('createdAt', 'desc').get();
+      allMessages = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderMessageList(allMessages);
+      updateMsgBadge();
+    } catch(e) {
+      // orderBy may fail without index, fallback
+      try {
+        const snap2 = await db.collection('messages').get();
+        allMessages = snap2.docs.map(d => ({ id: d.id, ...d.data() }))
+          .sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+        renderMessageList(allMessages);
+        updateMsgBadge();
+      } catch(e2) {
+        document.getElementById('msg-list').innerHTML = `<div class="empty"><i class="fas fa-envelope"></i><p>No messages yet.</p></div>`;
+      }
+    }
+  }
+
+  function updateMsgBadge() {
+    const unread = allMessages.filter(m => m.status === 'unread').length;
+    const badge = document.getElementById('msg-badge');
+    const countEl = document.getElementById('unread-count');
+    badge.style.display = unread > 0 ? 'inline' : 'none';
+    badge.textContent = unread;
+    if (countEl) countEl.textContent = unread > 0 ? `· ${unread} unread` : '';
+  }
+
+  function filterMessages(val) {
+    messagesFilter = val;
+    let list = [...allMessages];
+    if (val === 'unread') list = list.filter(m => m.status === 'unread');
+    if (val === 'read') list = list.filter(m => m.status === 'read');
+    renderMessageList(list);
+  }
+
+  function renderMessageList(messages) {
+    const container = document.getElementById('msg-list');
+    if (!messages.length) {
+      container.innerHTML = `<div class="empty" style="padding:40px 20px"><i class="fas fa-envelope-open"></i><p>No messages here.</p></div>`;
+      return;
+    }
+    container.innerHTML = messages.map(m => `
+      <div class="msg-item ${m.status === 'unread' ? 'unread' : ''} ${activeMessageId === m.id ? 'active' : ''}"
+           onclick="openMessage('${m.id}')">
+        <div class="msg-item-name">${m.name || 'Unknown'}</div>
+        <div class="msg-item-subject">${m.subject || m.topic || 'No subject'}</div>
+        <div class="msg-item-time">${m.createdAt ? timeAgo(m.createdAt) : '—'}</div>
+      </div>`).join('');
+  }
+
+  async function openMessage(id) {
+    const m = allMessages.find(x => x.id === id);
+    if (!m) return;
+    activeMessageId = id;
+
+    // Mark as read
+    if (m.status === 'unread') {
+      try {
+        await db.collection('messages').doc(id).update({ status: 'read' });
+        m.status = 'read';
+        updateMsgBadge();
+        // Re-render list to remove unread dot
+        filterMessages(messagesFilter);
+      } catch(e) {}
+    }
+
+    const detail = document.getElementById('msg-detail');
+    detail.innerHTML = `
+      <div class="msg-detail-header">
+        <div class="msg-detail-name">${m.name || 'Unknown Sender'}</div>
+        <div class="msg-meta-row">
+          <div class="msg-meta"><i class="fas fa-phone"></i> ${m.contact || '—'}</div>
+          ${m.subject ? `<div class="msg-meta"><i class="fas fa-tag"></i> <span class="topic-badge">${m.subject}</span></div>` : ''}
+          <div class="msg-meta"><i class="fas fa-clock"></i> ${m.createdAt ? new Date(m.createdAt).toLocaleString() : '—'}</div>
+        </div>
+      </div>
+      <div class="msg-body">${(m.message || '').replace(/
+/g, '<br>')}</div>
+      <div class="msg-actions-bar">
+        ${m.contact && m.contact.includes('+') ?
+          `<a href="https://wa.me/${m.contact.replace(/[^0-9]/g,'')}" target="_blank" class="btn btn-success btn-sm" style="text-decoration:none">
+            <i class="fab fa-whatsapp"></i> Reply on WhatsApp
+          </a>` : ''}
+        ${m.contact && m.contact.includes('@') ?
+          `<a href="mailto:${m.contact}" class="btn btn-ghost btn-sm" style="text-decoration:none">
+            <i class="fas fa-envelope"></i> Reply by Email
+          </a>` : ''}
+        <button class="btn btn-danger btn-sm" onclick="deleteMessage('${m.id}')">
+          <i class="fas fa-trash"></i> Delete
+        </button>
+      </div>`;
+  }
+
+  async function deleteMessage(id) {
+    if (!confirm('Delete this message?')) return;
+    try {
+      await db.collection('messages').doc(id).delete();
+      allMessages = allMessages.filter(m => m.id !== id);
+      activeMessageId = null;
+      document.getElementById('msg-detail').innerHTML = `
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--muted);text-align:center;gap:12px">
+          <i class="fas fa-envelope-open" style="font-size:40px;opacity:0.3"></i>
+          <p style="font-size:14px">Select a message to read it</p>
+        </div>`;
+      filterMessages(messagesFilter);
+      updateMsgBadge();
+      showToast('Message deleted', 'success');
+    } catch(e) { showToast('Error: ' + e.message, 'error'); }
+  }
+
+  async function markAllRead() {
+    const unread = allMessages.filter(m => m.status === 'unread');
+    if (!unread.length) { showToast('No unread messages', 'success'); return; }
+    try {
+      await Promise.all(unread.map(m => db.collection('messages').doc(m.id).update({ status: 'read' })));
+      unread.forEach(m => m.status = 'read');
+      filterMessages(messagesFilter);
+      updateMsgBadge();
+      showToast(`${unread.length} messages marked as read`, 'success');
+    } catch(e) { showToast('Error: ' + e.message, 'error'); }
+  }
+
+  function timeAgo(isoStr) {
+    const diff = Date.now() - new Date(isoStr).getTime();
+    const mins = Math.floor(diff/60000);
+    if (mins < 1) return 'just now';
+    if (mins < 60) return `${mins}m ago`;
+    const hrs = Math.floor(mins/60);
+    if (hrs < 24) return `${hrs}h ago`;
+    const days = Math.floor(hrs/24);
+    if (days < 7) return `${days}d ago`;
+    return new Date(isoStr).toLocaleDateString();
+  }
+
+  // Load messages when messages page is opened
+  const _origShowPage = window.showPage;
+  window.showPage = function(page) {
+    _origShowPage(page);
+    if (page === 'messages') loadMessages();
+  };
+
   })(); // end async IIFE
 </script>
 </body>
