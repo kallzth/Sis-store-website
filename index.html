@@ -979,6 +979,33 @@ if (_logo) {
     }
   });
 }
+
+// ── EXPOSE ALL ONCLICK FUNCTIONS TO WINDOW (ES module scope fix) ──
+window.scrollToProducts = scrollToProducts;
+window.resetFilter      = resetFilter;
+window.setFilter        = setFilter;
+window.filterByCategory = filterByCategory;
+window.sortProducts     = sortProducts;
+window.searchProducts   = searchProducts;
+window.openModal        = openModal;
+window.closeModal       = closeModal;
+window.addModalToCart   = addModalToCart;
+window.buyNowWA         = buyNowWA;
+window.pickSize         = pickSize;
+window.quickAdd         = quickAdd;
+window.openCart         = openCart;
+window.closeCart        = closeCart;
+window.changeQty        = changeQty;
+window.removeItem       = removeItem;
+window.checkoutWA       = checkoutWA;
+window.wishToggle       = wishToggle;
+window.toggleWishlistView = toggleWishlistView;
+window.subscribe        = subscribe;
+window.addDealToCart    = addDealToCart;
+window.openContact      = openContact;
+window.closeContact     = closeContact;
+window.sendContactMessage = sendContactMessage;
+window.toast            = toast;
 </script>
 
 <!-- ═══════════════════════════════════════════════ -->
@@ -1454,6 +1481,10 @@ setTimeout(() => {
     document.getElementById('chat-unread-dot').style.display = 'block';
   }
 }, 8000);
+
+// Expose to window for onclick handlers
+window.toggleChat = toggleChat;
+window.sendUserMessage = sendUserMessage;
 </script>
 </body>
 </html>
