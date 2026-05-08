@@ -980,5 +980,480 @@ if (_logo) {
   });
 }
 </script>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!--              SISAY STORE CHATBOT               -->
+<!-- ═══════════════════════════════════════════════ -->
+<style>
+/* BUBBLE */
+.chat-bubble {
+  position: fixed; bottom: 24px; right: 24px; z-index: 2000;
+  width: 56px; height: 56px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; box-shadow: 0 8px 24px rgba(255,107,152,0.45);
+  transition: transform 0.3s, box-shadow 0.3s;
+  animation: bubblePop 0.5s cubic-bezier(0.175,0.885,0.32,1.275) both;
+}
+.chat-bubble:hover { transform: scale(1.1); box-shadow: 0 12px 32px rgba(255,107,152,0.55); }
+.chat-bubble i { font-size: 22px; color: #fff; transition: all 0.3s; }
+.chat-bubble .unread-dot {
+  position: absolute; top: 2px; right: 2px;
+  width: 14px; height: 14px; background: #2ECC71;
+  border-radius: 50%; border: 2px solid var(--dark);
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes bubblePop { from{transform:scale(0);opacity:0} to{transform:scale(1);opacity:1} }
+@keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.3)} }
+
+/* CHAT WINDOW */
+.chat-window {
+  position: fixed; bottom: 92px; right: 24px; z-index: 2000;
+  width: 360px; max-height: 540px;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 20px; display: flex; flex-direction: column;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.6);
+  transform: scale(0.85) translateY(20px); opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s cubic-bezier(0.175,0.885,0.32,1.275);
+  transform-origin: bottom right;
+}
+.chat-window.open {
+  transform: scale(1) translateY(0); opacity: 1; pointer-events: all;
+}
+
+/* CHAT HEADER */
+.chat-header {
+  background: linear-gradient(135deg, #1a0a2e, #2d0050);
+  padding: 16px 18px; border-radius: 20px 20px 0 0;
+  display: flex; align-items: center; gap: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.chat-avatar {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  display: flex; align-items: center; justify-content: center; font-size: 18px;
+  flex-shrink: 0; position: relative;
+}
+.chat-avatar::after {
+  content: ''; position: absolute; bottom: 1px; right: 1px;
+  width: 10px; height: 10px; background: #2ECC71;
+  border-radius: 50%; border: 2px solid var(--card);
+}
+.chat-header-info { flex: 1; }
+.chat-header-name { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; }
+.chat-header-status { font-size: 11px; color: #6ee7b7; }
+.chat-close-btn {
+  background: none; border: none; color: rgba(255,255,255,0.5);
+  font-size: 18px; cursor: pointer; transition: color 0.2s; padding: 4px;
+}
+.chat-close-btn:hover { color: #fff; }
+
+/* MESSAGES */
+.chat-messages {
+  flex: 1; overflow-y: auto; padding: 16px;
+  display: flex; flex-direction: column; gap: 10px;
+  scroll-behavior: smooth;
+}
+.chat-messages::-webkit-scrollbar { width: 4px; }
+.chat-messages::-webkit-scrollbar-track { background: transparent; }
+.chat-messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+.msg-row { display: flex; gap: 8px; align-items: flex-end; }
+.msg-row.user { flex-direction: row-reverse; }
+
+.msg-avatar-sm {
+  width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  display: flex; align-items: center; justify-content: center; font-size: 13px;
+}
+
+.msg-bubble {
+  max-width: 78%; padding: 10px 14px; border-radius: 16px;
+  font-size: 13px; line-height: 1.5;
+  animation: msgIn 0.25s ease;
+}
+@keyframes msgIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+.msg-bubble.bot { background: var(--card2); color: var(--text); border-radius: 4px 16px 16px 16px; }
+.msg-bubble.user { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: #fff; border-radius: 16px 4px 16px 16px; }
+.msg-time { font-size: 10px; color: var(--muted); margin-top: 3px; }
+
+/* TYPING */
+.typing-indicator { display: flex; gap: 4px; padding: 12px 14px; }
+.typing-dot {
+  width: 7px; height: 7px; background: var(--muted);
+  border-radius: 50%; animation: typingBounce 1.2s ease-in-out infinite;
+}
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes typingBounce { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-6px)} }
+
+/* QUICK REPLIES */
+.quick-replies {
+  padding: 10px 14px 4px;
+  display: flex; flex-wrap: wrap; gap: 7px;
+}
+.qr-btn {
+  padding: 7px 13px; border-radius: 20px; font-size: 12px; font-weight: 600;
+  background: rgba(255,107,152,0.1); border: 1px solid rgba(255,107,152,0.3);
+  color: var(--primary); cursor: pointer; transition: all 0.2s;
+  font-family: 'DM Sans', sans-serif;
+}
+.qr-btn:hover { background: var(--primary); color: #fff; border-color: var(--primary); transform: translateY(-1px); }
+
+/* INPUT */
+.chat-input-row {
+  padding: 12px 14px; border-top: 1px solid var(--border);
+  display: flex; gap: 8px; align-items: center;
+}
+.chat-input {
+  flex: 1; background: var(--card2); border: 1px solid var(--border);
+  color: var(--text); padding: 10px 14px; border-radius: 20px;
+  font-size: 13px; font-family: 'DM Sans', sans-serif; outline: none;
+  transition: border 0.2s;
+}
+.chat-input:focus { border-color: var(--primary); }
+.chat-send-btn {
+  width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  border: none; color: #fff; cursor: pointer; font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+  transition: opacity 0.2s;
+}
+.chat-send-btn:hover { opacity: 0.85; }
+
+@media (max-width: 420px) {
+  .chat-window { width: calc(100vw - 24px); right: 12px; bottom: 84px; }
+  .chat-bubble { right: 12px; bottom: 16px; }
+}
+</style>
+
+<!-- CHAT BUBBLE -->
+<div class="chat-bubble" id="chat-bubble" onclick="toggleChat()">
+  <i class="fas fa-comment-dots" id="chat-bubble-icon"></i>
+  <div class="unread-dot" id="chat-unread-dot"></div>
+</div>
+
+<!-- CHAT WINDOW -->
+<div class="chat-window" id="chat-window">
+  <div class="chat-header">
+    <div class="chat-avatar">🛍️</div>
+    <div class="chat-header-info">
+      <div class="chat-header-name">Sisay Assistant</div>
+      <div class="chat-header-status">● Online — here to help</div>
+    </div>
+    <button class="chat-close-btn" onclick="toggleChat()"><i class="fas fa-times"></i></button>
+  </div>
+
+  <div class="chat-messages" id="chat-messages"></div>
+  <div class="quick-replies" id="quick-replies"></div>
+
+  <div class="chat-input-row">
+    <input class="chat-input" id="chat-input" type="text" placeholder="Type a message..." onkeydown="if(event.key==='Enter') sendUserMessage()">
+    <button class="chat-send-btn" onclick="sendUserMessage()"><i class="fas fa-paper-plane"></i></button>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+//          SISAY STORE CHATBOT ENGINE
+// ══════════════════════════════════════════
+
+const BOT_NAME = 'Sisay Assistant';
+const WA_LINK = `https://wa.me/251912345678`;
+let chatOpen = false;
+let chatStarted = false;
+let chatHistory = [];
+
+// ── CONVERSATION TREE ──
+const FLOWS = {
+  start: {
+    msg: "Hi there! 👋 Welcome to **Sisay Store**. I'm here to help you shop, track orders, or answer any questions.\n\nWhat can I help you with today?",
+    replies: [
+      { label: '🛍️ How to order',     next: 'how_to_order' },
+      { label: '📦 Delivery info',    next: 'delivery' },
+      { label: '↩️ Returns & exchanges', next: 'returns' },
+      { label: '📏 Size help',        next: 'sizes' },
+      { label: '🏪 Become a seller',  next: 'seller' },
+      { label: '📞 Contact us',       next: 'contact' },
+    ]
+  },
+
+  how_to_order: {
+    msg: "Ordering is simple! Here's how:\n\n1️⃣ Browse products and click one you like\n2️⃣ Choose your size\n3️⃣ Tap **Add to Cart**\n4️⃣ Open your cart 🛒 and tap **Order via WhatsApp**\n5️⃣ Your order details are sent to us automatically!\n\nWe confirm and arrange delivery within a few hours.",
+    replies: [
+      { label: '💳 Payment options',   next: 'payment' },
+      { label: '🚚 How long delivery?', next: 'delivery' },
+      { label: '🛒 Go shop now',       action: 'scroll_products' },
+      { label: '🔙 Main menu',         next: 'start' },
+    ]
+  },
+
+  payment: {
+    msg: "We accept the following payment methods:\n\n✅ **Telebirr**\n✅ **CBE Birr**\n✅ **Cash on delivery** (Addis Ababa)\n✅ **Bank transfer**\n\nPayment details are shared with you via WhatsApp once we confirm your order. You pay only after confirmation — no upfront risk! 🙌",
+    replies: [
+      { label: '🛍️ How to order',     next: 'how_to_order' },
+      { label: '🚚 Delivery info',    next: 'delivery' },
+      { label: '🔙 Main menu',        next: 'start' },
+    ]
+  },
+
+  delivery: {
+    msg: "Here's our delivery info:\n\n📍 **Addis Ababa** — 1–2 business days\n🏙️ **Dire Dawa / Hawassa** — 2–3 days\n🗺️ **Other cities** — 3–7 days\n\n🚚 **Free delivery on orders over ETB 500**\nSmaller orders: ETB 50–100 flat fee\n\nOnce dispatched, we send you a WhatsApp update with tracking details.",
+    replies: [
+      { label: '↩️ Returns policy',   next: 'returns' },
+      { label: '💳 Payment options',  next: 'payment' },
+      { label: '🛒 Shop now',         action: 'scroll_products' },
+      { label: '🔙 Main menu',        next: 'start' },
+    ]
+  },
+
+  returns: {
+    msg: "Our return & exchange policy:\n\n🔄 **7 days** to return or exchange\n✅ Items must be unused with original tags\n❌ Sale items are final\n\n**How to return:**\nJust WhatsApp us a photo of the item within 7 days. We arrange collection and process your refund in 2–3 business days.\n\n📏 **Wrong size?** We'll swap it for free!",
+    replies: [
+      { label: '📏 Size guide',       next: 'sizes' },
+      { label: '💬 WhatsApp us',      action: 'open_whatsapp' },
+      { label: '📄 Full returns page', action: 'open_shipping' },
+      { label: '🔙 Main menu',        next: 'start' },
+    ]
+  },
+
+  sizes: {
+    msg: "Not sure about your size? No problem!\n\n📏 We have a detailed **Size Guide** for:\n• Men's clothing\n• Women's clothing\n• Shoes (men & women)\n• Kids\n\nIt includes a size finder — just enter your measurements and it tells you your size instantly! 🎯\n\n**Between sizes?** We offer free exchanges, so don't worry.",
+    replies: [
+      { label: '📐 Open Size Guide',  action: 'open_size_guide' },
+      { label: '💬 Ask on WhatsApp',  action: 'open_whatsapp' },
+      { label: '🔙 Main menu',        next: 'start' },
+    ]
+  },
+
+  seller: {
+    msg: "Want to sell your products on Sisay Store? 🏪\n\nHere's how it works:\n\n✅ **Free to join** — no listing fees\n📦 We add your products for you\n📱 Orders go directly to your WhatsApp\n⚡ Approved within **24 hours**\n💰 Small commission on sales only\n\nHundreds of customers browse our store every month!",
+    replies: [
+      { label: '📋 Register my shop', action: 'open_seller_register' },
+      { label: '❓ More questions',   next: 'seller_faq' },
+      { label: '🔙 Main menu',        next: 'start' },
+    ]
+  },
+
+  seller_faq: {
+    msg: "Common seller questions:\n\n**Q: How do I get paid?**\nDirectly from customers via Telebirr, CBE Birr or cash — we don't handle payments.\n\n**Q: Can I update my products?**\nYes — WhatsApp us any time and we update within hours.\n\n**Q: How many products can I list?**\nNo limit! Start with a few and grow from there.",
+    replies: [
+      { label: '📋 Register now',     action: 'open_seller_register' },
+      { label: '💬 Chat with us',     action: 'open_whatsapp' },
+      { label: '🔙 Main menu',        next: 'start' },
+    ]
+  },
+
+  contact: {
+    msg: "Here's how to reach us:\n\n💬 **WhatsApp** — fastest response (usually under 2 hours)\n📧 **Email** — hello@sisaystore.com\n📱 **Telegram** — @sisaystore\n\nOr use the **Contact Us** form in the store footer — we read every message!\n\nWe're available **7 days a week** 🕐",
+    replies: [
+      { label: '💬 Open WhatsApp',    action: 'open_whatsapp' },
+      { label: '✉️ Contact form',     action: 'open_contact' },
+      { label: '❓ FAQs',             action: 'open_faq' },
+      { label: '🔙 Main menu',        next: 'start' },
+    ]
+  },
+
+  not_found: {
+    msg: "Hmm, I didn't quite catch that. Let me show you the main options — or you can WhatsApp us directly and we'll answer anything! 😊",
+    replies: [
+      { label: '🛍️ How to order',     next: 'how_to_order' },
+      { label: '📦 Delivery',         next: 'delivery' },
+      { label: '💬 WhatsApp us',      action: 'open_whatsapp' },
+      { label: '🔙 Main menu',        next: 'start' },
+    ]
+  }
+};
+
+// ── KEYWORD MATCHING for typed messages ──
+const KEYWORD_MAP = [
+  { keys: ['order','buy','purchase','shop','cart','checkout','how'], flow: 'how_to_order' },
+  { keys: ['pay','payment','telebirr','cbe','birr','cash','transfer'], flow: 'payment' },
+  { keys: ['deliver','shipping','days','fast','long','track','addis'], flow: 'delivery' },
+  { keys: ['return','exchange','refund','wrong','damaged','size'], flow: 'returns' },
+  { keys: ['size','measure','fit','small','large','xl','medium'], flow: 'sizes' },
+  { keys: ['sell','seller','shop','register','join','business'], flow: 'seller' },
+  { keys: ['contact','call','phone','whatsapp','email','telegram','help'], flow: 'contact' },
+  { keys: ['hello','hi','hey','start','menu','hiya'], flow: 'start' },
+];
+
+// ── ACTIONS ──
+function runAction(action) {
+  switch(action) {
+    case 'scroll_products':
+      toggleChat();
+      setTimeout(() => document.getElementById('products-section')?.scrollIntoView({behavior:'smooth'}), 300);
+      break;
+    case 'open_whatsapp':
+      window.open(WA_LINK, '_blank');
+      break;
+    case 'open_seller_register':
+      window.open('./seller-register.html', '_blank');
+      break;
+    case 'open_size_guide':
+      window.open('./size-guide.html', '_blank');
+      break;
+    case 'open_shipping':
+      window.open('./shipping.html', '_blank');
+      break;
+    case 'open_faq':
+      window.open('./faq.html', '_blank');
+      break;
+    case 'open_contact':
+      toggleChat();
+      setTimeout(() => { if(window.openContact) openContact(); }, 400);
+      break;
+  }
+}
+
+// ── RENDER ──
+function formatMsg(text) {
+  return text
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n/g, '<br>');
+}
+
+function now() {
+  return new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+}
+
+function addBotMessage(text, showTyping = true) {
+  const msgs = document.getElementById('chat-messages');
+  clearReplies();
+
+  if (showTyping) {
+    const typing = document.createElement('div');
+    typing.className = 'msg-row';
+    typing.id = 'typing-indicator';
+    typing.innerHTML = `
+      <div class="msg-avatar-sm">🛍️</div>
+      <div class="msg-bubble bot">
+        <div class="typing-indicator">
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+        </div>
+      </div>`;
+    msgs.appendChild(typing);
+    msgs.scrollTop = msgs.scrollHeight;
+
+    return new Promise(resolve => {
+      setTimeout(() => {
+        typing.remove();
+        const row = document.createElement('div');
+        row.className = 'msg-row';
+        row.innerHTML = `
+          <div class="msg-avatar-sm">🛍️</div>
+          <div>
+            <div class="msg-bubble bot">${formatMsg(text)}</div>
+            <div class="msg-time">${now()}</div>
+          </div>`;
+        msgs.appendChild(row);
+        msgs.scrollTop = msgs.scrollHeight;
+        resolve();
+      }, 800 + Math.min(text.length * 8, 900));
+    });
+  } else {
+    const row = document.createElement('div');
+    row.className = 'msg-row';
+    row.innerHTML = `
+      <div class="msg-avatar-sm">🛍️</div>
+      <div>
+        <div class="msg-bubble bot">${formatMsg(text)}</div>
+        <div class="msg-time">${now()}</div>
+      </div>`;
+    msgs.appendChild(row);
+    msgs.scrollTop = msgs.scrollHeight;
+    return Promise.resolve();
+  }
+}
+
+function addUserMessage(text) {
+  const msgs = document.getElementById('chat-messages');
+  clearReplies();
+  const row = document.createElement('div');
+  row.className = 'msg-row user';
+  row.innerHTML = `
+    <div>
+      <div class="msg-bubble user">${text}</div>
+      <div class="msg-time" style="text-align:right">${now()}</div>
+    </div>
+    <div class="msg-avatar-sm" style="background:var(--card2);font-size:14px">👤</div>`;
+  msgs.appendChild(row);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function showReplies(replies) {
+  const container = document.getElementById('quick-replies');
+  container.innerHTML = '';
+  replies.forEach(r => {
+    const btn = document.createElement('button');
+    btn.className = 'qr-btn';
+    btn.textContent = r.label;
+    btn.onclick = () => handleReply(r);
+    container.appendChild(btn);
+  });
+}
+
+function clearReplies() {
+  document.getElementById('quick-replies').innerHTML = '';
+}
+
+async function goToFlow(flowKey) {
+  const flow = FLOWS[flowKey] || FLOWS.not_found;
+  await addBotMessage(flow.msg);
+  if (flow.replies) showReplies(flow.replies);
+}
+
+async function handleReply(r) {
+  addUserMessage(r.label);
+  if (r.action) {
+    runAction(r.action);
+    return;
+  }
+  if (r.next) await goToFlow(r.next);
+}
+
+async function sendUserMessage() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  addUserMessage(text);
+
+  // Keyword matching
+  const lower = text.toLowerCase();
+  let matched = null;
+  for (const km of KEYWORD_MAP) {
+    if (km.keys.some(k => lower.includes(k))) { matched = km.flow; break; }
+  }
+  await goToFlow(matched || 'not_found');
+}
+
+// ── TOGGLE ──
+function toggleChat() {
+  chatOpen = !chatOpen;
+  const win = document.getElementById('chat-window');
+  const icon = document.getElementById('chat-bubble-icon');
+  const dot = document.getElementById('chat-unread-dot');
+
+  win.classList.toggle('open', chatOpen);
+  icon.className = chatOpen ? 'fas fa-times' : 'fas fa-comment-dots';
+  dot.style.display = 'none';
+
+  if (chatOpen && !chatStarted) {
+    chatStarted = true;
+    setTimeout(() => goToFlow('start'), 300);
+  }
+}
+
+// ── AUTO GREETING after 8 seconds ──
+setTimeout(() => {
+  if (!chatOpen) {
+    document.getElementById('chat-unread-dot').style.display = 'block';
+  }
+}, 8000);
+</script>
 </body>
 </html>
