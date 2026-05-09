@@ -250,7 +250,46 @@
   .stock-low { color:var(--red); font-weight:700; }
   .stock-ok  { color:var(--green); }
   .stock-med { color:var(--yellow); }
-  /* ── TIER 2 CSS ── */
+  /* ── TIER 3 CSS ── */
+  /* Customer Profiles */
+  .customer-card { background:var(--card2);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:12px;display:grid;grid-template-columns:48px 1fr auto;gap:16px;align-items:center;transition:border-color 0.2s; }
+  .customer-card:hover { border-color:rgba(255,107,152,0.3); }
+  .customer-avatar { width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--pink),var(--purple));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:#fff;flex-shrink:0; }
+  .customer-name { font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:3px; }
+  .customer-meta { font-size:12px;color:var(--muted);display:flex;gap:14px;flex-wrap:wrap; }
+  .customer-meta span { display:flex;align-items:center;gap:5px; }
+  .customer-orders { text-align:right; }
+  .customer-orders .order-count { font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--primary); }
+  .customer-orders .order-label { font-size:11px;color:var(--muted); }
+  .customer-orders .order-total { font-size:13px;font-weight:700;margin-top:2px; }
+
+  /* Discount Codes */
+  .discount-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-bottom:24px; }
+  .discount-card { background:var(--card2);border:1px solid var(--border);border-radius:14px;padding:20px;position:relative;overflow:hidden;transition:border-color 0.2s; }
+  .discount-card:hover { border-color:rgba(255,107,152,0.3); }
+  .discount-card::before { content:'';position:absolute;top:0;right:0;width:60px;height:60px;border-radius:0 14px 0 60px;opacity:0.1;background:var(--primary); }
+  .discount-code { font-family:'Syne',sans-serif;font-size:20px;font-weight:800;letter-spacing:2px;color:var(--primary);margin-bottom:8px; }
+  .discount-value { font-size:13px;color:var(--muted);margin-bottom:12px; }
+  .discount-stats { display:flex;gap:16px;margin-bottom:14px; }
+  .discount-stat { font-size:12px;color:var(--muted); }
+  .discount-stat strong { display:block;font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--text); }
+  .discount-actions { display:flex;gap:8px; }
+  .discount-status { position:absolute;top:14px;right:14px; }
+
+  /* Bulk Import */
+  .bulk-upload-area { border:2px dashed var(--border);border-radius:14px;padding:40px;text-align:center;cursor:pointer;transition:all 0.2s;background:var(--card2);position:relative;margin-bottom:20px; }
+  .bulk-upload-area:hover,.bulk-upload-area.dragover { border-color:var(--primary);background:rgba(255,107,152,0.04); }
+  .bulk-upload-area input[type=file] { position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%; }
+  .bulk-icon { font-size:40px;color:var(--muted);margin-bottom:14px; }
+  .bulk-preview table { width:100%;border-collapse:collapse;font-size:12px;margin-top:12px; }
+  .bulk-preview th { background:var(--card2);padding:8px 12px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700; }
+  .bulk-preview td { padding:8px 12px;border-bottom:1px solid var(--border);vertical-align:middle; }
+  .bulk-preview tr:last-child td { border-bottom:none; }
+  .bulk-preview tr:hover td { background:rgba(255,255,255,0.02); }
+  .bulk-row-ok { color:var(--green); }
+  .bulk-row-err { color:#e74c3c; }
+  .template-row { display:flex;align-items:center;gap:14px;background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:16px 20px;margin-bottom:16px; }
+  .template-row i { font-size:24px;color:var(--primary); }
   /* Image Upload */
   .img-upload-area {
     border: 2px dashed var(--border); border-radius: 12px;
@@ -335,6 +374,9 @@
     <div class="nav-item" onclick="showPage('orders')"><i class="fas fa-shopping-bag"></i> Orders</div>
     <div class="nav-item" onclick="showPage('pipeline')"><i class="fas fa-columns"></i> Pipeline</div>
     <div class="nav-item" onclick="showPage('payouts')"><i class="fas fa-hand-holding-usd"></i> Payouts</div>
+    <div class="nav-item" onclick="showPage('customers')"><i class="fas fa-user-friends"></i> Customers</div>
+    <div class="nav-item" onclick="showPage('discounts')"><i class="fas fa-tag"></i> Discounts</div>
+    <div class="nav-item" onclick="showPage('bulk')"><i class="fas fa-file-csv"></i> Bulk Import</div>
     <div class="nav-section">Settings</div>
     <div class="nav-item" onclick="showPage('subscribers')"><i class="fas fa-users"></i> Subscribers <span id="sub-badge" style="display:none;background:var(--green);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;margin-left:auto">0</span></div>
     <div class="nav-item" onclick="showPage('messages')"><i class="fas fa-envelope"></i> Messages <span id="msg-badge" style="display:none;background:var(--pink);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;margin-left:auto">0</span></div>
@@ -488,6 +530,92 @@
       </div>
       <div class="card">
         <div id="orders-table"><div class="loading"><div class="spinner"></div><p>Loading orders...</p></div></div>
+      </div>
+    </div>
+
+    <!-- CUSTOMERS PAGE -->
+    <div class="page" id="page-customers">
+      <div class="topbar">
+        <h1>Customers</h1>
+        <div class="topbar-actions">
+          <div class="search-bar"><i class="fas fa-search"></i><input type="text" placeholder="Search customers..." oninput="searchCustomers(this.value)" style="width:220px"></div>
+          <button class="btn btn-ghost" onclick="exportCustomers()"><i class="fas fa-download"></i> Export CSV</button>
+        </div>
+      </div>
+      <div id="customers-container"><div class="loading"><div class="spinner"></div><p>Building customer profiles...</p></div></div>
+    </div>
+
+    <!-- DISCOUNTS PAGE -->
+    <div class="page" id="page-discounts">
+      <div class="topbar">
+        <h1>Discount Codes</h1>
+        <div class="topbar-actions">
+          <button class="btn btn-pink" onclick="openDiscountModal()"><i class="fas fa-plus"></i> Create Code</button>
+        </div>
+      </div>
+      <div id="discounts-grid" class="discount-grid"><div class="loading"><div class="spinner"></div><p>Loading codes...</p></div></div>
+    </div>
+
+    <!-- BULK IMPORT PAGE -->
+    <div class="page" id="page-bulk">
+      <div class="topbar"><h1>Bulk Product Import</h1></div>
+
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-header"><div class="card-title"><i class="fas fa-file-csv" style="color:var(--green);margin-right:8px"></i> Upload CSV File</div></div>
+        <div class="template-row">
+          <i class="fas fa-download"></i>
+          <div style="flex:1">
+            <div style="font-weight:700;font-size:14px;margin-bottom:3px">Download the CSV Template</div>
+            <div style="font-size:12px;color:var(--muted)">Fill in the template with your products then upload below</div>
+          </div>
+          <button class="btn btn-ghost" onclick="downloadTemplate()"><i class="fas fa-download"></i> Download Template</button>
+        </div>
+        <div class="bulk-upload-area" id="bulk-drop-area">
+          <input type="file" id="bulk-csv-file" accept=".csv" onchange="handleBulkCSV(this)">
+          <div class="bulk-icon"><i class="fas fa-file-csv"></i></div>
+          <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:6px">Drop your CSV here</div>
+          <div style="font-size:13px;color:var(--muted)">or <strong style="color:var(--primary)">click to browse</strong></div>
+        </div>
+        <div id="bulk-preview" class="bulk-preview" style="display:none"></div>
+        <div id="bulk-actions" style="display:none;margin-top:16px;display:none">
+          <div style="display:flex;gap:12px;align-items:center">
+            <button class="btn btn-pink" id="bulk-import-btn" onclick="runBulkImport()"><i class="fas fa-upload"></i> Import All Valid Products</button>
+            <button class="btn btn-ghost" onclick="clearBulk()"><i class="fas fa-times"></i> Clear</button>
+            <span id="bulk-summary" style="font-size:13px;color:var(--muted)"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><div class="card-title">CSV Format Guide</div></div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Your CSV must have these column headers in the first row:</p>
+        <div style="overflow-x:auto">
+          <table style="width:100%;border-collapse:collapse;font-size:13px">
+            <thead><tr style="background:var(--card2)">
+              <th style="padding:10px 14px;text-align:left;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px">Column</th>
+              <th style="padding:10px 14px;text-align:left;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px">Required</th>
+              <th style="padding:10px 14px;text-align:left;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px">Example</th>
+            </tr></thead>
+            <tbody>
+              ${[
+                ['name','✅ Yes','Classic White T-Shirt'],
+                ['price','✅ Yes','1200'],
+                ['category','✅ Yes','men / women / accessories / shoes'],
+                ['description','No','Comfortable everyday tee'],
+                ['image','No','https://images.unsplash.com/...'],
+                ['originalPrice','No','1800'],
+                ['sizes','No','S,M,L,XL'],
+                ['stock','No','50'],
+                ['status','No','active / hidden'],
+                ['featured','No','true / false'],
+              ].map(([col,req,ex]) => `<tr>
+                <td style="padding:10px 14px;border-bottom:1px solid var(--border);font-weight:700;font-family:monospace">${col}</td>
+                <td style="padding:10px 14px;border-bottom:1px solid var(--border)">${req}</td>
+                <td style="padding:10px 14px;border-bottom:1px solid var(--border);color:var(--muted)">${ex}</td>
+              </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
 
@@ -671,6 +799,63 @@
       </div>
     </div>
 
+  </div>
+</div>
+
+<!-- DISCOUNT MODAL -->
+<div class="modal-overlay" id="discount-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="discount-modal-title">Create Discount Code</div>
+      <button class="modal-close" onclick="closeModal('discount-modal')"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group full">
+        <label>Discount Code <span style="color:var(--pink)">*</span></label>
+        <div style="display:flex;gap:10px">
+          <input type="text" id="dc-code" placeholder="e.g. SAVE20" style="text-transform:uppercase;flex:1">
+          <button class="btn btn-ghost" onclick="generateCode()" style="white-space:nowrap"><i class="fas fa-random"></i> Generate</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Discount Type</label>
+        <select id="dc-type" onchange="updateDiscountLabel()">
+          <option value="percent">Percentage (%)</option>
+          <option value="fixed">Fixed Amount (ETB)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label id="dc-value-label">Discount Value (%)</label>
+        <input type="number" id="dc-value" placeholder="e.g. 20" min="1">
+      </div>
+      <div class="form-group">
+        <label>Minimum Order (ETB)</label>
+        <input type="number" id="dc-min" placeholder="0 = no minimum" min="0">
+      </div>
+      <div class="form-group">
+        <label>Max Uses (0 = unlimited)</label>
+        <input type="number" id="dc-max-uses" placeholder="0" min="0">
+      </div>
+      <div class="form-group">
+        <label>Expiry Date (optional)</label>
+        <input type="date" id="dc-expiry">
+      </div>
+      <div class="form-group full">
+        <label>Description (internal note)</label>
+        <input type="text" id="dc-desc" placeholder="e.g. Launch week promo">
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select id="dc-status">
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('discount-modal')">Cancel</button>
+      <button class="btn btn-pink" onclick="saveDiscount()"><i class="fas fa-save"></i> Save Code</button>
+    </div>
   </div>
 </div>
 
@@ -887,7 +1072,7 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
   import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, orderBy, where, getDoc } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
-  import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-storage.js";
+  import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-storage.js";
   void (async () => {
 
   const firebaseConfig = {
@@ -1792,26 +1977,42 @@
     const file = input.files[0];
     if (!file) return;
     if (file.size > 5 * 1024 * 1024) { showToast('Image too large — max 5MB', 'error'); return; }
+
     const progress = document.getElementById('upload-progress');
     const bar = document.getElementById('upload-bar');
     progress.style.display = 'block';
-    bar.style.width = '30%';
+    bar.style.width = '10%';
+
     try {
-      const storageRef = ref(storage, `products/${Date.now()}_${file.name.replace(/\s/g,'_')}`);
-      bar.style.width = '60%';
-      await uploadBytes(storageRef, file);
-      bar.style.width = '90%';
-      const url = await getDownloadURL(storageRef);
-      bar.style.width = '100%';
-      document.getElementById('p-image-url').value = url;
-      document.getElementById('p-image').value = url;
-      document.getElementById('img-preview').src = url;
-      document.getElementById('img-preview-name').textContent = file.name;
-      document.getElementById('img-preview-wrap').style.display = 'block';
-      setTimeout(() => { progress.style.display = 'none'; bar.style.width = '0%'; }, 600);
-      showToast('Image uploaded!', 'success');
+      const fileName = `products/${Date.now()}_${file.name.replace(/\s/g,'_')}`;
+      const storageRef = ref(storage, fileName);
+      const uploadTask = uploadBytesResumable(storageRef, file);
+
+      uploadTask.on('state_changed',
+        snapshot => {
+          const pct = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          bar.style.width = Math.round(pct) + '%';
+        },
+        error => {
+          bar.style.width = '0%';
+          progress.style.display = 'none';
+          showToast('Upload failed: ' + error.message, 'error');
+        },
+        async () => {
+          const url = await getDownloadURL(uploadTask.snapshot.ref);
+          bar.style.width = '100%';
+          document.getElementById('p-image-url').value = url;
+          document.getElementById('p-image').value = url;
+          document.getElementById('img-preview').src = url;
+          document.getElementById('img-preview-name').textContent = file.name + ' ✓ Uploaded';
+          document.getElementById('img-preview-wrap').style.display = 'block';
+          setTimeout(() => { progress.style.display = 'none'; bar.style.width = '0%'; }, 700);
+          showToast('Image uploaded successfully! ✓', 'success');
+        }
+      );
     } catch(e) {
-      bar.style.width = '0%'; progress.style.display = 'none';
+      bar.style.width = '0%';
+      progress.style.display = 'none';
       showToast('Upload failed: ' + e.message, 'error');
     }
   };
