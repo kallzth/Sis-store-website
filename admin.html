@@ -887,6 +887,7 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
   import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, orderBy, where, getDoc } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+  import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-storage.js";
   void (async () => {
 
   const firebaseConfig = {
@@ -900,6 +901,7 @@
 
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
+  const storage = getStorage(app);
 
   // ---- GLOBALS ----
   let allProducts = [];
@@ -1786,57 +1788,30 @@
     document.getElementById('tab-url').className   = tab === 'url'    ? 'btn btn-pink btn-sm' : 'btn btn-ghost btn-sm';
   };
 
-  // ── CLOUDINARY CONFIG ──
-  const CLOUDINARY_CLOUD = 'dq4twclum';
-  const CLOUDINARY_PRESET = 'sisay-store-uploads';
-
   window.handleImageUpload = async function(input) {
     const file = input.files[0];
     if (!file) return;
     if (file.size > 5 * 1024 * 1024) { showToast('Image too large — max 5MB', 'error'); return; }
-
     const progress = document.getElementById('upload-progress');
     const bar = document.getElementById('upload-bar');
     progress.style.display = 'block';
-    bar.style.width = '20%';
-
+    bar.style.width = '30%';
     try {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('upload_preset', CLOUDINARY_PRESET);
-      formData.append('folder', 'products');
-
-      bar.style.width = '50%';
-
-      const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, {
-        method: 'POST',
-        body: formData
-      });
-
+      const storageRef = ref(storage, `products/${Date.now()}_${file.name.replace(/\s/g,'_')}`);
+      bar.style.width = '60%';
+      await uploadBytes(storageRef, file);
       bar.style.width = '90%';
-
-      if (!res.ok) throw new Error('Upload failed — ' + res.statusText);
-
-      const data = await res.json();
-      const url = data.secure_url;
-
+      const url = await getDownloadURL(storageRef);
       bar.style.width = '100%';
-
-      // Store the URL
       document.getElementById('p-image-url').value = url;
       document.getElementById('p-image').value = url;
-
-      // Show preview
       document.getElementById('img-preview').src = url;
-      document.getElementById('img-preview-name').textContent = file.name + ' ✓ Uploaded to Cloudinary';
+      document.getElementById('img-preview-name').textContent = file.name;
       document.getElementById('img-preview-wrap').style.display = 'block';
-
-      setTimeout(() => { progress.style.display = 'none'; bar.style.width = '0%'; }, 700);
-      showToast('Image uploaded successfully! ✓', 'success');
-
+      setTimeout(() => { progress.style.display = 'none'; bar.style.width = '0%'; }, 600);
+      showToast('Image uploaded!', 'success');
     } catch(e) {
-      bar.style.width = '0%';
-      progress.style.display = 'none';
+      bar.style.width = '0%'; progress.style.display = 'none';
       showToast('Upload failed: ' + e.message, 'error');
     }
   };
