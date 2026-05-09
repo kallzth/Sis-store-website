@@ -440,10 +440,17 @@
 <div id="toast"></div>
 
 <!-- FIREBASE -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<!-- Bridge for onclick handlers -->
 <script>
-  firebase.initializeApp({
+  function goStep(n) { if(window._goStep) window._goStep(n); }
+  function submitApplication() { if(window._submitApplication) window._submitApplication(); }
+</script>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+  import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+
+  const app = initializeApp({
     apiKey: "AIzaSyApRXoQIvtPFfHCK9J0XnNZ_PwRrRm3Dd8",
     authDomain: "sisay-store-593a9.firebaseapp.com",
     projectId: "sisay-store-593a9",
@@ -451,7 +458,7 @@
     messagingSenderId: "347897147293",
     appId: "1:347897147293:web:7d58f77bf3935e0ed6c974"
   });
-  const db = firebase.firestore();
+  const db = getFirestore(app);
 
   let currentStep = 1;
 
@@ -514,7 +521,7 @@
     const cats = [...document.querySelectorAll('.cat-option:checked')].map(c => c.value);
 
     try {
-      await db.collection('sellers').add({
+      await addDoc(collection(db, 'sellers'), {
         name: document.getElementById('r-shopname').value,
         owner: document.getElementById('r-fname').value + ' ' + document.getElementById('r-lname').value,
         phone: document.getElementById('r-phone').value,
@@ -539,6 +546,10 @@
       btn.disabled = false;
     }
   }
+
+  // Expose to window for onclick bridge
+  window._goStep = goStep;
+  window._submitApplication = submitApplication;
 
   function toast(msg, type = 'success') {
     const t = document.getElementById('toast');
