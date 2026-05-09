@@ -490,7 +490,8 @@
     currentStep = n;
 
     if (n === 3) buildReview();
-    window.scrollTo({ top: document.getElementById('form-section').offsetTop - 80, behavior: 'smooth' });
+    const formEl = document.getElementById('form-section');
+    if (formEl) window.scrollTo({ top: formEl.offsetTop - 80, behavior: 'smooth' });
   }
 
   function buildReview() {
@@ -536,9 +537,14 @@
         createdAt: new Date().toISOString()
       });
 
-      document.getElementById('form-section').style.display = 'none';
-      document.getElementById('success-screen').style.display = 'block';
-      document.querySelector('.how-section').style.display = 'none';
+      const formSection = document.getElementById('form-section');
+      const successScreen = document.getElementById('success-screen');
+      const howSection = document.querySelector('.how-section');
+      const statsBar = document.querySelector('.stats-bar');
+      if (formSection) formSection.style.display = 'none';
+      if (successScreen) successScreen.style.display = 'block';
+      if (howSection) howSection.style.display = 'none';
+      if (statsBar) statsBar.style.display = 'none';
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch(e) {
       toast('Error submitting: ' + e.message, 'error');
