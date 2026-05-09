@@ -250,11 +250,57 @@
   .stock-low { color:var(--red); font-weight:700; }
   .stock-ok  { color:var(--green); }
   .stock-med { color:var(--yellow); }
+  /* ── TIER 2 CSS ── */
+  /* Image Upload */
+  .img-upload-area {
+    border: 2px dashed var(--border); border-radius: 12px;
+    padding: 20px; text-align: center; cursor: pointer;
+    transition: all 0.2s; position: relative; background: var(--card2);
+  }
+  .img-upload-area:hover, .img-upload-area.dragover { border-color: var(--pink); background: rgba(255,107,152,0.05); }
+  .img-upload-area input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+  .img-upload-icon { font-size: 28px; color: var(--muted); margin-bottom: 8px; }
+  .img-upload-text { font-size: 13px; color: var(--muted); }
+  .img-upload-text strong { color: var(--primary); }
+  .upload-progress { margin-top: 10px; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; display: none; }
+  .upload-progress-bar { height: 100%; background: linear-gradient(90deg, var(--pink), var(--purple)); border-radius: 2px; transition: width 0.3s; width: 0%; }
+
+  /* Order Pipeline / Kanban */
+  .pipeline-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; align-items: start; }
+  .pipeline-col { background: var(--card2); border-radius: 14px; padding: 14px; border: 1px solid var(--border); }
+  .pipeline-col-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .pipeline-col-title { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; }
+  .pipeline-col-count { background: var(--border); color: var(--muted); font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px; }
+  .pipeline-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin-bottom: 8px; cursor: pointer; transition: all 0.2s; }
+  .pipeline-card:hover { border-color: var(--pink); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+  .pipeline-card:last-child { margin-bottom: 0; }
+  .pipeline-card-id { font-size: 10px; color: var(--muted); font-family: monospace; margin-bottom: 4px; }
+  .pipeline-card-items { font-size: 12px; font-weight: 600; margin-bottom: 6px; line-height: 1.4; }
+  .pipeline-card-amount { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 800; color: var(--primary); margin-bottom: 6px; }
+  .pipeline-card-date { font-size: 11px; color: var(--muted); }
+  .pipeline-actions { display: flex; gap: 6px; margin-top: 8px; }
+  .pipeline-empty { text-align: center; padding: 24px 12px; color: var(--muted); font-size: 12px; opacity: 0.6; }
+
+  /* Payout Tracker */
+  .payout-card { background: var(--card2); border: 1px solid var(--border); border-radius: 14px; padding: 20px; margin-bottom: 12px; }
+  .payout-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .payout-seller { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; }
+  .payout-meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .payout-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 14px; }
+  .payout-stat { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 12px; text-align: center; }
+  .payout-stat-val { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800; color: var(--primary); }
+  .payout-stat-lbl { font-size: 11px; color: var(--muted); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .payout-due { background: rgba(243,156,18,0.1); border: 1px solid rgba(243,156,18,0.3); border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; }
+  .payout-due-amount { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; color: #f39c12; }
+  .payout-due-label { font-size: 12px; color: var(--muted); }
+
   @media (max-width: 1200px) {
     .stats-grid { grid-template-columns: repeat(3, 1fr) !important; }
+    .pipeline-grid { grid-template-columns: repeat(2, 1fr); }
   }
   @media (max-width: 900px) {
     .stats-grid { grid-template-columns: 1fr 1fr !important; }
+    .pipeline-grid { grid-template-columns: 1fr 1fr; }
     .sidebar { width: 200px; }
     .main { margin-left: 200px; }
   }
@@ -287,6 +333,8 @@
     <div class="nav-item" onclick="showPage('products')"><i class="fas fa-tshirt"></i> Products</div>
     <div class="nav-item" onclick="showPage('sellers')"><i class="fas fa-store"></i> Sellers</div>
     <div class="nav-item" onclick="showPage('orders')"><i class="fas fa-shopping-bag"></i> Orders</div>
+    <div class="nav-item" onclick="showPage('pipeline')"><i class="fas fa-columns"></i> Pipeline</div>
+    <div class="nav-item" onclick="showPage('payouts')"><i class="fas fa-hand-holding-usd"></i> Payouts</div>
     <div class="nav-section">Settings</div>
     <div class="nav-item" onclick="showPage('subscribers')"><i class="fas fa-users"></i> Subscribers <span id="sub-badge" style="display:none;background:var(--green);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;margin-left:auto">0</span></div>
     <div class="nav-item" onclick="showPage('messages')"><i class="fas fa-envelope"></i> Messages <span id="msg-badge" style="display:none;background:var(--pink);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;margin-left:auto">0</span></div>
@@ -441,6 +489,57 @@
       <div class="card">
         <div id="orders-table"><div class="loading"><div class="spinner"></div><p>Loading orders...</p></div></div>
       </div>
+    </div>
+
+    <!-- PIPELINE PAGE -->
+    <div class="page" id="page-pipeline">
+      <div class="topbar">
+        <h1>Order Pipeline</h1>
+        <div class="topbar-actions">
+          <span style="font-size:13px;color:var(--muted)">Drag orders through stages to track fulfillment</span>
+        </div>
+      </div>
+      <div class="pipeline-grid" id="pipeline-grid">
+        <div class="pipeline-col">
+          <div class="pipeline-col-header">
+            <div class="pipeline-col-title" style="color:#f39c12">🆕 New</div>
+            <div class="pipeline-col-count" id="pipe-count-pending">0</div>
+          </div>
+          <div id="pipe-pending"></div>
+        </div>
+        <div class="pipeline-col">
+          <div class="pipeline-col-header">
+            <div class="pipeline-col-title" style="color:#0088cc">✅ Confirmed</div>
+            <div class="pipeline-col-count" id="pipe-count-confirmed">0</div>
+          </div>
+          <div id="pipe-confirmed"></div>
+        </div>
+        <div class="pipeline-col">
+          <div class="pipeline-col-header">
+            <div class="pipeline-col-title" style="color:#a78bfa">🚚 Shipped</div>
+            <div class="pipeline-col-count" id="pipe-count-shipped">0</div>
+          </div>
+          <div id="pipe-shipped"></div>
+        </div>
+        <div class="pipeline-col">
+          <div class="pipeline-col-header">
+            <div class="pipeline-col-title" style="color:var(--green)">🎉 Completed</div>
+            <div class="pipeline-col-count" id="pipe-count-completed">0</div>
+          </div>
+          <div id="pipe-completed"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAYOUTS PAGE -->
+    <div class="page" id="page-payouts">
+      <div class="topbar">
+        <h1>Seller Payouts</h1>
+        <div class="topbar-actions">
+          <span style="font-size:13px;color:var(--muted)">Commission owed to each seller based on completed orders</span>
+        </div>
+      </div>
+      <div id="payouts-container"><div class="loading"><div class="spinner"></div><p>Calculating payouts...</p></div></div>
     </div>
 
     <!-- SUBSCRIBERS PAGE -->
@@ -612,14 +711,40 @@
         </select>
       </div>
       <div class="form-group full">
-        <label>Image URL</label>
-        <input type="text" id="p-image" placeholder="https://images.unsplash.com/photo-..." oninput="previewProductImage(this.value)">
-        <div style="font-size:11px;color:var(--muted);margin-top:5px">💡 Tip: Use <strong style="color:var(--text)">images.unsplash.com</strong> URLs or right-click any image online → <em>"Copy image address"</em></div>
-        <div id="img-url-hint" style="display:none;font-size:12px;color:#f39c12;margin-top:6px;padding:10px;background:rgba(243,156,18,0.08);border-radius:8px;border:1px solid rgba(243,156,18,0.2)"></div>
-      </div>
-      <div class="form-group full" id="img-preview-wrap" style="display:none">
-        <label>Preview</label>
-        <img id="img-preview" src="" alt="Preview" style="height:120px;width:120px;object-fit:cover;border-radius:10px;border:1px solid var(--border)">
+        <label>Product Image</label>
+        <!-- Upload Tab -->
+        <div style="display:flex;gap:8px;margin-bottom:10px">
+          <button type="button" id="tab-upload" onclick="switchImgTab('upload')" class="btn btn-pink btn-sm" style="font-size:12px"><i class="fas fa-upload"></i> Upload Image</button>
+          <button type="button" id="tab-url" onclick="switchImgTab('url')" class="btn btn-ghost btn-sm" style="font-size:12px"><i class="fas fa-link"></i> Paste URL</button>
+        </div>
+        <!-- Upload area -->
+        <div id="img-tab-upload">
+          <div class="img-upload-area" id="img-drop-area">
+            <input type="file" id="p-image-file" accept="image/*" onchange="handleImageUpload(this)">
+            <div class="img-upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+            <div class="img-upload-text">Drop image here or <strong>click to browse</strong><br><span style="font-size:11px">JPG, PNG, WEBP — max 5MB</span></div>
+            <div class="upload-progress" id="upload-progress"><div class="upload-progress-bar" id="upload-bar"></div></div>
+          </div>
+        </div>
+        <!-- URL area -->
+        <div id="img-tab-url" style="display:none">
+          <input type="text" id="p-image" placeholder="https://images.unsplash.com/photo-..." oninput="previewProductImage(this.value)">
+          <div style="font-size:11px;color:var(--muted);margin-top:5px">💡 Right-click any image online → "Copy image address"</div>
+          <div id="img-url-hint" style="display:none;font-size:12px;color:#f39c12;margin-top:6px;padding:10px;background:rgba(243,156,18,0.08);border-radius:8px;border:1px solid rgba(243,156,18,0.2)"></div>
+        </div>
+        <!-- Preview -->
+        <div id="img-preview-wrap" style="display:none;margin-top:10px">
+          <label>Preview</label>
+          <div style="display:flex;align-items:center;gap:12px;margin-top:6px">
+            <img id="img-preview" src="" alt="Preview" style="height:100px;width:100px;object-fit:cover;border-radius:10px;border:1px solid var(--border)">
+            <div>
+              <div id="img-preview-name" style="font-size:12px;color:var(--muted);margin-bottom:6px"></div>
+              <button type="button" class="btn btn-danger btn-sm" onclick="clearImage()"><i class="fas fa-trash"></i> Remove</button>
+            </div>
+          </div>
+        </div>
+        <!-- Hidden field to hold the final URL -->
+        <input type="hidden" id="p-image-url">
       </div>
       <div class="form-group full">
         <label>Description</label>
@@ -751,12 +876,18 @@
   function searchSubscribers(q) { if(window._searchSubscribers) window._searchSubscribers(q); }
   function exportSubscribers() { if(window._exportSubscribers) window._exportSubscribers(); }
   function previewProductImage(url) { if(window.previewProductImage) window.previewProductImage(url); }
+  // Tier 2 bridges
+  function switchImgTab(t) { if(window.switchImgTab) window.switchImgTab(t); }
+  function handleImageUpload(i) { if(window.handleImageUpload) window.handleImageUpload(i); }
+  function clearImage() { if(window.clearImage) window.clearImage(); }
+  function moveOrder(id,s) { if(window._moveOrder) window._moveOrder(id,s); }
 </script>
 
 <!-- FIREBASE MODULE -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
   import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, orderBy, where, getDoc } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+  import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-storage.js";
   void (async () => {
 
   const firebaseConfig = {
@@ -770,6 +901,7 @@
 
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
+  const storage = getStorage(app);
 
   // ---- GLOBALS ----
   let allProducts = [];
@@ -1646,7 +1778,205 @@
   // STOCK QUANTITY — add to product form + save
   // ══════════════════════════════════════════
 
-  // ── CLEAR COLLECTION (danger zone) ──
+  // ══════════════════════════════════════════
+  // TIER 2 — IMAGE UPLOAD
+  // ══════════════════════════════════════════
+  window.switchImgTab = function(tab) {
+    document.getElementById('img-tab-upload').style.display = tab === 'upload' ? 'block' : 'none';
+    document.getElementById('img-tab-url').style.display = tab === 'url' ? 'block' : 'none';
+    document.getElementById('tab-upload').className = tab === 'upload' ? 'btn btn-pink btn-sm' : 'btn btn-ghost btn-sm';
+    document.getElementById('tab-url').className   = tab === 'url'    ? 'btn btn-pink btn-sm' : 'btn btn-ghost btn-sm';
+  };
+
+  window.handleImageUpload = async function(input) {
+    const file = input.files[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) { showToast('Image too large — max 5MB', 'error'); return; }
+    const progress = document.getElementById('upload-progress');
+    const bar = document.getElementById('upload-bar');
+    progress.style.display = 'block';
+    bar.style.width = '30%';
+    try {
+      const storageRef = ref(storage, `products/${Date.now()}_${file.name.replace(/\s/g,'_')}`);
+      bar.style.width = '60%';
+      await uploadBytes(storageRef, file);
+      bar.style.width = '90%';
+      const url = await getDownloadURL(storageRef);
+      bar.style.width = '100%';
+      document.getElementById('p-image-url').value = url;
+      document.getElementById('p-image').value = url;
+      document.getElementById('img-preview').src = url;
+      document.getElementById('img-preview-name').textContent = file.name;
+      document.getElementById('img-preview-wrap').style.display = 'block';
+      setTimeout(() => { progress.style.display = 'none'; bar.style.width = '0%'; }, 600);
+      showToast('Image uploaded!', 'success');
+    } catch(e) {
+      bar.style.width = '0%'; progress.style.display = 'none';
+      showToast('Upload failed: ' + e.message, 'error');
+    }
+  };
+
+  window.clearImage = function() {
+    document.getElementById('p-image-url').value = '';
+    document.getElementById('p-image').value = '';
+    document.getElementById('img-preview-wrap').style.display = 'none';
+    document.getElementById('img-preview').src = '';
+    document.getElementById('p-image-file').value = '';
+  };
+
+  // Drag and drop
+  const dropArea = document.getElementById('img-drop-area');
+  if (dropArea) {
+    dropArea.addEventListener('dragover', e => { e.preventDefault(); dropArea.classList.add('dragover'); });
+    dropArea.addEventListener('dragleave', () => dropArea.classList.remove('dragover'));
+    dropArea.addEventListener('drop', e => {
+      e.preventDefault(); dropArea.classList.remove('dragover');
+      const file = e.dataTransfer.files[0];
+      if (file && file.type.startsWith('image/')) {
+        const dt = new DataTransfer(); dt.items.add(file);
+        document.getElementById('p-image-file').files = dt.files;
+        handleImageUpload(document.getElementById('p-image-file'));
+      }
+    });
+  }
+
+  // Fix saveProduct to use the hidden URL field
+  const _origSaveProduct = window._saveProduct;
+  window._saveProduct = async function() {
+    // Sync image URL from whichever tab is active
+    const urlFromUpload = document.getElementById('p-image-url')?.value;
+    const urlFromInput  = document.getElementById('p-image')?.value;
+    const finalUrl = urlFromUpload || urlFromInput;
+    if (document.getElementById('p-image')) document.getElementById('p-image').value = finalUrl;
+    if (document.getElementById('p-image-url')) document.getElementById('p-image-url').value = finalUrl;
+    await _origSaveProduct();
+  };
+
+  // ══════════════════════════════════════════
+  // TIER 2 — ORDER PIPELINE (KANBAN)
+  // ══════════════════════════════════════════
+  const PIPELINE_STAGES = ['pending','confirmed','shipped','completed'];
+
+  function buildPipeline() {
+    PIPELINE_STAGES.forEach(stage => {
+      const orders = allOrders.filter(o => (o.status || 'pending') === stage);
+      const container = document.getElementById('pipe-' + stage);
+      const countEl   = document.getElementById('pipe-count-' + stage);
+      if (!container) return;
+      countEl.textContent = orders.length;
+      if (!orders.length) {
+        container.innerHTML = `<div class="pipeline-empty">No orders here</div>`;
+        return;
+      }
+      container.innerHTML = orders.map(o => {
+        const items = Array.isArray(o.items) ? o.items.map(i => i.name).join(', ') : (o.productName || 'Order');
+        const next  = PIPELINE_STAGES[PIPELINE_STAGES.indexOf(stage) + 1];
+        const prev  = PIPELINE_STAGES[PIPELINE_STAGES.indexOf(stage) - 1];
+        return `<div class="pipeline-card">
+          <div class="pipeline-card-id">#${o.id.slice(-6).toUpperCase()}</div>
+          <div class="pipeline-card-items">${items.length > 40 ? items.slice(0,40)+'…' : items}</div>
+          <div class="pipeline-card-amount">ETB ${parseFloat(o.amount||0).toFixed(0)}</div>
+          <div class="pipeline-card-date">${o.createdAt ? new Date(o.createdAt).toLocaleDateString('en-GB',{day:'numeric',month:'short'}) : '—'}</div>
+          <div class="pipeline-actions">
+            ${next ? `<button class="btn btn-success btn-sm" style="font-size:11px" onclick="moveOrder('${o.id}','${next}')">→ ${next.charAt(0).toUpperCase()+next.slice(1)}</button>` : ''}
+            ${prev ? `<button class="btn btn-ghost btn-sm" style="font-size:11px" onclick="moveOrder('${o.id}','${prev}')">← Back</button>` : ''}
+            ${stage === 'completed' ? `<button class="btn btn-danger btn-sm" style="font-size:11px" onclick="moveOrder('${o.id}','cancelled')"><i class="fas fa-times"></i></button>` : ''}
+          </div>
+        </div>`;
+      }).join('');
+    });
+  }
+
+  window._moveOrder = async function(id, status) {
+    try {
+      await updateDoc(doc(db, 'orders', id), { status });
+      const o = allOrders.find(x => x.id === id);
+      if (o) o.status = status;
+      buildPipeline();
+      renderOrdersTable();
+      updateStats();
+      showToast(`Order moved to ${status}`, 'success');
+    } catch(e) { showToast('Error: ' + e.message, 'error'); }
+  };
+
+  // ══════════════════════════════════════════
+  // TIER 2 — SELLER PAYOUT TRACKER
+  // ══════════════════════════════════════════
+  function buildPayouts() {
+    const container = document.getElementById('payouts-container');
+    const activeSellers = allSellers.filter(s => s.status === 'active');
+
+    if (!activeSellers.length) {
+      container.innerHTML = `<div class="empty"><i class="fas fa-hand-holding-usd"></i><p>No active sellers yet.</p></div>`;
+      return;
+    }
+
+    container.innerHTML = activeSellers.map(seller => {
+      const sellerOrders = allOrders.filter(o =>
+        Array.isArray(o.items) && o.items.some(i => i.sellerId === seller.id)
+        || allProducts.filter(p => p.sellerId === seller.id).some(p =>
+          Array.isArray(o.items) && o.items.some(i => i.name === p.name)
+        )
+      );
+      const completedOrders = sellerOrders.filter(o => o.status === 'completed');
+      const totalRevenue = completedOrders.reduce((sum, o) => {
+        const sellerItems = Array.isArray(o.items)
+          ? o.items.filter(i => allProducts.find(p => p.sellerId === seller.id && p.name === i.name))
+          : [];
+        return sum + sellerItems.reduce((s, i) => s + (parseFloat(i.price || 0) * (i.qty || 1)), 0);
+      }, 0);
+      const commission = parseFloat(seller.commission || 10);
+      const commissionOwed = (totalRevenue * commission / 100);
+      const productCount = allProducts.filter(p => p.sellerId === seller.id).length;
+
+      return `<div class="payout-card">
+        <div class="payout-header">
+          <div>
+            <div class="payout-seller">🏪 ${seller.name}</div>
+            <div class="payout-meta">${seller.owner || ''} · ${seller.phone || ''} · ${commission}% commission</div>
+          </div>
+          <a href="https://wa.me/${(seller.phone||'').replace(/[^0-9]/g,'')}" target="_blank" class="btn btn-ghost btn-sm" style="text-decoration:none">
+            <i class="fab fa-whatsapp"></i> Contact
+          </a>
+        </div>
+        <div class="payout-stats">
+          <div class="payout-stat">
+            <div class="payout-stat-val">${productCount}</div>
+            <div class="payout-stat-lbl">Products</div>
+          </div>
+          <div class="payout-stat">
+            <div class="payout-stat-val">${completedOrders.length}</div>
+            <div class="payout-stat-lbl">Completed Orders</div>
+          </div>
+          <div class="payout-stat">
+            <div class="payout-stat-val">ETB ${totalRevenue.toFixed(0)}</div>
+            <div class="payout-stat-lbl">Total Revenue</div>
+          </div>
+        </div>
+        <div class="payout-due">
+          <div>
+            <div class="payout-due-label">Commission owed (${commission}%)</div>
+            <div class="payout-due-amount">ETB ${commissionOwed.toFixed(2)}</div>
+          </div>
+          <button class="btn btn-success btn-sm" onclick="showToast('Mark as paid feature coming in Tier 3 🚀','success')">
+            <i class="fas fa-check"></i> Mark as Paid
+          </button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // Hook pipeline and payouts into showPage
+  const _origShowPage2 = window._showPage;
+  window._showPage = function(page) {
+    _origShowPage2(page);
+    if (page === 'pipeline') buildPipeline();
+    if (page === 'payouts')  buildPayouts();
+  };
+
+  window._moveOrder = window._moveOrder; // already set above
+  // Bridge
+
   window._clearCollection = async function(colName) {
     try {
       const snap = await getDocs(collection(db, colName));
