@@ -1066,6 +1066,20 @@
   function handleImageUpload(i) { if(window.handleImageUpload) window.handleImageUpload(i); }
   function clearImage() { if(window.clearImage) window.clearImage(); }
   function moveOrder(id,s) { if(window._moveOrder) window._moveOrder(id,s); }
+  // Tier 3 bridges
+  function searchCustomers(q) { if(window._searchCustomers) window._searchCustomers(q); }
+  function exportCustomers() { if(window._exportCustomers) window._exportCustomers(); }
+  function openDiscountModal() { if(window._openDiscountModal) window._openDiscountModal(); }
+  function generateCode() { if(window._generateCode) window._generateCode(); }
+  function updateDiscountLabel() { if(window._updateDiscountLabel) window._updateDiscountLabel(); }
+  function saveDiscount() { if(window._saveDiscount) window._saveDiscount(); }
+  function editDiscount(id) { if(window._editDiscount) window._editDiscount(id); }
+  function deleteDiscount(id) { if(window._deleteDiscount) window._deleteDiscount(id); }
+  function copyDiscountCode(c) { if(window._copyDiscountCode) window._copyDiscountCode(c); }
+  function downloadTemplate() { if(window._downloadTemplate) window._downloadTemplate(); }
+  function handleBulkCSV(i) { if(window._handleBulkCSV) window._handleBulkCSV(i); }
+  function runBulkImport() { if(window._runBulkImport) window._runBulkImport(); }
+  function clearBulk() { if(window._clearBulk) window._clearBulk(); }
 </script>
 
 <!-- FIREBASE MODULE -->
@@ -2176,6 +2190,312 @@
   };
 
   window._moveOrder = window._moveOrder; // already set above
+
+  // ══════════════════════════════════════════
+  // TIER 3 — CUSTOMER PROFILES
+  // ══════════════════════════════════════════
+  let allCustomers = [];
+
+  function buildCustomers() {
+    // Build customer profiles from orders
+    const customerMap = {};
+    allOrders.forEach(o => {
+      const key = o.customerPhone || o.customerName || 'anonymous';
+      if (!customerMap[key]) {
+        customerMap[key] = {
+          name: o.customerName || 'WhatsApp Customer',
+          phone: o.customerPhone || key,
+          orders: [], totalSpent: 0
+        };
+      }
+      customerMap[key].orders.push(o);
+      customerMap[key].totalSpent += parseFloat(o.amount || 0);
+    });
+    allCustomers = Object.values(customerMap);
+    renderCustomers(allCustomers);
+  }
+
+  function renderCustomers(list) {
+    const container = document.getElementById('customers-container');
+    if (!list.length) {
+      container.innerHTML = `<div class="empty"><i class="fas fa-user-friends"></i><p>No customers yet. Orders placed via WhatsApp will build customer profiles automatically.</p></div>`;
+      return;
+    }
+    container.innerHTML = list.map(c => {
+      const initials = c.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
+      const lastOrder = c.orders[c.orders.length - 1];
+      const lastDate = lastOrder?.createdAt ? new Date(lastOrder.createdAt).toLocaleDateString() : '—';
+      return `<div class="customer-card">
+        <div class="customer-avatar">${initials}</div>
+        <div>
+          <div class="customer-name">${c.name}</div>
+          <div class="customer-meta">
+            ${c.phone !== 'anonymous' ? `<span><i class="fas fa-phone"></i> ${c.phone}</span>` : ''}
+            <span><i class="fas fa-calendar"></i> Last order: ${lastDate}</span>
+          </div>
+        </div>
+        <div class="customer-orders">
+          <div class="order-count">${c.orders.length}</div>
+          <div class="order-label">order${c.orders.length !== 1 ? 's' : ''}</div>
+          <div class="order-total">ETB ${c.totalSpent.toFixed(0)}</div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  window._searchCustomers = function(q) {
+    const lower = q.toLowerCase();
+    const filtered = allCustomers.filter(c =>
+      c.name?.toLowerCase().includes(lower) ||
+      c.phone?.toLowerCase().includes(lower)
+    );
+    renderCustomers(filtered);
+  };
+
+  window._exportCustomers = function() {
+    if (!allCustomers.length) { showToast('No customers to export', 'error'); return; }
+    const rows = [['Name','Phone','Orders','Total Spent (ETB)']];
+    allCustomers.forEach(c => rows.push([c.name, c.phone, c.orders.length, c.totalSpent.toFixed(2)]));
+    const csv = rows.map(r => r.map(v => `"${v}"`).join(',')).join('\n');
+    const a = document.createElement('a');
+    a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+    a.download = 'sisay-store-customers.csv';
+    a.click();
+    showToast('Customers exported!', 'success');
+  };
+
+  // ══════════════════════════════════════════
+  // TIER 3 — DISCOUNT CODES
+  // ══════════════════════════════════════════
+  let allDiscounts = [];
+  let editingDiscountId = null;
+
+  async function loadDiscounts() {
+    try {
+      const snap = await getDocs(collection(db, 'discounts'));
+      allDiscounts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderDiscounts();
+    } catch(e) {
+      document.getElementById('discounts-grid').innerHTML = `<div class="empty"><i class="fas fa-tag"></i><p>No discount codes yet.</p></div>`;
+    }
+  }
+
+  function renderDiscounts() {
+    const container = document.getElementById('discounts-grid');
+    if (!allDiscounts.length) {
+      container.innerHTML = `<div class="empty" style="grid-column:1/-1"><i class="fas fa-tag"></i><p>No discount codes yet. Create your first one!</p></div>`;
+      return;
+    }
+    container.innerHTML = allDiscounts.map(d => {
+      const isExpired = d.expiry && new Date(d.expiry) < new Date();
+      const statusBadge = isExpired ? 'badge-red' : d.status === 'active' ? 'badge-green' : 'badge-yellow';
+      const statusLabel = isExpired ? 'expired' : d.status;
+      const discountLabel = d.type === 'percent' ? `${d.value}% off` : `ETB ${d.value} off`;
+      return `<div class="discount-card">
+        <div class="discount-status"><span class="badge ${statusBadge}">${statusLabel}</span></div>
+        <div class="discount-code">${d.code}</div>
+        <div class="discount-value">${discountLabel}${d.minOrder ? ` · Min order ETB ${d.minOrder}` : ''}</div>
+        <div class="discount-stats">
+          <div class="discount-stat"><strong>${d.usedCount || 0}</strong>Used</div>
+          <div class="discount-stat"><strong>${d.maxUses || '∞'}</strong>Max Uses</div>
+          <div class="discount-stat"><strong>${d.expiry || '∞'}</strong>Expires</div>
+        </div>
+        ${d.description ? `<div style="font-size:12px;color:var(--muted);margin-bottom:12px">${d.description}</div>` : ''}
+        <div class="discount-actions">
+          <button class="btn btn-ghost btn-sm" onclick="copyDiscountCode('${d.code}')"><i class="fas fa-copy"></i> Copy</button>
+          <button class="btn btn-ghost btn-sm" onclick="editDiscount('${d.id}')"><i class="fas fa-edit"></i></button>
+          <button class="btn btn-danger btn-sm" onclick="deleteDiscount('${d.id}')"><i class="fas fa-trash"></i></button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  window._openDiscountModal = function() {
+    editingDiscountId = null;
+    document.getElementById('discount-modal-title').textContent = 'Create Discount Code';
+    ['dc-code','dc-value','dc-min','dc-max-uses','dc-expiry','dc-desc'].forEach(id => {
+      const el = document.getElementById(id); if (el) el.value = '';
+    });
+    document.getElementById('dc-type').value = 'percent';
+    document.getElementById('dc-status').value = 'active';
+    document.getElementById('dc-value-label').textContent = 'Discount Value (%)';
+    document.getElementById('discount-modal').classList.add('open');
+  };
+
+  window._generateCode = function() {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    const code = 'SISAY' + Array.from({length:5}, () => chars[Math.floor(Math.random()*chars.length)]).join('');
+    document.getElementById('dc-code').value = code;
+  };
+
+  window._updateDiscountLabel = function() {
+    const type = document.getElementById('dc-type').value;
+    document.getElementById('dc-value-label').textContent = type === 'percent' ? 'Discount Value (%)' : 'Discount Value (ETB)';
+  };
+
+  window._saveDiscount = async function() {
+    const code = document.getElementById('dc-code').value.trim().toUpperCase();
+    const value = document.getElementById('dc-value').value;
+    if (!code) { showToast('Please enter a code', 'error'); return; }
+    if (!value) { showToast('Please enter a discount value', 'error'); return; }
+    const data = {
+      code, value: parseFloat(value),
+      type: document.getElementById('dc-type').value,
+      minOrder: parseFloat(document.getElementById('dc-min').value) || 0,
+      maxUses: parseInt(document.getElementById('dc-max-uses').value) || 0,
+      expiry: document.getElementById('dc-expiry').value || null,
+      description: document.getElementById('dc-desc').value,
+      status: document.getElementById('dc-status').value,
+      usedCount: 0,
+      updatedAt: new Date().toISOString()
+    };
+    try {
+      if (editingDiscountId) {
+        await updateDoc(doc(db, 'discounts', editingDiscountId), data);
+        showToast('Discount code updated!', 'success');
+      } else {
+        data.createdAt = new Date().toISOString();
+        await addDoc(collection(db, 'discounts'), data);
+        showToast('Discount code created!', 'success');
+      }
+      closeModal('discount-modal');
+      await loadDiscounts();
+    } catch(e) { showToast('Error: ' + e.message, 'error'); }
+  };
+
+  window._editDiscount = async function(id) {
+    const d = allDiscounts.find(x => x.id === id);
+    if (!d) return;
+    editingDiscountId = id;
+    document.getElementById('discount-modal-title').textContent = 'Edit Discount Code';
+    document.getElementById('dc-code').value = d.code;
+    document.getElementById('dc-value').value = d.value;
+    document.getElementById('dc-type').value = d.type;
+    document.getElementById('dc-min').value = d.minOrder || '';
+    document.getElementById('dc-max-uses').value = d.maxUses || '';
+    document.getElementById('dc-expiry').value = d.expiry || '';
+    document.getElementById('dc-desc').value = d.description || '';
+    document.getElementById('dc-status').value = d.status;
+    document.getElementById('dc-value-label').textContent = d.type === 'percent' ? 'Discount Value (%)' : 'Discount Value (ETB)';
+    document.getElementById('discount-modal').classList.add('open');
+  };
+
+  window._deleteDiscount = async function(id) {
+    if (!confirm('Delete this discount code?')) return;
+    await deleteDoc(doc(db, 'discounts', id));
+    allDiscounts = allDiscounts.filter(d => d.id !== id);
+    renderDiscounts();
+    showToast('Discount code deleted', 'success');
+  };
+
+  window._copyDiscountCode = function(code) {
+    navigator.clipboard.writeText(code);
+    showToast(`Code "${code}" copied!`, 'success');
+  };
+
+  // ══════════════════════════════════════════
+  // TIER 3 — BULK CSV IMPORT
+  // ══════════════════════════════════════════
+  let bulkData = [];
+
+  window._downloadTemplate = function() {
+    const headers = 'name,price,category,description,image,originalPrice,sizes,stock,status,featured';
+    const sample = 'Classic White T-Shirt,1200,men,Comfortable everyday tee,https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400,,S/M/L/XL,50,active,false';
+    const csv = headers + '\n' + sample;
+    const a = document.createElement('a');
+    a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+    a.download = 'sisay-store-product-template.csv';
+    a.click();
+    showToast('Template downloaded!', 'success');
+  };
+
+  window._handleBulkCSV = function(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      const lines = e.target.result.split('\n').filter(l => l.trim());
+      const headers = lines[0].split(',').map(h => h.trim().replace(/"/g,''));
+      bulkData = [];
+      const preview = [];
+      for (let i = 1; i < lines.length; i++) {
+        const vals = lines[i].split(',').map(v => v.trim().replace(/"/g,''));
+        const row = {};
+        headers.forEach((h, idx) => row[h] = vals[idx] || '');
+        const hasName = !!row.name;
+        const hasPrice = !!row.price && !isNaN(row.price);
+        const hasCategory = ['men','women','accessories','shoes'].includes(row.category?.toLowerCase());
+        row._valid = hasName && hasPrice && hasCategory;
+        row._error = !hasName ? 'Missing name' : !hasPrice ? 'Invalid price' : !hasCategory ? 'Invalid category' : '';
+        bulkData.push(row);
+        preview.push(row);
+      }
+      const valid = bulkData.filter(r => r._valid).length;
+      const invalid = bulkData.length - valid;
+      document.getElementById('bulk-summary').textContent = `${valid} valid · ${invalid} invalid`;
+      document.getElementById('bulk-preview').style.display = 'block';
+      document.getElementById('bulk-actions').style.display = 'flex';
+      document.getElementById('bulk-preview').innerHTML = `
+        <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin:16px 0 10px">Preview (${bulkData.length} rows)</div>
+        <div style="overflow-x:auto;border-radius:12px;border:1px solid var(--border)">
+        <table>
+          <thead><tr><th>Status</th><th>Name</th><th>Price</th><th>Category</th><th>Stock</th><th>Issue</th></tr></thead>
+          <tbody>${bulkData.map(r => `<tr>
+            <td class="${r._valid ? 'bulk-row-ok' : 'bulk-row-err'}">${r._valid ? '✓' : '✗'}</td>
+            <td>${r.name || '—'}</td>
+            <td>${r.price ? 'ETB '+r.price : '—'}</td>
+            <td>${r.category || '—'}</td>
+            <td>${r.stock || '—'}</td>
+            <td style="color:#e74c3c;font-size:11px">${r._error || ''}</td>
+          </tr>`).join('')}</tbody>
+        </table></div>`;
+    };
+    reader.readAsText(file);
+  };
+
+  window._runBulkImport = async function() {
+    const valid = bulkData.filter(r => r._valid);
+    if (!valid.length) { showToast('No valid products to import', 'error'); return; }
+    const btn = document.getElementById('bulk-import-btn');
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Importing...';
+    btn.disabled = true;
+    try {
+      await Promise.all(valid.map(r => addDoc(collection(db, 'products'), {
+        name: r.name, price: parseFloat(r.price),
+        originalPrice: r.originalPrice ? parseFloat(r.originalPrice) : null,
+        category: r.category.toLowerCase(),
+        description: r.description || '',
+        image: r.image || '',
+        sizes: r.sizes ? r.sizes.split('/').map(s => s.trim()) : [],
+        stock: r.stock ? parseInt(r.stock) : null,
+        status: r.status || 'active',
+        featured: r.featured === 'true',
+        createdAt: new Date().toISOString()
+      })));
+      showToast(`${valid.length} products imported successfully! ✓`, 'success');
+      await loadProducts();
+      updateStats();
+      clearBulk();
+    } catch(e) { showToast('Import error: ' + e.message, 'error'); }
+    btn.innerHTML = '<i class="fas fa-upload"></i> Import All Valid Products';
+    btn.disabled = false;
+  };
+
+  window._clearBulk = function() {
+    bulkData = [];
+    document.getElementById('bulk-preview').style.display = 'none';
+    document.getElementById('bulk-actions').style.display = 'none';
+    document.getElementById('bulk-csv-file').value = '';
+    document.getElementById('bulk-summary').textContent = '';
+  };
+
+  // Hook Tier 3 into showPage
+  const _origShowPage3 = window._showPage;
+  window._showPage = function(page) {
+    _origShowPage3(page);
+    if (page === 'customers') buildCustomers();
+    if (page === 'discounts') loadDiscounts();
+  };
   // Bridge
 
   window._clearCollection = async function(colName) {
