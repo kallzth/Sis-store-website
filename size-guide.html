@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Size Guide — Sisay Store</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=block" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+:root{--primary:#FF6B98;--secondary:#5F27CD;--dark:#111114;--card:#1c1c22;--card2:#242430;--border:#2a2a38;--text:#f0f0f5;--muted:#7777aa;--green:#2ECC71;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--dark);color:var(--text);font-family:'DM Sans',sans-serif;}
+a{text-decoration:none;color:inherit;}
+
+nav{display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:64px;background:rgba(17,17,20,0.97);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;}
+.nav-logo{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--primary);}
+.nav-back{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:14px;transition:color 0.2s;}
+.nav-back:hover{color:var(--text);}
+
+.page-hero{background:radial-gradient(ellipse at 50% 80%,#1a1040 0%,var(--dark) 65%);padding:60px 40px 44px;text-align:center;border-bottom:1px solid var(--border);}
+.hero-tag{display:inline-flex;align-items:center;gap:8px;background:rgba(255,107,152,0.12);border:1px solid rgba(255,107,152,0.3);color:var(--primary);padding:7px 16px;border-radius:30px;font-size:12px;font-weight:600;margin-bottom:20px;}
+.page-hero h1{font-family:'Syne',sans-serif;font-size:clamp(28px,5vw,46px);font-weight:800;margin-bottom:12px;}
+.page-hero p{color:var(--muted);font-size:15px;max-width:500px;margin:0 auto 28px;line-height:1.6;}
+.unit-toggle{display:inline-flex;background:var(--card);border:1px solid var(--border);border-radius:30px;padding:4px;gap:4px;}
+.unit-btn{padding:8px 22px;border-radius:24px;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s;color:var(--muted);border:none;background:none;font-family:'DM Sans',sans-serif;}
+.unit-btn.active{background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;}
+
+.page-wrap{max-width:960px;margin:0 auto;padding:52px 40px 80px;}
+
+.cat-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:40px;}
+.cat-tab{padding:9px 22px;border-radius:30px;font-size:13px;font-weight:600;background:var(--card);border:1px solid var(--border);color:var(--muted);cursor:pointer;transition:all 0.2s;}
+.cat-tab.active,.cat-tab:hover{background:var(--primary);border-color:var(--primary);color:#fff;}
+
+.size-section{display:none;}
+.size-section.active{display:block;animation:fadeIn 0.3s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.section-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:8px;}
+.section-sub{color:var(--muted);font-size:14px;margin-bottom:28px;line-height:1.6;}
+
+.measure-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-bottom:36px;}
+.measure-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 16px;display:flex;gap:14px;align-items:flex-start;transition:border-color 0.2s;}
+.measure-card:hover{border-color:rgba(255,107,152,0.3);}
+.measure-icon{width:40px;height:40px;border-radius:10px;background:rgba(255,107,152,0.12);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.measure-label{font-weight:700;font-size:13px;margin-bottom:4px;}
+.measure-desc{font-size:12px;color:var(--muted);line-height:1.5;}
+
+.finder-box{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:28px;margin-bottom:24px;}
+.finder-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:10px;}
+.finder-title i{color:var(--primary);}
+.finder-sub{color:var(--muted);font-size:13px;margin-bottom:20px;}
+.finder-inputs{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px;margin-bottom:16px;}
+.finder-group{display:flex;flex-direction:column;gap:6px;}
+.finder-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;font-weight:600;}
+.finder-input{background:var(--card2);border:1px solid var(--border);color:var(--text);padding:11px 14px;border-radius:10px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;transition:border 0.2s;width:100%;}
+.finder-input:focus{border-color:var(--primary);}
+.finder-btn{background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;border:none;padding:12px 28px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity 0.2s;display:inline-flex;align-items:center;gap:8px;}
+.finder-btn:hover{opacity:0.88;}
+.finder-result{margin-top:16px;padding:16px 20px;border-radius:12px;background:rgba(255,107,152,0.08);border:1px solid rgba(255,107,152,0.25);display:none;align-items:center;gap:16px;}
+.finder-result.show{display:flex;}
+.result-size{font-family:'Syne',sans-serif;font-size:36px;font-weight:800;color:var(--primary);white-space:nowrap;}
+.result-text{font-size:13px;color:var(--muted);line-height:1.7;}
+.result-text strong{color:var(--text);display:block;margin-bottom:2px;}
+
+.table-wrap{overflow-x:auto;border-radius:14px;border:1px solid var(--border);margin-bottom:20px;}
+.size-table{width:100%;border-collapse:collapse;font-size:13px;min-width:480px;}
+.size-table thead tr{background:var(--card2);}
+.size-table th{padding:12px 16px;text-align:center;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-weight:700;white-space:nowrap;}
+.size-table th:first-child{text-align:left;}
+.size-table td{padding:13px 16px;border-bottom:1px solid var(--border);text-align:center;font-size:13px;}
+.size-table td:first-child{text-align:left;font-weight:700;}
+.size-table tr:last-child td{border-bottom:none;}
+.size-table tbody tr:hover td{background:rgba(255,255,255,0.025);}
+.size-pill{display:inline-flex;align-items:center;justify-content:center;min-width:36px;height:32px;padding:0 10px;border-radius:8px;background:linear-gradient(135deg,var(--primary),var(--secondary));color:#fff;font-family:'Syne',sans-serif;font-weight:800;font-size:12px;}
+
+.alert{border-radius:12px;padding:14px 18px;font-size:13px;line-height:1.6;display:flex;gap:12px;align-items:flex-start;margin-bottom:20px;}
+.alert i{flex-shrink:0;margin-top:2px;}
+.alert strong{font-weight:700;}
+.alert-blue{background:rgba(95,39,205,0.08);border:1px solid rgba(95,39,205,0.25);color:#c4b5fd;}
+.alert-green{background:rgba(46,204,113,0.08);border:1px solid rgba(46,204,113,0.25);color:#6ee7b7;}
+
+.tips-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:32px;}
+.tip-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 20px;display:flex;gap:12px;}
+.tip-icon{font-size:20px;flex-shrink:0;margin-top:2px;}
+.tip-title{font-weight:700;font-size:13px;margin-bottom:4px;}
+.tip-desc{font-size:12px;color:var(--muted);line-height:1.55;}
+
+.page-cta{background:linear-gradient(135deg,#1a0a2e,var(--card));border:1px solid var(--border);border-radius:20px;padding:36px;text-align:center;margin-top:40px;}
+.page-cta h3{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:8px;}
+.page-cta p{color:var(--muted);font-size:14px;margin-bottom:20px;}
+.cta-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s;border:none;font-family:'DM Sans',sans-serif;text-decoration:none;}
+.btn-wa{background:#25D366;color:#fff;}
+.btn-wa:hover{opacity:0.88;}
+.btn-outline{background:var(--card2);color:var(--text);border:1px solid var(--border);}
+.btn-outline:hover{border-color:var(--primary);color:var(--primary);}
+
+.page-footer{border-top:1px solid var(--border);padding:24px 40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+.page-footer p{color:var(--muted);font-size:13px;}
+.footer-links{display:flex;gap:20px;flex-wrap:wrap;}
+.footer-links a{color:var(--muted);font-size:13px;transition:color 0.2s;}
+.footer-links a:hover{color:var(--primary);}
+
+@media(max-width:700px){
+  nav{padding:0 16px;}
+  .page-hero{padding:40px 16px 32px;}
+  .page-wrap{padding:32px 16px 60px;}
+  .tips-grid{grid-template-columns:1fr;}
+  .measure-grid{grid-template-columns:1fr 1fr;}
+  .page-footer{padding:20px 16px;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">Sisay Store</div>
+  <a href="./" class="nav-back"><i class="fas fa-arrow-left"></i> Back to Store</a>
+</nav>
+
+<div class="page-hero">
+  <div class="hero-tag"><i class="fas fa-ruler"></i> Size Guide</div>
+  <h1>Find Your Perfect Fit</h1>
+  <p>Interactive size charts for men, women, kids and shoes — with a built-in size finder that recommends your size from your measurements.</p>
+  <div class="unit-toggle">
+    <button class="unit-btn active" onclick="setUnit('cm',this)">Centimeters (cm)</button>
+    <button class="unit-btn" onclick="setUnit('in',this)">Inches (in)</button>
+  </div>
+</div>
+
+<div class="page-wrap">
+  <div class="cat-tabs">
+    <div class="cat-tab active" onclick="showCat('men',this)"><i class="fas fa-male"></i> Men</div>
+    <div class="cat-tab" onclick="showCat('women',this)"><i class="fas fa-female"></i> Women</div>
+    <div class="cat-tab" onclick="showCat('shoes',this)"><i class="fas fa-shoe-prints"></i> Shoes</div>
+    <div class="cat-tab" onclick="showCat('kids',this)"><i class="fas fa-child"></i> Kids</div>
+  </div>
+
+  <!-- ═══ MEN ═══ -->
+  <div class="size-section active" id="cat-men">
+    <div class="section-title">Men's Clothing Sizes</div>
+    <div class="section-sub">Measurements are of the <strong style="color:var(--text)">body</strong>, not the garment. Measure over light clothing for best accuracy.</div>
+    <div class="measure-grid">
+      <div class="measure-card"><div class="measure-icon">📏</div><div><div class="measure-label">Chest</div><div class="measure-desc">Measure around the fullest part of your chest, keeping the tape horizontal.</div></div></div>
+      <div class="measure-card"><div class="measure-icon">📐</div><div><div class="measure-label">Waist</div><div class="measure-desc">Measure around your natural waistline at the narrowest part of your torso.</div></div></div>
+      <div class="measure-card"><div class="measure-icon">📏</div><div><div class="measure-label">Hips</div><div class="measure-desc">Measure around the fullest part of your hips, about 20 cm below your waist.</div></div></div>
+      <div class="measure-card"><div class="measure-icon">📐</div><div><div class="measure-label">Shoulder</div><div class="measure-desc">Measure from shoulder point to shoulder point across your back.</div></div></div>
+    </div>
+    <div class="finder-box">
+      <div class="finder-title"><i class="fas fa-magic"></i> Men's Size Finder</div>
+      <div class="finder-sub">Enter your measurements — we'll recommend your size instantly.</div>
+      <div class="finder-inputs">
+        <div class="finder-group"><div class="finder-label">Chest <span class="ul">(cm)</span></div><input class="finder-input" id="m-chest" type="number" placeholder="e.g. 96"></div>
+        <div class="finder-group"><div class="finder-label">Waist <span class="ul">(cm)</span></div><input class="finder-input" id="m-waist" type="number" placeholder="e.g. 82"></div>
+        <div class="finder-group"><div class="finder-label">Hips <span class="ul">(cm)</span></div><input class="finder-input" id="m-hips" type="number" placeholder="e.g. 98"></div>
+      </div>
+      <button class="finder-btn" onclick="findMenSize()"><i class="fas fa-search"></i> Find My Size</button>
+      <div class="finder-result" id="men-result">
+        <div class="result-size" id="men-rs"></div>
+        <div class="result-text" id="men-rt"></div>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table class="size-table">
+        <thead><tr><th>Size</th><th>Chest <span class="ul">(cm)</span></th><th>Waist <span class="ul">(cm)</span></th><th>Hips <span class="ul">(cm)</span></th><th>EU</th><th>US/UK</th></tr></thead>
+        <tbody id="men-tbody"></tbody>
+      </table>
+    </div>
+    <div class="alert alert-blue"><i class="fas fa-info-circle"></i><span><strong>Between sizes?</strong> Size up for a relaxed fit, size down for slim. Not sure? Send us your measurements on WhatsApp!</span></div>
+  </div>
+
+  <!-- ═══ WOMEN ═══ -->
+  <div class="size-section" id="cat-women">
+    <div class="section-title">Women's Clothing Sizes</div>
+    <div class="section-sub">Measurements are of the <strong style="color:var(--text)">body</strong>. Measure without heavy clothing for accuracy.</div>
+    <div class="measure-grid">
+      <div class="measure-card"><div class="measure-icon">📏</div><div><div class="measure-label">Bust</div><div class="measure-desc">Measure around the fullest part of your bust, keeping the tape parallel to the floor.</div></div></div>
+      <div class="measure-card"><div class="measure-icon">📐</div><div><div class="measure-label">Waist</div><div class="measure-desc">Measure around your natural waist — the narrowest part just above the navel.</div></div></div>
+      <div class="measure-card"><div class="measure-icon">📏</div><div><div class="measure-label">Hips</div><div class="measure-desc">Measure around the fullest part of your hips and seat, about 20 cm below your waist.</div></div></div>
+      <div class="measure-card"><div class="measure-icon">📐</div><div><div class="measure-label">Length</div><div class="measure-desc">Measure from the top of your shoulder down to where you want the garment to end.</div></div></div>
+    </div>
+    <div class="finder-box">
+      <div class="finder-title"><i class="fas fa-magic"></i> Women's Size Finder</div>
+      <div class="finder-sub">Enter your measurements — we'll recommend your size instantly.</div>
+      <div class="finder-inputs">
+        <div class="finder-group"><div class="finder-label">Bust <span class="ul">(cm)</span></div><input class="finder-input" id="w-bust" type="number" placeholder="e.g. 90"></div>
+        <div class="finder-group"><div class="finder-label">Waist <span class="ul">(cm)</span></div><input class="finder-input" id="w-waist" type="number" placeholder="e.g. 70"></div>
+        <div class="finder-group"><div class="finder-label">Hips <span class="ul">(cm)</span></div><input class="finder-input" id="w-hips" type="number" placeholder="e.g. 96"></div>
+      </div>
+      <button class="finder-btn" onclick="findWomenSize()"><i class="fas fa-search"></i> Find My Size</button>
+      <div class="finder-result" id="women-result">
+        <div class="result-size" id="women-rs"></div>
+        <div class="result-text" id="women-rt"></div>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table class="size-table">
+        <thead><tr><th>Size</th><th>Bust <span class="ul">(cm)</span></th><th>Waist <span class="ul">(cm)</span></th><th>Hips <span class="ul">(cm)</span></th><th>EU</th><th>US</th><th>UK</th></tr></thead>
+        <tbody id="women-tbody"></tbody>
+      </table>
+    </div>
+    <div class="alert alert-blue"><i class="fas fa-info-circle"></i><span><strong>Between sizes?</strong> For fitted styles size down, for relaxed styles size up. Still unsure? Message us!</span></div>
+  </div>
+
+  <!-- ═══ SHOES ═══ -->
+  <div class="size-section" id="cat-shoes">
+    <div class="section-title">Shoe Sizes</div>
+    <div class="section-sub">Measure your foot at the end of the day when feet are at their largest. Stand on a flat surface for accuracy.</div>
+    <div class="measure-grid" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr))">
+      <div class="measure-card"><div class="measure-icon">📏</div><div><div class="measure-label">How to measure</div><div class="measure-desc">Place your foot on paper, mark your longest toe and heel, then measure the distance between the marks.</div></div></div>
+      <div class="measure-card"><div class="measure-icon">⏰</div><div><div class="measure-label">Measure in the evening</div><div class="measure-desc">Feet swell slightly during the day — measuring in the evening gives a more accurate size.</div></div></div>
+      <div class="measure-card"><div class="measure-icon">🧦</div><div><div class="measure-label">Wear your usual socks</div><div class="measure-desc">Measure while wearing the socks you'll normally wear with your new shoes.</div></div></div>
+    </div>
+    <div class="finder-box">
+      <div class="finder-title"><i class="fas fa-magic"></i> Shoe Size Finder</div>
+      <div class="finder-sub">Enter your foot length to find your size across all standards.</div>
+      <div class="finder-inputs" style="max-width:320px">
+        <div class="finder-group"><div class="finder-label">Foot Length <span class="ul">(cm)</span></div><input class="finder-input" id="s-length" type="number" placeholder="e.g. 26" step="0.5"></div>
+        <div class="finder-group"><div class="finder-label">Gender</div><select class="finder-input" id="s-gender"><option value="men">Men's</option><option value="women">Women's</option></select></div>
+      </div>
+      <button class="finder-btn" onclick="findShoeSize()"><i class="fas fa-search"></i> Find My Size</button>
+      <div class="finder-result" id="shoes-result">
+        <div class="result-size" id="shoes-rs"></div>
+        <div class="result-text" id="shoes-rt"></div>
+      </div>
+    </div>
+    <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:12px">Men's Shoe Sizes</div>
+    <div class="table-wrap" style="margin-bottom:28px">
+      <table class="size-table"><thead><tr><th>EU</th><th>US</th><th>UK</th><th>Foot Length <span class="ul">(cm)</span></th></tr></thead><tbody id="mshoe-tbody"></tbody></table>
+    </div>
+    <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:12px">Women's Shoe Sizes</div>
+    <div class="table-wrap">
+      <table class="size-table"><thead><tr><th>EU</th><th>US</th><th>UK</th><th>Foot Length <span class="ul">(cm)</span></th></tr></thead><tbody id="wshoe-tbody"></tbody></table>
+    </div>
+    <div class="alert alert-green"><i class="fas fa-check-circle"></i><span><strong>Half sizes:</strong> If between sizes, go up half a size — especially for trainers and sports shoes.</span></div>
+  </div>
+
+  <!-- ═══ KIDS ═══ -->
+  <div class="size-section" id="cat-kids">
+    <div class="section-title">Kids' Clothing Sizes</div>
+    <div class="section-sub">Kids' sizes are based on <strong style="color:var(--text)">age and height</strong>. We recommend measuring height for the most accurate fit as children vary greatly in size.</div>
+    <div class="measure-grid">
+      <div class="measure-card"><div class="measure-icon">📏</div><div><div class="measure-label">Height</div><div class="measure-desc">Stand straight against a wall. Mark the top of the head and measure from the floor.</div></div></div>
+      <div class="measure-card"><div class="measure-icon">📐</div><div><div class="measure-label">Chest</div><div class="measure-desc">Measure around the fullest part of the chest, keeping the tape comfortable and level.</div></div></div>
+      <div class="measure-card"><div class="measure-icon">📏</div><div><div class="measure-label">Waist</div><div class="measure-desc">Measure around the natural waistline while relaxed — do not pull the tape tight.</div></div></div>
+    </div>
+    <div class="table-wrap">
+      <table class="size-table">
+        <thead><tr><th>Age</th><th>Height <span class="ul">(cm)</span></th><th>Chest <span class="ul">(cm)</span></th><th>Waist <span class="ul">(cm)</span></th><th>Label</th></tr></thead>
+        <tbody id="kids-tbody"></tbody>
+      </table>
+    </div>
+    <div class="alert alert-blue"><i class="fas fa-info-circle"></i><span><strong>Kids grow fast!</strong> If between sizes we recommend sizing up — especially for outerwear and school clothing.</span></div>
+  </div>
+
+  <!-- TIPS -->
+  <div style="margin-top:48px;margin-bottom:28px;font-family:'Syne',sans-serif;font-size:20px;font-weight:800">📌 Fitting Tips</div>
+  <div class="tips-grid">
+    <div class="tip-card"><div class="tip-icon">📸</div><div><div class="tip-title">Send us your measurements</div><div class="tip-desc">Not sure? WhatsApp us your measurements and we'll personally recommend the best size for the specific item you want.</div></div></div>
+    <div class="tip-card"><div class="tip-icon">🔄</div><div><div class="tip-title">Free size exchanges</div><div class="tip-desc">If your size doesn't fit, we offer free size exchanges within 7 days. No stress — we've got you covered.</div></div></div>
+    <div class="tip-card"><div class="tip-icon">📏</div><div><div class="tip-title">Measure twice</div><div class="tip-desc">Always measure twice for accuracy. Use a flexible tape measure and measure at the widest point of each area.</div></div></div>
+    <div class="tip-card"><div class="tip-icon">👗</div><div><div class="tip-title">Fit varies by style</div><div class="tip-desc">Slim-fit styles run smaller. Oversized or relaxed styles may run larger. Check the product description for specific fit notes.</div></div></div>
+  </div>
+
+  <div class="page-cta">
+    <h3>Still not sure about your size?</h3>
+    <p>Send us your measurements on WhatsApp and we'll find the perfect fit for you personally.</p>
+    <div class="cta-btns">
+      <a href="https://wa.me/251912345678" target="_blank" class="btn btn-wa"><i class="fab fa-whatsapp"></i> Ask on WhatsApp</a>
+      <a href="./" class="btn btn-outline"><i class="fas fa-store"></i> Back to Store</a>
+    </div>
+  </div>
+</div>
+
+<div class="page-footer">
+  <p>© 2025 Sisay Store. All Rights Reserved.</p>
+  <div class="footer-links">
+    <a href="./faq.html">FAQs</a>
+    <a href="./shipping.html">Shipping & Returns</a>
+    <a href="./size-guide.html">Size Guide</a>
+    <a href="./seller-register.html">Sell With Us</a>
+  </div>
+</div>
+
+<script>
+const D = {
+  men:[
+    {s:'XS',c:[82,86],w:[66,70],h:[86,90],eu:44,us:'XS'},
+    {s:'S', c:[87,91],w:[71,75],h:[91,95],eu:46,us:'S'},
+    {s:'M', c:[92,96],w:[76,80],h:[96,100],eu:48,us:'M'},
+    {s:'L', c:[97,101],w:[81,85],h:[101,105],eu:50,us:'L'},
+    {s:'XL',c:[102,106],w:[86,90],h:[106,110],eu:52,us:'XL'},
+    {s:'2XL',c:[107,112],w:[91,96],h:[111,116],eu:54,us:'2XL'},
+    {s:'3XL',c:[113,118],w:[97,102],h:[117,122],eu:56,us:'3XL'},
+  ],
+  women:[
+    {s:'XS',b:[76,80],w:[58,62],h:[82,86],eu:32,us:0,uk:4},
+    {s:'S', b:[81,85],w:[63,67],h:[87,91],eu:34,us:4,uk:8},
+    {s:'M', b:[86,90],w:[68,72],h:[92,96],eu:36,us:6,uk:10},
+    {s:'L', b:[91,95],w:[73,77],h:[97,101],eu:38,us:8,uk:12},
+    {s:'XL',b:[96,100],w:[78,82],h:[102,106],eu:40,us:10,uk:14},
+    {s:'2XL',b:[101,106],w:[83,88],h:[107,112],eu:42,us:12,uk:16},
+    {s:'3XL',b:[107,112],w:[89,94],h:[113,118],eu:44,us:14,uk:18},
+  ],
+  mshoe:[
+    {eu:39,us:6,  uk:5.5,cm:24.5},{eu:40,us:7,  uk:6,  cm:25.0},
+    {eu:41,us:7.5,uk:6.5,cm:25.5},{eu:42,us:8,  uk:7.5,cm:26.5},
+    {eu:43,us:9,  uk:8.5,cm:27.0},{eu:44,us:10, uk:9,  cm:27.5},
+    {eu:45,us:11, uk:10, cm:28.5},{eu:46,us:12, uk:11, cm:29.0},
+  ],
+  wshoe:[
+    {eu:35,us:5,  uk:2.5,cm:22.0},{eu:36,us:5.5,uk:3,  cm:22.5},
+    {eu:37,us:6,  uk:3.5,cm:23.5},{eu:38,us:7,  uk:4.5,cm:24.0},
+    {eu:39,us:8,  uk:5.5,cm:24.5},{eu:40,us:9,  uk:6,  cm:25.5},
+    {eu:41,us:9.5,uk:6.5,cm:26.0},{eu:42,us:10, uk:7,  cm:26.5},
+  ],
+  kids:[
+    {age:'2–3 yrs', h:[86,98],  c:[52,55],w:[50,52],l:'2T'},
+    {age:'3–4 yrs', h:[98,104], c:[55,58],w:[52,54],l:'3T'},
+    {age:'4–5 yrs', h:[104,110],c:[58,61],w:[54,56],l:'4T'},
+    {age:'5–6 yrs', h:[110,116],c:[61,64],w:[56,58],l:'5'},
+    {age:'6–7 yrs', h:[116,122],c:[64,67],w:[58,60],l:'6'},
+    {age:'7–8 yrs', h:[122,128],c:[67,70],w:[60,62],l:'7'},
+    {age:'8–9 yrs', h:[128,134],c:[70,73],w:[62,64],l:'8'},
+    {age:'9–10 yrs',h:[134,140],c:[73,77],w:[64,67],l:'10'},
+    {age:'10–11 yrs',h:[140,146],c:[77,81],w:[67,70],l:'12'},
+    {age:'11–12 yrs',h:[146,152],c:[81,85],w:[70,73],l:'14'},
+  ]
+};
+
+let unit = 'cm';
+const i2c = v => +(v*2.54).toFixed(1);
+const c2i = v => +(v/2.54).toFixed(1);
+const fmt  = v => unit==='cm' ? v : c2i(v);
+const fmtR = (a,b) => unit==='cm' ? `${a}–${b}` : `${c2i(a)}–${c2i(b)}`;
+
+function setUnit(u, btn) {
+  unit = u;
+  document.querySelectorAll('.unit-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.ul').forEach(el => el.textContent = unit==='cm'?'(cm)':'(in)');
+  // update placeholders
+  const ph = unit==='cm'
+    ? {mc:'e.g. 96',mw:'e.g. 82',mh:'e.g. 98',wb:'e.g. 90',ww:'e.g. 70',wh:'e.g. 96',sl:'e.g. 26'}
+    : {mc:'e.g. 37.8',mw:'e.g. 32.3',mh:'e.g. 38.6',wb:'e.g. 35.4',ww:'e.g. 27.6',wh:'e.g. 37.8',sl:'e.g. 10.2'};
+  document.getElementById('m-chest').placeholder=ph.mc;
+  document.getElementById('m-waist').placeholder=ph.mw;
+  document.getElementById('m-hips').placeholder=ph.mh;
+  document.getElementById('w-bust').placeholder=ph.wb;
+  document.getElementById('w-waist').placeholder=ph.ww;
+  document.getElementById('w-hips').placeholder=ph.wh;
+  document.getElementById('s-length').placeholder=ph.sl;
+  renderAll();
+}
+
+function showCat(cat, el) {
+  document.querySelectorAll('.cat-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.size-section').forEach(s=>s.classList.remove('active'));
+  document.getElementById('cat-'+cat).classList.add('active');
+}
+
+function renderAll() {
+  // Men
+  document.getElementById('men-tbody').innerHTML = D.men.map(r=>`
+    <tr><td><span class="size-pill">${r.s}</span></td><td>${fmtR(r.c[0],r.c[1])}</td><td>${fmtR(r.w[0],r.w[1])}</td><td>${fmtR(r.h[0],r.h[1])}</td><td>${r.eu}</td><td>${r.us}</td></tr>`).join('');
+  // Women
+  document.getElementById('women-tbody').innerHTML = D.women.map(r=>`
+    <tr><td><span class="size-pill">${r.s}</span></td><td>${fmtR(r.b[0],r.b[1])}</td><td>${fmtR(r.w[0],r.w[1])}</td><td>${fmtR(r.h[0],r.h[1])}</td><td>${r.eu}</td><td>${r.us}</td><td>${r.uk}</td></tr>`).join('');
+  // Men shoes
+  document.getElementById('mshoe-tbody').innerHTML = D.mshoe.map(r=>`
+    <tr><td><strong>${r.eu}</strong></td><td>${r.us}</td><td>${r.uk}</td><td>${fmt(r.cm)}</td></tr>`).join('');
+  // Women shoes
+  document.getElementById('wshoe-tbody').innerHTML = D.wshoe.map(r=>`
+    <tr><td><strong>${r.eu}</strong></td><td>${r.us}</td><td>${r.uk}</td><td>${fmt(r.cm)}</td></tr>`).join('');
+  // Kids
+  document.getElementById('kids-tbody').innerHTML = D.kids.map(r=>`
+    <tr><td><strong>${r.age}</strong></td><td>${fmtR(r.h[0],r.h[1])}</td><td>${fmtR(r.c[0],r.c[1])}</td><td>${fmtR(r.w[0],r.w[1])}</td><td><span class="size-pill">${r.l}</span></td></tr>`).join('');
+}
+
+function toCm(v) { return unit==='cm' ? parseFloat(v) : i2c(parseFloat(v)); }
+
+function findMenSize() {
+  const chest = toCm(document.getElementById('m-chest').value);
+  const waist = toCm(document.getElementById('m-waist').value);
+  if(!chest && !waist) { showToast('Enter at least one measurement'); return; }
+  let match = D.men[D.men.length-1];
+  for(const r of D.men) {
+    const cOk = !chest||(chest>=r.c[0]&&chest<=r.c[1]+2);
+    const wOk = !waist||(waist>=r.w[0]&&waist<=r.w[1]+2);
+    if(cOk&&wOk){match=r;break;}
+    if(chest&&chest>=r.c[0]) match=r;
+  }
+  document.getElementById('men-rs').textContent=match.s;
+  document.getElementById('men-rt').innerHTML=`<strong>Recommended: ${match.s}</strong>EU ${match.eu} · US/UK ${match.us}<br>Chest ${fmtR(match.c[0],match.c[1])} · Waist ${fmtR(match.w[0],match.w[1])}`;
+  document.getElementById('men-result').classList.add('show');
+}
+
+function findWomenSize() {
+  const bust = toCm(document.getElementById('w-bust').value);
+  const waist = toCm(document.getElementById('w-waist').value);
+  if(!bust && !waist) { showToast('Enter at least one measurement'); return; }
+  let match = D.women[D.women.length-1];
+  for(const r of D.women) {
+    const bOk = !bust||(bust>=r.b[0]&&bust<=r.b[1]+2);
+    const wOk = !waist||(waist>=r.w[0]&&waist<=r.w[1]+2);
+    if(bOk&&wOk){match=r;break;}
+    if(bust&&bust>=r.b[0]) match=r;
+  }
+  document.getElementById('women-rs').textContent=match.s;
+  document.getElementById('women-rt').innerHTML=`<strong>Recommended: ${match.s}</strong>EU ${match.eu} · US ${match.us} · UK ${match.uk}<br>Bust ${fmtR(match.b[0],match.b[1])} · Waist ${fmtR(match.w[0],match.w[1])}`;
+  document.getElementById('women-result').classList.add('show');
+}
+
+function findShoeSize() {
+  const len = toCm(document.getElementById('s-length').value);
+  const gen = document.getElementById('s-gender').value;
+  if(!len) { showToast('Enter your foot length'); return; }
+  const tbl = gen==='men'?D.mshoe:D.wshoe;
+  let match = tbl[tbl.length-1];
+  for(const r of tbl) { if(len>=r.cm-0.4) match=r; }
+  document.getElementById('shoes-rs').textContent='EU '+match.eu;
+  document.getElementById('shoes-rt').innerHTML=`<strong>Recommended: EU ${match.eu}</strong>US ${match.us} · UK ${match.uk}<br>Foot length: ${fmt(match.cm)} ${unit}`;
+  document.getElementById('shoes-result').classList.add('show');
+}
+
+function showToast(msg){
+  let t=document.getElementById('sg-toast');
+  if(!t){t=document.createElement('div');t.id='sg-toast';t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1c1c22;border:1px solid #2a2a38;color:#f0f0f5;padding:12px 20px;border-radius:12px;font-size:14px;z-index:9999;';document.body.appendChild(t);}
+  t.textContent=msg;t.style.opacity='1';
+  setTimeout(()=>t.style.opacity='0',2500);
+}
+
+renderAll();
+</script>
+</body>
+</html>
