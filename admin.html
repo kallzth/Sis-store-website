@@ -1080,6 +1080,7 @@
   function handleBulkCSV(i) { if(window._handleBulkCSV) window._handleBulkCSV(i); }
   function runBulkImport() { if(window._runBulkImport) window._runBulkImport(); }
   function clearBulk() { if(window._clearBulk) window._clearBulk(); }
+  function markSellerPaid(id,n,p,a) { if(window._markSellerPaid) window._markSellerPaid(id,n,p,a); }
 </script>
 
 <!-- FIREBASE MODULE -->
@@ -2173,7 +2174,7 @@
             <div class="payout-due-label">Commission owed (${commission}%)</div>
             <div class="payout-due-amount">ETB ${commissionOwed.toFixed(2)}</div>
           </div>
-          <button class="btn btn-success btn-sm" onclick="showToast('Mark as paid feature coming in Tier 3 🚀','success')">
+          <button class="btn btn-success btn-sm" onclick="markSellerPaid('${seller.id}','${seller.name}','${seller.phone}',${commissionOwed.toFixed(2)})">
             <i class="fas fa-check"></i> Mark as Paid
           </button>
         </div>
@@ -2497,6 +2498,19 @@
     if (page === 'discounts') loadDiscounts();
   };
   // Bridge
+
+  window._markSellerPaid = async function(sellerId, sellerName, sellerPhone, amount) {
+    if (!confirm(`Mark ETB ${amount} as paid to ${sellerName}?`)) return;
+    try {
+      await addDoc(collection(db, 'payouts'), {
+        sellerId, sellerName, sellerPhone,
+        amount, paidAt: new Date().toISOString(), status: 'paid'
+      });
+      const msg = `Hello ${sellerName}! 👋\n\nYour commission payment of *ETB ${amount}* has been processed by Sisay Store.\n\nThank you for selling with us! 🎉`;
+      window.open(`https://wa.me/${sellerPhone.replace(/[^0-9]/g,'')}?text=${encodeURIComponent(msg)}`, '_blank');
+      showToast(`Payment recorded & WhatsApp opened for ${sellerName}!`, 'success');
+    } catch(e) { showToast('Error: ' + e.message, 'error'); }
+  };
 
   window._clearCollection = async function(colName) {
     try {
