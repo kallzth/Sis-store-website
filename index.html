@@ -223,6 +223,15 @@ footer { padding: 48px 40px 24px; border-top: 1px solid var(--border); }
 .btn-wa { width: 100%; background: #25D366; color: #fff; border: none; padding: 14px; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; font-family: 'DM Sans', sans-serif; }
 .btn-wa:hover { opacity: 0.88; }
 .cart-note-text { font-size: 12px; color: var(--muted); text-align: center; margin-top: 10px; }
+.discount-row { display: flex; gap: 8px; margin-bottom: 14px; }
+.discount-input { flex: 1; background: var(--card2); border: 1px solid var(--border); color: var(--text); padding: 10px 14px; border-radius: 10px; font-size: 13px; font-family: 'DM Sans', sans-serif; outline: none; transition: border 0.2s; text-transform: uppercase; }
+.discount-input:focus { border-color: var(--primary); }
+.discount-apply-btn { background: var(--card2); border: 1px solid var(--border); color: var(--text); padding: 10px 16px; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s; white-space: nowrap; font-family: 'DM Sans', sans-serif; }
+.discount-apply-btn:hover { border-color: var(--primary); color: var(--primary); }
+.discount-applied { display: flex; align-items: center; justify-content: space-between; background: rgba(46,204,113,0.08); border: 1px solid rgba(46,204,113,0.25); border-radius: 10px; padding: 10px 14px; margin-bottom: 14px; font-size: 13px; color: var(--green); }
+.discount-applied button { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 14px; }
+.discount-applied button:hover { color: #e74c3c; }
+.cart-savings { display: flex; justify-content: space-between; font-size: 13px; color: var(--green); margin-bottom: 8px; }
 
 /* MODAL */
 .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.78); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(6px); }
@@ -506,7 +515,19 @@ footer { padding: 48px 40px 24px; border-top: 1px solid var(--border); }
   </div>
   <div class="cart-body" id="cart-body"></div>
   <div class="cart-foot" id="cart-foot" style="display:none">
-    <div class="cart-total-row"><span>Total</span><span id="cart-total">$0.00</span></div>
+    <!-- DISCOUNT CODE -->
+    <div id="discount-input-row" class="discount-row">
+      <input class="discount-input" id="discount-code-input" placeholder="Discount code..." maxlength="20">
+      <button class="discount-apply-btn" onclick="applyDiscount()">Apply</button>
+    </div>
+    <div id="discount-applied-row" class="discount-applied" style="display:none">
+      <span>🎉 <strong id="applied-code-label"></strong> applied!</span>
+      <button onclick="removeDiscount()" title="Remove"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="cart-savings" id="cart-savings" style="display:none">
+      <span>Discount</span><span id="cart-discount-amount">-ETB 0</span>
+    </div>
+    <div class="cart-total-row"><span>Total</span><span id="cart-total">ETB 0.00</span></div>
     <button class="btn-wa" onclick="checkoutWA()"><i class="fab fa-whatsapp" style="font-size:20px"></i> Order via WhatsApp</button>
     <div class="cart-note-text">📦 Order details sent directly to seller via WhatsApp</div>
   </div>
@@ -844,14 +865,25 @@ function renderCart(){
       </div>
     </div>
   </div>`).join('');
-  document.getElementById('cart-total').textContent='ETB '+total.toFixed(2);
+  const discount = calcDiscount(total);
+  const finalTotal = Math.max(0, total - discount);
+  document.getElementById('cart-total').textContent='ETB '+finalTotal.toFixed(2);
+  const savingsEl = document.getElementById('cart-savings');
+  const discAmtEl = document.getElementById('cart-discount-amount');
+  if (discount > 0 && savingsEl && discAmtEl) {
+    savingsEl.style.display='flex';
+    discAmtEl.textContent='-ETB '+discount.toFixed(2);
+  } else if (savingsEl) { savingsEl.style.display='none'; }
   f.style.display='block';
 }
 function checkoutWA(){
   if(!cart.length) return;
-  const total=cart.reduce((s,i)=>s+i.price*i.qty,0);
+  const subtotal=cart.reduce((s,i)=>s+i.price*i.qty,0);
+  const discount=calcDiscount(subtotal);
+  const total=Math.max(0,subtotal-discount);
   const lines=cart.map(i=>`• ${i.name}${i.size?' ('+i.size+')':''} ×${i.qty} = ETB ${(i.price*i.qty).toFixed(2)}`).join('\n');
-  const msg=`Hello! I'd like to place an order:\n\n${lines}\n\n*Total: ETB ${total.toFixed(2)}*\n\nPlease confirm and send delivery info. Thank you!`;
+  const discLine=discount>0?`\nDiscount (${appliedDiscount.code}): -ETB ${discount.toFixed(2)}`:'';
+  const msg=`Hello! I'd like to place an order:\n\n${lines}${discLine}\n\n*Total: ETB ${total.toFixed(2)}*\n\nPlease confirm and send delivery info. Thank you!`;
   window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
   addDoc(collection(db,'orders'),{items:cart,amount:total,status:'pending',createdAt:new Date().toISOString()}).catch(()=>{});
 }
@@ -980,6 +1012,47 @@ if (_logo) {
   });
 }
 
+// ── DISCOUNT CODE ──
+let appliedDiscount = null;
+
+async function applyDiscount() {
+  const code = document.getElementById('discount-code-input').value.trim().toUpperCase();
+  if (!code) { toast('Please enter a discount code'); return; }
+  try {
+    const snap = await getDocs(query(collection(db,'discounts'),where('code','==',code),where('status','==','active')));
+    if (snap.empty) { toast('Invalid or expired discount code'); return; }
+    const d = { id: snap.docs[0].id, ...snap.docs[0].data() };
+    // Check expiry
+    if (d.expiry && new Date(d.expiry) < new Date()) { toast('This discount code has expired'); return; }
+    // Check max uses
+    if (d.maxUses > 0 && (d.usedCount || 0) >= d.maxUses) { toast('This discount code has reached its limit'); return; }
+    // Check min order
+    const subtotal = cart.reduce((s,i) => s + i.price * i.qty, 0);
+    if (d.minOrder > 0 && subtotal < d.minOrder) { toast(`Minimum order of ETB ${d.minOrder} required`); return; }
+    appliedDiscount = d;
+    document.getElementById('discount-input-row').style.display = 'none';
+    document.getElementById('discount-applied-row').style.display = 'flex';
+    document.getElementById('applied-code-label').textContent = code;
+    renderCart();
+    toast('Discount code applied! 🎉');
+  } catch(e) { toast('Error checking code: ' + e.message); }
+}
+
+function removeDiscount() {
+  appliedDiscount = null;
+  document.getElementById('discount-input-row').style.display = 'flex';
+  document.getElementById('discount-applied-row').style.display = 'none';
+  document.getElementById('discount-code-input').value = '';
+  renderCart();
+  toast('Discount removed');
+}
+
+function calcDiscount(subtotal) {
+  if (!appliedDiscount) return 0;
+  if (appliedDiscount.type === 'percent') return subtotal * appliedDiscount.value / 100;
+  return Math.min(appliedDiscount.value, subtotal);
+}
+
 // ── EXPOSE ALL ONCLICK FUNCTIONS TO WINDOW (ES module scope fix) ──
 window.scrollToProducts = scrollToProducts;
 window.resetFilter      = resetFilter;
@@ -1001,6 +1074,8 @@ window.checkoutWA       = checkoutWA;
 window.wishToggle       = wishToggle;
 window.toggleWishlistView = toggleWishlistView;
 window.subscribe        = subscribe;
+window.applyDiscount    = applyDiscount;
+window.removeDiscount   = removeDiscount;
 window.addDealToCart    = addDealToCart;
 window.openContact      = openContact;
 window.closeContact     = closeContact;
