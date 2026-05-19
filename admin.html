@@ -377,6 +377,7 @@
     <div class="nav-item" onclick="showPage('customers')"><i class="fas fa-user-friends"></i> Customers</div>
     <div class="nav-item" onclick="showPage('discounts')"><i class="fas fa-tag"></i> Discounts</div>
     <div class="nav-item" onclick="showPage('bulk')"><i class="fas fa-file-csv"></i> Bulk Import</div>
+    <div class="nav-item" onclick="showPage('announcements')"><i class="fas fa-bullhorn"></i> Announcements</div>
     <div class="nav-section">Settings</div>
     <div class="nav-item" onclick="showPage('subscribers')"><i class="fas fa-users"></i> Subscribers <span id="sub-badge" style="display:none;background:var(--green);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;margin-left:auto">0</span></div>
     <div class="nav-item" onclick="showPage('messages')"><i class="fas fa-envelope"></i> Messages <span id="msg-badge" style="display:none;background:var(--pink);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;margin-left:auto">0</span></div>
@@ -709,6 +710,102 @@
             <p style="font-size:14px">Select a message to read it</p>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- ANNOUNCEMENTS PAGE -->
+    <div class="page" id="page-announcements">
+      <div class="topbar"><h1>Announcements & Ads</h1></div>
+
+      <!-- ANNOUNCEMENT BANNER -->
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-header"><div class="card-title"><i class="fas fa-bullhorn" style="color:var(--pink);margin-right:8px"></i> Store Announcement Banner</div></div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:20px">This banner appears at the top of the store. Use it for sales, events or important notices.</p>
+        <div class="form-grid">
+          <div class="form-group full"><label>Announcement Text</label><input type="text" id="ann-text" placeholder="e.g. 🎉 Summer Sale — 30% off all women's clothing this weekend!"></div>
+          <div class="form-group"><label>Background Color</label>
+            <select id="ann-color">
+              <option value="linear-gradient(135deg,#FF6B98,#5F27CD)">Pink to Purple (default)</option>
+              <option value="linear-gradient(135deg,#2ECC71,#0088cc)">Green to Blue</option>
+              <option value="linear-gradient(135deg,#f39c12,#e74c3c)">Orange to Red</option>
+              <option value="#1a1a22">Dark</option>
+              <option value="#003DA5">Blue</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Status</label>
+            <select id="ann-active">
+              <option value="true">Active — show on store</option>
+              <option value="false">Inactive — hidden</option>
+            </select>
+          </div>
+        </div>
+        <div style="margin-top:16px;display:flex;gap:12px">
+          <button class="btn btn-pink" onclick="saveAnnouncement()"><i class="fas fa-save"></i> Save Announcement</button>
+          <button class="btn btn-ghost" onclick="previewAnnouncement()"><i class="fas fa-eye"></i> Preview</button>
+        </div>
+        <!-- Preview -->
+        <div id="ann-preview" style="display:none;margin-top:16px;border-radius:10px;padding:14px 20px;text-align:center;font-size:14px;font-weight:600;color:#fff"></div>
+      </div>
+
+      <!-- AD SLOTS -->
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-header"><div class="card-title"><i class="fas fa-ad" style="color:var(--pink);margin-right:8px"></i> Ad Slots</div></div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:20px">Place ads between product sections. Supports Google AdSense, image ads, or text/link ads.</p>
+        <div class="form-grid">
+          <div class="form-group"><label>Ad Slot Position</label>
+            <select id="ad-slot-pos">
+              <option value="1">Slot 1 — Between Categories & Products</option>
+              <option value="2">Slot 2 — Between Deal & Products</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Ad Type</label>
+            <select id="ad-type" onchange="toggleAdFields()">
+              <option value="image">Image Ad</option>
+              <option value="text">Text/Link Ad</option>
+              <option value="adsense">Google AdSense</option>
+            </select>
+          </div>
+          <!-- Image ad fields -->
+          <div class="form-group full" id="ad-image-fields">
+            <label>Image URL</label>
+            <input type="text" id="ad-image-url" placeholder="https://...image.jpg">
+          </div>
+          <div class="form-group full" id="ad-link-field">
+            <label>Click Link (optional)</label>
+            <input type="text" id="ad-link" placeholder="https://...">
+          </div>
+          <!-- Text ad fields -->
+          <div class="form-group" id="ad-text-fields" style="display:none">
+            <label>Headline</label>
+            <input type="text" id="ad-headline" placeholder="Big Sale This Weekend!">
+          </div>
+          <div class="form-group" id="ad-body-field" style="display:none">
+            <label>Body Text</label>
+            <input type="text" id="ad-body" placeholder="Shop now and save up to 50%">
+          </div>
+          <!-- AdSense fields -->
+          <div class="form-group" id="ad-adsense-fields" style="display:none">
+            <label>AdSense Publisher ID</label>
+            <input type="text" id="ad-client" placeholder="ca-pub-XXXXXXXXXXXXXXXXX">
+          </div>
+          <div class="form-group" id="ad-adsense-slot" style="display:none">
+            <label>AdSense Ad Slot ID</label>
+            <input type="text" id="ad-slot-id" placeholder="1234567890">
+          </div>
+          <div class="form-group"><label>Status</label>
+            <select id="ad-active">
+              <option value="true">Active</option>
+              <option value="false">Inactive</option>
+            </select>
+          </div>
+        </div>
+        <div style="margin-top:16px"><button class="btn btn-pink" onclick="saveAd()"><i class="fas fa-save"></i> Save Ad</button></div>
+      </div>
+
+      <!-- EXISTING ADS TABLE -->
+      <div class="card">
+        <div class="card-header"><div class="card-title">Active Ads & Announcements</div></div>
+        <div id="ads-list"><div class="loading"><div class="spinner"></div><p>Loading...</p></div></div>
       </div>
     </div>
 
@@ -1081,6 +1178,11 @@
   function runBulkImport() { if(window._runBulkImport) window._runBulkImport(); }
   function clearBulk() { if(window._clearBulk) window._clearBulk(); }
   function markSellerPaid(id,n,p,a) { if(window._markSellerPaid) window._markSellerPaid(id,n,p,a); }
+  function saveAnnouncement() { if(window._saveAnnouncement) window._saveAnnouncement(); }
+  function previewAnnouncement() { if(window._previewAnnouncement) window._previewAnnouncement(); }
+  function saveAd() { if(window._saveAd) window._saveAd(); }
+  function toggleAdFields() { if(window._toggleAdFields) window._toggleAdFields(); }
+  function deleteAd(id,col) { if(window._deleteAd) window._deleteAd(id,col); }
 </script>
 
 <!-- FIREBASE MODULE -->
@@ -2490,12 +2592,116 @@
     document.getElementById('bulk-summary').textContent = '';
   };
 
+  // ── ANNOUNCEMENTS & ADS ──
+  window._previewAnnouncement = function() {
+    const text = document.getElementById('ann-text').value;
+    const color = document.getElementById('ann-color').value;
+    const prev = document.getElementById('ann-preview');
+    if (!text) { showToast('Enter announcement text first', 'error'); return; }
+    prev.style.display = 'block';
+    prev.style.background = color;
+    prev.textContent = text;
+  };
+
+  window._saveAnnouncement = async function() {
+    const text = document.getElementById('ann-text').value.trim();
+    if (!text) { showToast('Please enter announcement text', 'error'); return; }
+    try {
+      // Delete existing announcements first
+      const snap = await getDocs(collection(db, 'announcements'));
+      await Promise.all(snap.docs.map(d => deleteDoc(doc(db, 'announcements', d.id))));
+      await addDoc(collection(db, 'announcements'), {
+        text, color: document.getElementById('ann-color').value,
+        textColor: '#fff',
+        active: document.getElementById('ann-active').value === 'true',
+        updatedAt: new Date().toISOString()
+      });
+      showToast('Announcement saved! ✓', 'success');
+      loadAdsPage();
+    } catch(e) { showToast('Error: ' + e.message, 'error'); }
+  };
+
+  window._toggleAdFields = function() {
+    const type = document.getElementById('ad-type').value;
+    document.getElementById('ad-image-fields').style.display = type === 'image' ? 'block' : 'none';
+    document.getElementById('ad-link-field').style.display = type === 'image' || type === 'text' ? 'block' : 'none';
+    document.getElementById('ad-text-fields').style.display = type === 'text' ? 'block' : 'none';
+    document.getElementById('ad-body-field').style.display = type === 'text' ? 'block' : 'none';
+    document.getElementById('ad-adsense-fields').style.display = type === 'adsense' ? 'block' : 'none';
+    document.getElementById('ad-adsense-slot').style.display = type === 'adsense' ? 'block' : 'none';
+  };
+
+  window._saveAd = async function() {
+    const type = document.getElementById('ad-type').value;
+    const slot = document.getElementById('ad-slot-pos').value;
+    const data = {
+      type, slot: parseInt(slot),
+      active: document.getElementById('ad-active').value === 'true',
+      createdAt: new Date().toISOString()
+    };
+    if (type === 'image') {
+      data.image = document.getElementById('ad-image-url').value;
+      data.link = document.getElementById('ad-link').value;
+    } else if (type === 'text') {
+      data.headline = document.getElementById('ad-headline').value;
+      data.body = document.getElementById('ad-body').value;
+      data.link = document.getElementById('ad-link').value;
+    } else if (type === 'adsense') {
+      data.adClient = document.getElementById('ad-client').value;
+      data.adSlot = document.getElementById('ad-slot-id').value;
+    }
+    try {
+      await addDoc(collection(db, 'ads'), data);
+      showToast('Ad saved! ✓', 'success');
+      loadAdsPage();
+    } catch(e) { showToast('Error: ' + e.message, 'error'); }
+  };
+
+  window._deleteAd = async function(id, col) {
+    if (!confirm('Delete this ad?')) return;
+    await deleteDoc(doc(db, col, id));
+    showToast('Deleted', 'success');
+    loadAdsPage();
+  };
+
+  async function loadAdsPage() {
+    const container = document.getElementById('ads-list');
+    if (!container) return;
+    try {
+      const [annSnap, adSnap] = await Promise.all([
+        getDocs(collection(db, 'announcements')),
+        getDocs(collection(db, 'ads'))
+      ]);
+      const rows = [
+        ...annSnap.docs.map(d => ({id:d.id, col:'announcements', ...d.data(), _type:'Announcement'})),
+        ...adSnap.docs.map(d => ({id:d.id, col:'ads', ...d.data(), _type:'Ad Slot '+d.data().slot}))
+      ];
+      if (!rows.length) { container.innerHTML = `<div class="empty"><i class="fas fa-ad"></i><p>No ads or announcements yet.</p></div>`; return; }
+      container.innerHTML = `<table><thead><tr><th>Type</th><th>Content</th><th>Status</th><th>Action</th></tr></thead>
+      <tbody>${rows.map(r => `<tr>
+        <td><span class="badge badge-purple">${r._type}</span></td>
+        <td style="font-size:13px;max-width:300px">${r.text||r.headline||r.image||r.adClient||'—'}</td>
+        <td><span class="badge ${r.active?'badge-green':'badge-yellow'}">${r.active?'Active':'Inactive'}</span></td>
+        <td><button class="btn btn-danger btn-sm" onclick="deleteAd('${r.id}','${r.col}')"><i class="fas fa-trash"></i></button></td>
+      </tr>`).join('')}</tbody></table>`;
+      // Pre-fill announcement form
+      const ann = annSnap.docs[0]?.data();
+      if (ann) {
+        document.getElementById('ann-text').value = ann.text || '';
+        document.getElementById('ann-color').value = ann.color || 'linear-gradient(135deg,#FF6B98,#5F27CD)';
+        document.getElementById('ann-active').value = String(ann.active);
+      }
+    } catch(e) { container.innerHTML = `<div class="empty"><p>Error loading ads.</p></div>`; }
+  }
+
+  // Hook announcements into showPage
   // Hook Tier 3 into showPage
   const _origShowPage3 = window._showPage;
   window._showPage = function(page) {
     _origShowPage3(page);
     if (page === 'customers') buildCustomers();
     if (page === 'discounts') loadDiscounts();
+    if (page === 'announcements') loadAdsPage();
   };
   // Bridge
 
