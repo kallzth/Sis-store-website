@@ -167,6 +167,23 @@ img { max-width: 100%; display: block; }
 .skeleton-line.short { width: 60%; }
 @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
 
+/* COUPONS SECTION */
+.coupons-section { padding: 56px 40px; max-width: 1400px; margin: 0 auto; }
+.coupons-section h2 { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; margin-bottom: 6px; }
+.coupons-section p { color: var(--muted); font-size: 14px; margin-bottom: 28px; }
+.coupons-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+.coupon-card { background: var(--card); border: 1px dashed var(--border); border-radius: 16px; padding: 20px 24px; position: relative; overflow: hidden; transition: all 0.2s; }
+.coupon-card::before { content: ''; position: absolute; top: 0; right: 0; width: 80px; height: 80px; border-radius: 0 16px 0 80px; opacity: 0.08; background: var(--primary); }
+.coupon-card:hover { border-color: rgba(255,107,152,0.4); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+.coupon-badge { display: inline-block; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: #fff; font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 20px; margin-bottom: 10px; }
+.coupon-code { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; letter-spacing: 2px; color: var(--primary); margin-bottom: 6px; }
+.coupon-desc { font-size: 13px; color: var(--muted); margin-bottom: 4px; }
+.coupon-meta { font-size: 11px; color: var(--muted); opacity: 0.7; margin-bottom: 14px; }
+.coupon-expiry { color: #f39c12; font-size: 11px; font-weight: 600; margin-bottom: 14px; display: flex; align-items: center; gap: 5px; }
+.coupon-btn { width: 100%; background: rgba(255,107,152,0.1); border: 1px solid rgba(255,107,152,0.3); color: var(--primary); padding: 10px; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.coupon-btn:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
+.coupon-btn.copied { background: var(--green); border-color: var(--green); color: #fff; }
+
 /* NEWSLETTER */
 .newsletter { background: linear-gradient(135deg, #1a0a2e, #0f0f1a); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
 .newsletter-inner { max-width: 580px; margin: 0 auto; padding: 60px 40px; text-align: center; }
@@ -472,6 +489,15 @@ footer { padding: 48px 40px 24px; border-top: 1px solid var(--border); }
     <div class="skeleton"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line"></div><div class="skeleton-line short"></div></div></div>
     <div class="skeleton"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line"></div><div class="skeleton-line short"></div></div></div>
     <div class="skeleton"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line"></div><div class="skeleton-line short"></div></div></div>
+  </div>
+</div>
+
+<!-- COUPONS SECTION -->
+<div id="coupons-wrapper" style="display:none">
+  <div class="coupons-section">
+    <h2>🏷️ Active Discount Codes</h2>
+    <p>Use these codes at checkout for instant savings. Click any code to copy and apply it to your cart.</p>
+    <div class="coupons-grid" id="coupons-grid"></div>
   </div>
 </div>
 
@@ -1031,6 +1057,68 @@ function showEarlyAccessBanner(){
   if(nav) nav.after(bar);
 }
 
+// ── COUPONS SECTION ──
+async function loadCoupons() {
+  try {
+    const snap = await getDocs(query(collection(db,'discounts'),
+      where('status','==','active')));
+    const now = new Date();
+    // Filter: only public codes (not subscriber welcome codes)
+    const codes = snap.docs.map(d=>({id:d.id,...d.data()}))
+      .filter(d => {
+        if (d.code && d.code.startsWith('WELCOME')) return false; // hide personal subscriber codes
+        if (d.expiry && new Date(d.expiry) < now) return false;   // hide expired
+        return true;
+      });
+
+    const wrapper = document.getElementById('coupons-wrapper');
+    const grid = document.getElementById('coupons-grid');
+    if (!codes.length || !wrapper || !grid) return;
+
+    wrapper.style.display = 'block';
+    grid.innerHTML = codes.map(c => {
+      const isPercent = c.type === 'percent';
+      const discountLabel = isPercent ? `${c.value}% OFF` : `ETB ${c.value} OFF`;
+      const minLabel = c.minOrder > 0 ? `Min order ETB ${c.minOrder}` : 'No minimum order';
+      const usesLeft = c.maxUses > 0 ? `${c.maxUses - (c.usedCount||0)} uses left` : 'Unlimited uses';
+      const expiryLabel = c.expiry ? `Expires ${new Date(c.expiry).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}` : '';
+
+      return `<div class="coupon-card" id="coupon-${c.id}">
+        <div class="coupon-badge">${discountLabel}</div>
+        <div class="coupon-code">${c.code}</div>
+        <div class="coupon-desc">${c.description || discountLabel + ' on your order'}</div>
+        <div class="coupon-meta">${minLabel} · ${usesLeft}</div>
+        ${expiryLabel ? `<div class="coupon-expiry"><i class="fas fa-clock"></i> ${expiryLabel}</div>` : ''}
+        <button class="coupon-btn" id="btn-${c.id}" onclick="copyAndApplyCoupon('${c.code}','${c.id}')">
+          <i class="fas fa-copy"></i> Copy & Apply Code
+        </button>
+      </div>`;
+    }).join('');
+  } catch(e) {}
+}
+
+function copyAndApplyCoupon(code, id) {
+  // Copy to clipboard
+  navigator.clipboard.writeText(code).catch(()=>{});
+  // Pre-fill discount input
+  const input = document.getElementById('discount-code-input');
+  if (input) input.value = code;
+  // Update button state
+  const btn = document.getElementById('btn-'+id);
+  if (btn) {
+    btn.classList.add('copied');
+    btn.innerHTML = '<i class="fas fa-check"></i> Copied! Open cart to apply';
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.innerHTML = '<i class="fas fa-copy"></i> Copy & Apply Code';
+    }, 3000);
+  }
+  // Open cart and apply
+  openCart();
+  setTimeout(() => applyDiscount(), 600);
+  toast('Code ' + code + ' copied & applied! 🎉');
+}
+
 // Check if already subscribed on page load
 function checkSubscriberStatus(){
   const code=localStorage.getItem('ss_subscriber_code');
@@ -1148,6 +1236,7 @@ const wb=document.getElementById('wishlist-badge');
 wb.style.display=wishlist.length>0?'flex':'none'; wb.textContent=wishlist.length;
 loadProducts();
 loadAnnouncements();
+loadCoupons();
 checkSubscriberStatus();
 
 // ── SECRET ADMIN ACCESS ──
