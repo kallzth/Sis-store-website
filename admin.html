@@ -663,12 +663,33 @@
     <!-- PAYOUTS PAGE -->
     <div class="page" id="page-payouts">
       <div class="topbar">
-        <h1>Seller Payouts</h1>
+        <h1>Payouts & Commission</h1>
         <div class="topbar-actions">
-          <span style="font-size:13px;color:var(--muted)">Commission owed to each seller based on completed orders</span>
+          <select class="sort-select" onchange="switchPayoutsTab(this.value)" style="background:var(--card2);border:1px solid var(--border);color:var(--text);padding:9px 14px;border-radius:10px;font-size:13px;outline:none;font-family:'DM Sans',sans-serif">
+            <option value="submissions">Commission Submissions</option>
+            <option value="summary">Seller Summary</option>
+          </select>
         </div>
       </div>
-      <div id="payouts-container"><div class="loading"><div class="spinner"></div><p>Calculating payouts...</p></div></div>
+
+      <!-- COMMISSION SUBMISSIONS TAB -->
+      <div id="tab-submissions">
+        <div class="card" style="margin-bottom:20px;border-color:rgba(243,156,18,0.3)">
+          <div class="card-header">
+            <div class="card-title"><i class="fas fa-inbox" style="color:#f39c12;margin-right:8px"></i> Pending Commission Verifications <span id="pending-commission-count" style="background:#f39c12;color:#fff;font-size:11px;padding:2px 8px;border-radius:10px;margin-left:8px">0</span></div>
+          </div>
+          <div id="commissions-pending"><div class="loading"><div class="spinner"></div><p>Loading submissions...</p></div></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">All Commission Submissions</div></div>
+          <div id="commissions-all"></div>
+        </div>
+      </div>
+
+      <!-- SELLER SUMMARY TAB -->
+      <div id="tab-summary" style="display:none">
+        <div id="payouts-container"><div class="loading"><div class="spinner"></div><p>Calculating payouts...</p></div></div>
+      </div>
     </div>
 
     <!-- SUBSCRIBERS PAGE -->
@@ -1179,6 +1200,9 @@
   function clearBulk() { if(window._clearBulk) window._clearBulk(); }
   function markSellerPaid(id,n,p,a) { if(window._markSellerPaid) window._markSellerPaid(id,n,p,a); }
   function saveAnnouncement() { if(window._saveAnnouncement) window._saveAnnouncement(); }
+  function switchPayoutsTab(v) { if(window._switchPayoutsTab) window._switchPayoutsTab(v); }
+  function verifyCommission(id,orderId) { if(window._verifyCommission) window._verifyCommission(id,orderId); }
+  function rejectCommission(id,orderId) { if(window._rejectCommission) window._rejectCommission(id,orderId); }
   function previewAnnouncement() { if(window._previewAnnouncement) window._previewAnnouncement(); }
   function saveAd() { if(window._saveAd) window._saveAd(); }
   function toggleAdFields() { if(window._toggleAdFields) window._toggleAdFields(); }
@@ -2695,6 +2719,125 @@
   }
 
   // Hook announcements into showPage
+  // ── COMMISSION VERIFICATION ──
+  let allCommissions = [];
+
+  async function loadCommissions() {
+    try {
+      const snap = await getDocs(collection(db, 'commissions'));
+      allCommissions = snap.docs.map(d => ({id:d.id,...d.data()}))
+        .sort((a,b) => new Date(b.submittedAt) - new Date(a.submittedAt));
+      renderCommissions();
+    } catch(e) {
+      document.getElementById('commissions-pending').innerHTML = `<div class="empty"><p>No submissions yet.</p></div>`;
+    }
+  }
+
+  function renderCommissions() {
+    const pending = allCommissions.filter(c => c.status === 'pending');
+    const all = allCommissions;
+
+    // Update badge
+    const badge = document.getElementById('pending-commission-count');
+    if (badge) badge.textContent = pending.length;
+
+    // Render pending
+    const pendingEl = document.getElementById('commissions-pending');
+    if (pendingEl) {
+      if (!pending.length) {
+        pendingEl.innerHTML = `<div class="empty" style="padding:30px"><i class="fas fa-check-circle" style="color:var(--green)"></i><p>No pending submissions — all clear!</p></div>`;
+      } else {
+        pendingEl.innerHTML = pending.map(c => commissionRowHTML(c, true)).join('');
+      }
+    }
+
+    // Render all
+    const allEl = document.getElementById('commissions-all');
+    if (allEl) {
+      if (!all.length) {
+        allEl.innerHTML = `<div class="empty" style="padding:30px"><i class="fas fa-inbox"></i><p>No commission submissions yet.</p></div>`;
+      } else {
+        allEl.innerHTML = all.map(c => commissionRowHTML(c, false)).join('');
+      }
+    }
+  }
+
+  function commissionRowHTML(c, showActions) {
+    const statusBadge = c.status === 'verified'
+      ? `<span class="badge badge-green">✓ Verified</span>`
+      : c.status === 'rejected'
+      ? `<span class="badge badge-red">✗ Rejected</span>`
+      : `<span class="badge badge-yellow">⏳ Pending</span>`;
+    return `<div class="commission-row">
+      <div class="commission-row-info">
+        <div class="commission-row-title">${c.sellerName||'—'} <span style="font-weight:400;color:var(--muted);font-size:13px">— Order #${(c.orderId||'').slice(-6).toUpperCase()}</span></div>
+        <div class="commission-row-meta">
+          <span><i class="fas fa-phone"></i> ${c.sellerPhone||'—'}</span>
+          <span><i class="fas fa-calendar"></i> ${c.submittedAt?new Date(c.submittedAt).toLocaleDateString():''}</span>
+          <span><i class="fas fa-receipt"></i> <span class="commission-row-txn">${c.transactionId||'—'}</span></span>
+          ${c.screenshot?`<span><a href="${c.screenshot}" target="_blank" style="color:var(--pink)"><i class="fas fa-image"></i> View Screenshot</a></span>`:''}
+          ${c.notes?`<span><i class="fas fa-comment"></i> ${c.notes}</span>`:''}
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+        ${statusBadge}
+        ${showActions && c.status === 'pending' ? `
+        <div class="commission-row-actions">
+          <button class="btn btn-success btn-sm" onclick="verifyCommission('${c.id}','${c.orderId}')"><i class="fas fa-check"></i> Verify</button>
+          <button class="btn btn-danger btn-sm" onclick="rejectCommission('${c.id}','${c.orderId}')"><i class="fas fa-times"></i> Reject</button>
+          <a href="https://wa.me/${(c.sellerPhone||'').replace(/[^0-9]/g,'')}" target="_blank" class="btn btn-ghost btn-sm"><i class="fab fa-whatsapp"></i></a>
+        </div>` : ''}
+      </div>
+    </div>`;
+  }
+
+  window._verifyCommission = async function(id, orderId) {
+    if (!confirm('Mark this commission as verified?')) return;
+    try {
+      await updateDoc(doc(db, 'commissions', id), {status:'verified', verifiedAt: new Date().toISOString()});
+      await updateDoc(doc(db, 'orders', orderId), {commissionStatus: 'verified'});
+      const c = allCommissions.find(x => x.id === id);
+      if (c) c.status = 'verified';
+      renderCommissions();
+      // Notify seller via WhatsApp
+      const msg = `✅ Commission Verified!
+
+Hello ${c?.sellerName||'Seller'}! Your commission payment for order #${orderId.slice(-6).toUpperCase()} has been verified.
+
+Thank you! 🎉 — Sisay Store`;
+      window.open(`https://wa.me/${(c?.sellerPhone||'').replace(/[^0-9]/g,'')}?text=${encodeURIComponent(msg)}`, '_blank');
+      showToast('Commission verified! WhatsApp opened ✓', 'success');
+    } catch(e) { showToast('Error: ' + e.message, 'error'); }
+  };
+
+  window._rejectCommission = async function(id, orderId) {
+    const reason = prompt('Reason for rejection (will be sent to seller):');
+    if (reason === null) return;
+    try {
+      await updateDoc(doc(db, 'commissions', id), {status:'rejected', rejectedAt: new Date().toISOString(), rejectionReason: reason});
+      await updateDoc(doc(db, 'orders', orderId), {commissionStatus: 'rejected'});
+      const c = allCommissions.find(x => x.id === id);
+      if (c) c.status = 'rejected';
+      renderCommissions();
+      // Notify seller via WhatsApp
+      const msg = `❌ Commission Submission Issue
+
+Hello ${c?.sellerName||'Seller'}! Your commission submission for order #${orderId.slice(-6).toUpperCase()} was not verified.
+
+Reason: ${reason}
+
+Please resubmit via your seller dashboard. — Sisay Store`;
+      window.open(`https://wa.me/${(c?.sellerPhone||'').replace(/[^0-9]/g,'')}?text=${encodeURIComponent(msg)}`, '_blank');
+      showToast('Commission rejected. WhatsApp opened ✓', 'success');
+    } catch(e) { showToast('Error: ' + e.message, 'error'); }
+  };
+
+  window._switchPayoutsTab = function(val) {
+    document.getElementById('tab-submissions').style.display = val === 'submissions' ? 'block' : 'none';
+    document.getElementById('tab-summary').style.display = val === 'summary' ? 'block' : 'none';
+    if (val === 'summary') buildPayouts();
+  };
+
   // Hook Tier 3 into showPage
   const _origShowPage3 = window._showPage;
   window._showPage = function(page) {
@@ -2702,6 +2845,7 @@
     if (page === 'customers') buildCustomers();
     if (page === 'discounts') loadDiscounts();
     if (page === 'announcements') loadAdsPage();
+    if (page === 'payouts') loadCommissions();
   };
   // Bridge
 
