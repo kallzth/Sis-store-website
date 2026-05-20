@@ -175,6 +175,15 @@ select option{background:var(--card2);}
 .dash-empty{text-align:center;padding:48px 20px;color:var(--muted);}
 .dash-empty i{font-size:36px;display:block;margin-bottom:12px;opacity:0.3;}
 
+/* COMMISSION */
+.commission-alert { background:rgba(243,156,18,0.08);border:1px solid rgba(243,156,18,0.25);border-radius:12px;padding:16px 20px;margin-bottom:16px;display:flex;align-items:flex-start;gap:12px; }
+.commission-alert i { color:#f39c12;font-size:18px;margin-top:2px;flex-shrink:0; }
+.commission-alert-title { font-weight:700;font-size:14px;margin-bottom:4px;color:#f39c12; }
+.commission-alert-desc { font-size:13px;color:var(--muted);line-height:1.5; }
+.commission-status-paid { background:rgba(46,204,113,0.08);border:1px solid rgba(46,204,113,0.2);border-radius:8px;padding:8px 14px;font-size:12px;color:var(--green);display:flex;align-items:center;gap:6px; }
+.commission-status-pending { background:rgba(243,156,18,0.08);border:1px solid rgba(243,156,18,0.2);border-radius:8px;padding:8px 14px;font-size:12px;color:#f39c12;display:flex;align-items:center;gap:6px; }
+.commission-status-rejected { background:rgba(231,76,60,0.08);border:1px solid rgba(231,76,60,0.2);border-radius:8px;padding:8px 14px;font-size:12px;color:#e74c3c;display:flex;align-items:center;gap:6px; }
+
 /* MODAL */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:1000;display:none;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(6px);}
 .modal-overlay.open{display:flex;}
@@ -475,6 +484,52 @@ select option{background:var(--card2);}
   </div><!-- /dash-layout -->
 </div><!-- /screen-dashboard -->
 
+<!-- COMMISSION SUBMISSION MODAL -->
+<div class="modal-overlay" id="commission-modal">
+  <div class="modal-box" style="max-width:480px">
+    <div class="modal-header">
+      <div class="modal-title">💰 Submit Commission Payment</div>
+      <button class="modal-close" onclick="closeCommissionModal()"><i class="fas fa-times"></i></button>
+    </div>
+    <div id="commission-modal-body">
+      <div class="commission-alert">
+        <i class="fas fa-info-circle"></i>
+        <div>
+          <div class="commission-alert-title">How to pay commission</div>
+          <div class="commission-alert-desc">Send your commission amount to our Telebirr: <strong style="color:var(--text)">+251912345678</strong>. Then enter your Telebirr transaction ID below so we can verify your payment.</div>
+        </div>
+      </div>
+      <div class="prod-form-grid">
+        <div class="prod-form-group full">
+          <div class="prod-form-label">Order ID</div>
+          <input type="text" id="cm-order-id" readonly style="opacity:0.6">
+        </div>
+        <div class="prod-form-group full">
+          <div class="prod-form-label">Commission Amount (ETB)</div>
+          <input type="text" id="cm-amount" readonly style="opacity:0.6;color:var(--green);font-weight:700">
+        </div>
+        <div class="prod-form-group full">
+          <div class="prod-form-label">Telebirr Transaction ID <span style="color:var(--pink)">*</span></div>
+          <input type="text" id="cm-txn-id" placeholder="e.g. TB2024XXXXXXXXX" style="font-family:monospace">
+          <div style="font-size:11px;color:var(--muted);margin-top:4px">Found in your Telebirr app under transaction history</div>
+        </div>
+        <div class="prod-form-group full">
+          <div class="prod-form-label">Screenshot (optional URL)</div>
+          <input type="text" id="cm-screenshot" placeholder="Paste image URL of payment screenshot">
+        </div>
+        <div class="prod-form-group full">
+          <div class="prod-form-label">Notes (optional)</div>
+          <input type="text" id="cm-notes" placeholder="Any additional info...">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeCommissionModal()">Cancel</button>
+      <button class="btn btn-primary" style="width:auto" onclick="submitCommission()"><i class="fas fa-paper-plane"></i> Submit for Verification</button>
+    </div>
+  </div>
+</div>
+
 <!-- ADD/EDIT PRODUCT MODAL -->
 <div class="modal-overlay" id="product-modal">
   <div class="modal-box">
@@ -533,6 +588,9 @@ function filterSellerOrders(v){if(window._filterSellerOrders)window._filterSelle
 function editProduct(id){if(window._editProduct)window._editProduct(id);}
 function deleteProduct(id){if(window._deleteProduct)window._deleteProduct(id);}
 function confirmOrder(id){if(window._confirmOrder)window._confirmOrder(id);}
+function openCommissionModal(id,amount){if(window._openCommissionModal)window._openCommissionModal(id,amount);}
+function closeCommissionModal(){if(window._closeCommissionModal)window._closeCommissionModal();}
+function submitCommission(){if(window._submitCommission)window._submitCommission();}
 </script>
 
 <!-- FIREBASE MODULE -->
@@ -894,6 +952,51 @@ window._filterSellerOrders = function(status) {
   renderSellerOrders(filtered);
 };
 
+// Commission modal state
+let commissionOrderId = null;
+
+window._openCommissionModal = function(orderId, amount) {
+  commissionOrderId = orderId;
+  document.getElementById('cm-order-id').value = '#' + orderId.slice(-6).toUpperCase();
+  document.getElementById('cm-amount').value = 'ETB ' + amount;
+  document.getElementById('cm-txn-id').value = '';
+  document.getElementById('cm-screenshot').value = '';
+  document.getElementById('cm-notes').value = '';
+  document.getElementById('commission-modal').classList.add('open');
+};
+
+window._closeCommissionModal = function() {
+  document.getElementById('commission-modal').classList.remove('open');
+  commissionOrderId = null;
+};
+
+window._submitCommission = async function() {
+  const txnId = document.getElementById('cm-txn-id').value.trim();
+  if (!txnId) { toast('Please enter your Telebirr transaction ID', 'error'); return; }
+  try {
+    // Save commission submission to Firebase
+    await addDoc(collection(db, 'commissions'), {
+      orderId: commissionOrderId,
+      sellerId: currentSeller.id,
+      sellerName: currentSeller.name,
+      sellerPhone: currentSeller.phone,
+      transactionId: txnId,
+      screenshot: document.getElementById('cm-screenshot').value,
+      notes: document.getElementById('cm-notes').value,
+      status: 'pending',
+      submittedAt: new Date().toISOString()
+    });
+    // Update order with commission pending status
+    await updateDoc(doc(db, 'orders', commissionOrderId), { commissionStatus: 'pending' });
+    // Update local state
+    const o = sellerOrders.find(x => x.id === commissionOrderId);
+    if (o) o.commissionStatus = 'pending';
+    window._closeCommissionModal();
+    renderSellerOrders(sellerOrders);
+    toast('Commission submitted! Admin will verify within 24 hours ✓', 'success');
+  } catch(e) { toast('Error: ' + e.message, 'error'); }
+};
+
 window._confirmOrder = async function(id) {
   await updateDoc(doc(db,'orders',id),{status:'confirmed'});
   const o=sellerOrders.find(x=>x.id===id);if(o)o.status='confirmed';
@@ -962,6 +1065,7 @@ function toast(msg,type='success'){
 
 // Close modal on background click
 document.getElementById('product-modal').addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');});
+document.getElementById('commission-modal').addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');});
 </script>
 </body>
 </html>
