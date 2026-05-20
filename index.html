@@ -478,11 +478,34 @@ footer { padding: 48px 40px 24px; border-top: 1px solid var(--border); }
 <!-- NEWSLETTER -->
 <div class="newsletter">
   <div class="newsletter-inner">
-    <h2>Get Exclusive Deals 🎁</h2>
-    <p>Subscribe for 10% off your first order and early access to new arrivals.</p>
-    <div class="nl-form">
-      <input type="email" id="nl-email" placeholder="Enter your email address">
-      <button onclick="subscribe()">Subscribe</button>
+    <!-- Before subscribing -->
+    <div id="nl-before">
+      <h2>Get Exclusive Deals 🎁</h2>
+      <p>Subscribe for <strong>10% off your first order</strong> and early access to new arrivals.</p>
+      <div style="display:flex;gap:20px;justify-content:center;flex-wrap:wrap;margin-bottom:24px">
+        <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:rgba(255,255,255,0.7)"><span style="color:#2ECC71;font-size:16px">✓</span> Personal 10% discount code</div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:rgba(255,255,255,0.7)"><span style="color:#2ECC71;font-size:16px">✓</span> Early access to new arrivals</div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:rgba(255,255,255,0.7)"><span style="color:#2ECC71;font-size:16px">✓</span> Exclusive flash sale alerts</div>
+      </div>
+      <div class="nl-form">
+        <input type="email" id="nl-email" placeholder="Enter your email address">
+        <button onclick="subscribe()">Subscribe Free</button>
+      </div>
+    </div>
+    <!-- After subscribing -->
+    <div id="nl-after" style="display:none">
+      <div style="font-size:48px;margin-bottom:16px">🎉</div>
+      <h2>Welcome to the Family!</h2>
+      <p style="margin-bottom:20px">Your personal discount code is ready. Use it at checkout for <strong>10% off</strong> your first order!</p>
+      <div style="background:rgba(255,255,255,0.1);border:2px dashed rgba(255,255,255,0.4);border-radius:14px;padding:20px 32px;display:inline-block;margin-bottom:20px">
+        <div style="font-size:11px;color:rgba(255,255,255,0.6);margin-bottom:6px;letter-spacing:2px;text-transform:uppercase">Your Discount Code</div>
+        <div id="subscriber-code-display" style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;letter-spacing:4px;color:#fff"></div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.6);margin-top:6px">10% off your first order</div>
+      </div>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+        <button onclick="copySubCode()" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:#fff;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif"><i class="fas fa-copy"></i> Copy Code</button>
+        <button onclick="applySubCodeToCart()" style="background:linear-gradient(135deg,#2ECC71,#0088cc);border:none;color:#fff;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif"><i class="fas fa-shopping-cart"></i> Apply to Cart</button>
+      </div>
     </div>
   </div>
 </div>
@@ -946,9 +969,78 @@ function toggleWishlistView(){
 function subscribe(){
   const e=document.getElementById('nl-email').value.trim();
   if(!e||!e.includes('@')){toast('Please enter a valid email');return;}
-  addDoc(collection(db,'subscribers'),{email:e,createdAt:new Date().toISOString()})
-    .then(()=>{toast('Subscribed! 🎉 Welcome to Sisay Store!');document.getElementById('nl-email').value='';})
-    .catch(()=>toast('Subscribed! 🎉'));
+
+  // Generate unique subscriber discount code
+  const chars='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  const unique=Array.from({length:6},()=>chars[Math.floor(Math.random()*chars.length)]).join('');
+  const code='WELCOME'+unique;
+
+  // Save subscriber + their code to Firebase
+  addDoc(collection(db,'subscribers'),{email:e,code,createdAt:new Date().toISOString()})
+    .then(async()=>{
+      // Also save the discount code to discounts collection
+      try {
+        await addDoc(collection(db,'discounts'),{
+          code, value:10, type:'percent',
+          minOrder:0, maxUses:1, usedCount:0,
+          status:'active', description:'Subscriber welcome discount - '+e,
+          expiry:null, createdAt:new Date().toISOString()
+        });
+      } catch(e2){}
+      // Store in localStorage for persistence
+      localStorage.setItem('ss_subscriber_code', code);
+      localStorage.setItem('ss_subscriber_email', e);
+      // Show success state
+      document.getElementById('nl-before').style.display='none';
+      document.getElementById('nl-after').style.display='block';
+      document.getElementById('subscriber-code-display').textContent=code;
+      // Show early access banner
+      showEarlyAccessBanner();
+    })
+    .catch(()=>{
+      // Even if Firebase fails, show code from localStorage
+      localStorage.setItem('ss_subscriber_code', code);
+      document.getElementById('nl-before').style.display='none';
+      document.getElementById('nl-after').style.display='block';
+      document.getElementById('subscriber-code-display').textContent=code;
+    });
+}
+
+function copySubCode(){
+  const code=document.getElementById('subscriber-code-display').textContent;
+  if(code) navigator.clipboard.writeText(code).then(()=>toast('Code copied! 📋'));
+}
+
+function applySubCodeToCart(){
+  const code=document.getElementById('subscriber-code-display').textContent;
+  if(code){
+    document.getElementById('discount-code-input').value=code;
+    openCart();
+    setTimeout(()=>applyDiscount(),400);
+  }
+}
+
+function showEarlyAccessBanner(){
+  // Check if early access banner already exists
+  if(document.getElementById('early-access-bar')) return;
+  const bar=document.createElement('div');
+  bar.id='early-access-bar';
+  bar.style.cssText='background:linear-gradient(135deg,#2ECC71,#0088cc);color:#fff;padding:10px 24px;text-align:center;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:10px;position:relative;';
+  bar.innerHTML='<span>⚡ Early Access Member — You see new arrivals 24h before everyone else!</span><button onclick="this.parentElement.remove()" style="background:none;border:none;color:rgba(255,255,255,0.7);cursor:pointer;font-size:16px;position:absolute;right:16px">✕</button>';
+  const nav=document.querySelector('nav');
+  if(nav) nav.after(bar);
+}
+
+// Check if already subscribed on page load
+function checkSubscriberStatus(){
+  const code=localStorage.getItem('ss_subscriber_code');
+  if(code){
+    // Show early access banner
+    showEarlyAccessBanner();
+    // Pre-fill cart discount field when cart opens
+    const input=document.getElementById('discount-code-input');
+    if(input && !input.value) input.placeholder=`Your code: ${code}`;
+  }
 }
 
 // ── COUNTDOWN ──
@@ -1056,6 +1148,7 @@ const wb=document.getElementById('wishlist-badge');
 wb.style.display=wishlist.length>0?'flex':'none'; wb.textContent=wishlist.length;
 loadProducts();
 loadAnnouncements();
+checkSubscriberStatus();
 
 // ── SECRET ADMIN ACCESS ──
 // Desktop: type "admin" anywhere on the page
