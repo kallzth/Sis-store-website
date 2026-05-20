@@ -368,7 +368,7 @@ footer { padding: 48px 40px 24px; border-top: 1px solid var(--border); }
 </nav>
 
 <!-- FLASH BANNER -->
-<div class="flash-banner">
+<div class="flash-banner" id="flash-banner" style="display:none">
   <div class="flash-pill"><span class="flash-dot"></span> Flash Sale</div>
   <span>50% OFF selected items — ends in <span class="flash-time" id="countdown">—</span></span>
   <span class="flash-sep">|</span>
@@ -517,7 +517,7 @@ footer { padding: 48px 40px 24px; border-top: 1px solid var(--border); }
     <div class="footer-col">
       <h4>Sell</h4>
       <a href="seller-register.html">Become a Seller</a>
-      <a href="seller-guide.html">Seller Guide</a>
+      <a href="./seller-guide.html">Seller Guide</a>
     </div>
   </div>
   <div class="footer-bottom">
@@ -598,12 +598,12 @@ footer { padding: 48px 40px 24px; border-top: 1px solid var(--border); }
 
       <!-- Quick contact channels -->
       <div class="contact-channels">
-        <a class="contact-channel" href="https://wa.me/251982602264" target="_blank">
+        <a class="contact-channel" href="https://wa.me/251912345678" target="_blank">
           <div class="channel-icon" style="background:rgba(37,211,102,0.15)"><i class="fab fa-whatsapp" style="color:#25D366"></i></div>
           <div class="channel-label">WhatsApp</div>
           <div class="channel-val">Chat now</div>
         </a>
-        <a class="contact-channel" href="tel:+251982602264">
+        <a class="contact-channel" href="tel:+251912345678">
           <div class="channel-icon" style="background:rgba(255,107,152,0.12)"><i class="fas fa-phone" style="color:var(--primary)"></i></div>
           <div class="channel-label">Phone</div>
           <div class="channel-val">Call us</div>
@@ -683,7 +683,7 @@ const app = initializeApp({
 const db = getFirestore(app);
 
 // ── CONFIG ── update this to your brother's WhatsApp number
-const WA_NUMBER = '251982602264';
+const WA_NUMBER = '251912345678';
 
 // ── STATE ──
 let allProducts = [], filtered = [];
@@ -703,7 +703,17 @@ async function loadProducts() {
     document.getElementById('stat-p').textContent = allProducts.length;
     document.getElementById('stat-s').textContent = sSnap.size;
     const flash = allProducts.find(p => p.flashSale === 'true' || p.flashSale === true);
-    if (flash) showDeal(flash);
+    if (flash) {
+      showDeal(flash);
+      // Show flash banner only if flash sale products exist
+      const flashBanner = document.getElementById('flash-banner');
+      if (flashBanner) flashBanner.style.display = 'flex';
+      startCountdown();
+    } else {
+      // No flash sale products — hide banner completely
+      const flashBanner = document.getElementById('flash-banner');
+      if (flashBanner) flashBanner.style.display = 'none';
+    }
     renderProducts(filtered);
   } catch(e) {
     document.getElementById('products-grid').innerHTML = `<div class="empty-state"><i class="fas fa-tshirt"></i><p>New products are coming soon — check back shortly!</p></div>`;
@@ -1044,7 +1054,6 @@ async function loadAnnouncements() {
 updateBadges();
 const wb=document.getElementById('wishlist-badge');
 wb.style.display=wishlist.length>0?'flex':'none'; wb.textContent=wishlist.length;
-startCountdown();
 loadProducts();
 loadAnnouncements();
 
@@ -1326,7 +1335,7 @@ window.toast            = toast;
 // ══════════════════════════════════════════
 
 const BOT_NAME = 'Sisay Assistant';
-const WA_LINK = `https://wa.me/251982602264`;
+const WA_LINK = `https://wa.me/251912345678`;
 let chatOpen = false;
 let chatStarted = false;
 let chatHistory = [];
