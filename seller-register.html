@@ -197,6 +197,18 @@ select option{background:var(--card2);}
 .btn-danger{background:rgba(231,76,60,0.15);color:#e74c3c;border:1px solid rgba(231,76,60,0.3);}
 .btn-danger:hover{background:#e74c3c;color:#fff;}
 
+/* PASSWORD TOGGLE */
+.pass-wrap { position:relative; margin-bottom:12px; }
+.pass-wrap input { padding-right:44px !important; margin-bottom:0 !important; }
+.pass-toggle { position:absolute; right:14px; top:50%; transform:translateY(-50%); background:none; border:none; color:var(--muted); cursor:pointer; font-size:15px; padding:4px; transition:color 0.2s; }
+.pass-toggle:hover { color:var(--text); }
+.forgot-link { display:block; text-align:right; font-size:12px; color:var(--muted); margin-bottom:16px; cursor:pointer; transition:color 0.2s; }
+.forgot-link:hover { color:var(--pink); }
+.forgot-box { background:rgba(255,107,152,0.05); border:1px solid rgba(255,107,152,0.2); border-radius:14px; padding:20px; margin-bottom:16px; display:none; }
+.forgot-box h3 { font-family:'Syne',sans-serif; font-size:15px; font-weight:700; margin-bottom:8px; color:var(--pink); }
+.forgot-step { display:flex; align-items:flex-start; gap:10px; font-size:13px; color:var(--muted); margin-bottom:8px; line-height:1.5; }
+.forgot-step-num { background:var(--pink); color:#fff; width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; flex-shrink:0; margin-top:1px; }
+
 /* TOAST */
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--card2);border:1px solid var(--border);color:var(--text);padding:13px 22px;border-radius:12px;font-size:14px;z-index:9999;opacity:0;transition:all 0.3s;display:flex;align-items:center;gap:10px;white-space:nowrap;box-shadow:0 20px 40px rgba(0,0,0,0.5);}
 #toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
@@ -287,7 +299,7 @@ select option{background:var(--card2);}
           <div class="form-group"><label>Phone / WhatsApp <span class="req">*</span></label><input type="tel" id="r-phone" placeholder="+251912345678"><div class="input-hint">We'll contact you on this number to confirm</div></div>
           <div class="form-group"><label>Email Address</label><input type="email" id="r-email" placeholder="your@email.com"></div>
           <div class="form-group full"><label>City / Location <span class="req">*</span></label><input type="text" id="r-city" placeholder="e.g. Addis Ababa, Bole"></div>
-          <div class="form-group full"><label>Create a Password <span class="req">*</span></label><input type="password" id="r-password" placeholder="Min 6 characters"><div class="input-hint">You'll use this to log into your seller dashboard</div></div>
+          <div class="form-group full"><label>Create a Password <span class="req">*</span></label><div class="pass-wrap" style="margin-bottom:0"><input type="password" id="r-password" placeholder="Min 6 characters"><button class="pass-toggle" type="button" onclick="toggleSellerPass('r-password',this)"><i class="fas fa-eye"></i></button></div><div class="input-hint">You'll use this to log into your seller dashboard</div></div>
         </div>
       </div>
       <button class="btn btn-primary" onclick="goStep(2)"><i class="fas fa-arrow-right"></i> Continue to Shop Details</button>
@@ -372,7 +384,18 @@ select option{background:var(--card2);}
       <h2>Seller Login</h2>
       <p>Log in to your seller dashboard using your registered phone number and password.</p>
       <input type="tel" id="sl-phone" placeholder="Phone number e.g. +251912345678">
-      <input type="password" id="sl-pass" placeholder="Password">
+      <div class="pass-wrap">
+        <input type="password" id="sl-pass" placeholder="Password">
+        <button class="pass-toggle" type="button" onclick="toggleSellerPass('sl-pass',this)" title="Show/hide password"><i class="fas fa-eye"></i></button>
+      </div>
+      <span class="forgot-link" onclick="toggleForgotSeller()"><i class="fas fa-question-circle"></i> Forgot your password?</span>
+      <div class="forgot-box" id="forgot-seller">
+        <h3>🔑 Forgot Password?</h3>
+        <div class="forgot-step"><div class="forgot-step-num">1</div><span>Contact Sisay Store admin via WhatsApp — tell them your registered shop name and phone number</span></div>
+        <div class="forgot-step"><div class="forgot-step-num">2</div><span>Admin will verify your identity and reset your password in Firebase</span></div>
+        <div class="forgot-step"><div class="forgot-step-num">3</div><span>You'll receive your new temporary password on WhatsApp — log in and change it from your dashboard</span></div>
+        <a href="https://wa.me/251912345678?text=${encodeURIComponent('Hi! I forgot my Sisay Store seller password. My shop name is: ')}" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:#25D366;color:#fff;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:700;text-decoration:none;margin-top:8px"><i class="fab fa-whatsapp"></i> Contact Admin on WhatsApp</a>
+      </div>
       <button class="btn btn-primary" onclick="sellerLogin()" style="margin-top:4px"><i class="fas fa-sign-in-alt"></i> Sign In</button>
       <div class="login-error" id="login-err">❌ Phone number or password incorrect. Check your details or contact admin.</div>
       <div style="margin-top:20px;font-size:13px;color:var(--muted)">Don't have an account? <a href="#" onclick="showRegister()" style="color:var(--pink)">Register here</a></div>
@@ -573,6 +596,16 @@ select option{background:var(--card2);}
 <!-- BRIDGE -->
 <script>
 function goStep(n){if(window._goStep)window._goStep(n);}
+function toggleSellerPass(id,btn){
+  const inp=document.getElementById(id);
+  if(!inp)return;
+  inp.type=inp.type==='password'?'text':'password';
+  btn.innerHTML=inp.type==='password'?'<i class="fas fa-eye"></i>':'<i class="fas fa-eye-slash"></i>';
+}
+function toggleForgotSeller(){
+  const el=document.getElementById('forgot-seller');
+  el.style.display=el.style.display==='none'||!el.style.display?'block':'none';
+}
 function submitApplication(){if(window._submitApplication)window._submitApplication();}
 function showSellerLogin(){if(window._showSellerLogin)window._showSellerLogin();}
 function showRegister(){if(window._showRegister)window._showRegister();}
