@@ -276,17 +276,17 @@
   .customer-orders .order-total { font-size:13px;font-weight:700;margin-top:2px; }
 
   /* Discount Codes */
-  .discount-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-bottom:24px; }
-  .discount-card { background:var(--card2);border:1px solid var(--border);border-radius:14px;padding:20px;position:relative;overflow:hidden;transition:border-color 0.2s; }
+  .discount-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-bottom:24px; }
+  .discount-card { background:var(--card2);border:1px solid var(--border);border-radius:14px;padding:20px;position:relative;overflow:hidden;transition:border-color 0.2s;display:flex;flex-direction:column;gap:0; }
   .discount-card:hover { border-color:rgba(255,107,152,0.3); }
-  .discount-card::before { content:'';position:absolute;top:0;right:0;width:60px;height:60px;border-radius:0 14px 0 60px;opacity:0.1;background:var(--primary); }
-  .discount-code { font-family:'Syne',sans-serif;font-size:20px;font-weight:800;letter-spacing:2px;color:var(--primary);margin-bottom:8px; }
+  .discount-card-header { display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px; }
+  .discount-code { font-family:'Syne',sans-serif;font-size:18px;font-weight:800;letter-spacing:1px;color:var(--primary);word-break:break-all;line-height:1.2;max-width:calc(100% - 80px); }
   .discount-value { font-size:13px;color:var(--muted);margin-bottom:12px; }
-  .discount-stats { display:flex;gap:16px;margin-bottom:14px; }
-  .discount-stat { font-size:12px;color:var(--muted); }
-  .discount-stat strong { display:block;font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--text); }
-  .discount-actions { display:flex;gap:8px; }
-  .discount-status { position:absolute;top:14px;right:14px; }
+  .discount-stats { display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;background:var(--card);border-radius:10px;padding:10px; }
+  .discount-stat { font-size:11px;color:var(--muted);text-align:center; }
+  .discount-stat strong { display:block;font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:var(--text);margin-bottom:2px;word-break:break-all; }
+  .discount-actions { display:flex;gap:8px;margin-top:auto; }
+  .discount-status { flex-shrink:0; }
 
   /* Bulk Import */
   .bulk-upload-area { border:2px dashed var(--border);border-radius:14px;padding:40px;text-align:center;cursor:pointer;transition:all 0.2s;background:var(--card2);position:relative;margin-bottom:20px; }
@@ -2452,22 +2452,30 @@
     }
     container.innerHTML = allDiscounts.map(d => {
       const isExpired = d.expiry && new Date(d.expiry) < new Date();
-      const statusBadge = isExpired ? 'badge-red' : d.status === 'active' ? 'badge-green' : 'badge-yellow';
-      const statusLabel = isExpired ? 'expired' : d.status;
+      const isActive = !isExpired && d.status === 'active';
+      const statusBadge = isExpired ? 'badge-red' : isActive ? 'badge-green' : 'badge-yellow';
+      const statusLabel = isExpired ? 'Expired' : isActive ? 'Active' : 'Inactive';
       const discountLabel = d.type === 'percent' ? `${d.value}% off` : `ETB ${d.value} off`;
-      return `<div class="discount-card">
-        <div class="discount-status"><span class="badge ${statusBadge}">${statusLabel}</span></div>
-        <div class="discount-code">${d.code}</div>
-        <div class="discount-value">${discountLabel}${d.minOrder ? ` · Min order ETB ${d.minOrder}` : ''}</div>
-        <div class="discount-stats">
-          <div class="discount-stat"><strong>${d.usedCount || 0}</strong>Used</div>
-          <div class="discount-stat"><strong>${d.maxUses || '∞'}</strong>Max Uses</div>
-          <div class="discount-stat"><strong>${d.expiry || '∞'}</strong>Expires</div>
+      const expiryDisplay = d.expiry ? new Date(d.expiry).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'2-digit'}) : '∞';
+      const usesLeft = d.maxUses > 0 ? `${(d.maxUses||0)-(d.usedCount||0)} left` : '∞';
+      return `<div class="discount-card" style="border-color:${isActive?'rgba(46,204,113,0.2)':isExpired?'rgba(231,76,60,0.2)':'var(--border)'}">
+        <div class="discount-card-header">
+          <div class="discount-code">${d.code}</div>
+          <div class="discount-status"><span class="badge ${statusBadge}">${statusLabel}</span></div>
         </div>
-        ${d.description ? `<div style="font-size:12px;color:var(--muted);margin-bottom:12px">${d.description}</div>` : ''}
+        <div class="discount-value">
+          <strong style="color:var(--text);font-size:15px">${discountLabel}</strong>
+          ${d.minOrder ? `<span style="color:var(--muted)"> · Min ETB ${d.minOrder}</span>` : ''}
+        </div>
+        <div class="discount-stats">
+          <div class="discount-stat"><strong>${d.usedCount||0}</strong>Used</div>
+          <div class="discount-stat"><strong>${usesLeft}</strong>Remaining</div>
+          <div class="discount-stat"><strong>${expiryDisplay}</strong>Expires</div>
+        </div>
+        ${d.description ? `<div style="font-size:12px;color:var(--muted);margin-bottom:12px;padding:8px 10px;background:var(--card);border-radius:8px"><i class="fas fa-tag" style="margin-right:5px;opacity:0.5"></i>${d.description}</div>` : ''}
         <div class="discount-actions">
           <button class="btn btn-ghost btn-sm" onclick="copyDiscountCode('${d.code}')"><i class="fas fa-copy"></i> Copy</button>
-          <button class="btn btn-ghost btn-sm" onclick="editDiscount('${d.id}')"><i class="fas fa-edit"></i></button>
+          <button class="btn btn-ghost btn-sm" onclick="editDiscount('${d.id}')"><i class="fas fa-edit"></i> Edit</button>
           <button class="btn btn-danger btn-sm" onclick="deleteDiscount('${d.id}')"><i class="fas fa-trash"></i></button>
         </div>
       </div>`;
