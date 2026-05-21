@@ -221,6 +221,18 @@
   .mini-chart { height: 6px; background: var(--card2); border-radius: 3px; overflow: hidden; margin-top: 10px; }
   .mini-chart-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--pink), var(--purple)); transition: width 0.6s ease; }
 
+  /* PASSWORD TOGGLE */
+  .pass-wrap { position:relative; }
+  .pass-wrap input { padding-right: 44px; width:100%; }
+  .pass-toggle { position:absolute; right:14px; top:50%; transform:translateY(-50%); background:none; border:none; color:var(--muted); cursor:pointer; font-size:15px; padding:4px; transition:color 0.2s; }
+  .pass-toggle:hover { color:var(--text); }
+  .forgot-link { display:block; text-align:right; font-size:12px; color:var(--muted); margin-top:6px; cursor:pointer; transition:color 0.2s; }
+  .forgot-link:hover { color:var(--pink); }
+  .forgot-modal { background:var(--card2); border:1px solid var(--border); border-radius:14px; padding:24px; margin-top:16px; display:none; animation:fadeIn 0.3s ease; }
+  .forgot-modal h3 { font-family:'Syne',sans-serif; font-size:16px; font-weight:700; margin-bottom:8px; }
+  .forgot-modal p { font-size:13px; color:var(--muted); line-height:1.6; margin-bottom:14px; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+
   /* MESSAGES */
   .sort-select { background:var(--card2);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:8px;font-size:13px;outline:none;font-family:'DM Sans',sans-serif;cursor:pointer; }
   .msg-item { padding:16px 20px;border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.15s;position:relative; }
@@ -353,8 +365,23 @@
     <div class="login-logo">Sisay Store</div>
     <div class="login-sub">Admin Dashboard · Secure Access</div>
     <input type="text" id="login-user" placeholder="Admin username" autocomplete="off">
-    <input type="password" id="login-pass" placeholder="Password">
-    <button class="btn-primary" onclick="doLogin()">Sign In</button>
+    <div class="pass-wrap">
+      <input type="password" id="login-pass" placeholder="Password">
+      <button class="pass-toggle" type="button" onclick="togglePass('login-pass',this)" title="Show/hide password"><i class="fas fa-eye"></i></button>
+    </div>
+    <span class="forgot-link" onclick="toggleForgotAdmin()"><i class="fas fa-question-circle"></i> Forgot password?</span>
+    <div class="forgot-modal" id="forgot-admin">
+      <h3>🔑 Reset Admin Password</h3>
+      <p>Since this is a private admin panel, your password is stored locally in your browser. To reset it:</p>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px">
+        <div style="display:flex;align-items:flex-start;gap:10px;font-size:13px"><span style="color:var(--pink);font-weight:700;flex-shrink:0">1.</span><span>Open browser Console (F12 → Console tab)</span></div>
+        <div style="display:flex;align-items:flex-start;gap:10px;font-size:13px"><span style="color:var(--pink);font-weight:700;flex-shrink:0">2.</span><span>Type: <code style="background:var(--card);padding:2px 6px;border-radius:4px;font-size:12px">localStorage.setItem('sisay_admin_pass','yournewpassword')</code></span></div>
+        <div style="display:flex;align-items:flex-start;gap:10px;font-size:13px"><span style="color:var(--pink);font-weight:700;flex-shrink:0">3.</span><span>Press Enter → then try logging in with the new password</span></div>
+      </div>
+      <p style="margin-bottom:10px">Or contact your developer to reset it directly.</p>
+      <a href="https://wa.me/251912345678" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:#25D366;color:#fff;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none"><i class="fab fa-whatsapp"></i> WhatsApp Admin</a>
+    </div>
+    <button class="btn-primary" onclick="doLogin()" style="margin-top:16px">Sign In</button>
     <div class="login-error" id="login-error">❌ Wrong username or password</div>
     <a href="./" style="display:block;margin-top:20px;font-size:13px;color:var(--muted);text-align:center;text-decoration:none;transition:color 0.2s" onmouseover="this.style.color='#FF6B98'" onmouseout="this.style.color=''">
       <i class="fas fa-arrow-left" style="margin-right:6px"></i> Back to Store
@@ -1150,6 +1177,16 @@
 <script>
   // These will be filled by the module below
   function doLogin() { if(window._doLogin) window._doLogin(); }
+  function togglePass(id,btn) {
+    const inp = document.getElementById(id);
+    if (!inp) return;
+    inp.type = inp.type === 'password' ? 'text' : 'password';
+    btn.innerHTML = inp.type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+  }
+  function toggleForgotAdmin() {
+    const el = document.getElementById('forgot-admin');
+    el.style.display = el.style.display === 'none' || !el.style.display ? 'block' : 'none';
+  }
   function logout() { if(window._logout) window._logout(); }
   function showPage(p) { if(window._showPage) window._showPage(p); }
   function openProductModal() { if(window._openProductModal) window._openProductModal(); }
