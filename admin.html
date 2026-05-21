@@ -364,9 +364,9 @@
   <div class="login-box">
     <div class="login-logo">Sisay Store</div>
     <div class="login-sub">Admin Dashboard · Secure Access</div>
-    <input type="text" id="login-user" placeholder="Admin username" autocomplete="off">
+    <input type="text" id="login-user" placeholder="Admin username" autocomplete="off" readonly onfocus="this.removeAttribute('readonly')">
     <div class="pass-wrap">
-      <input type="password" id="login-pass" placeholder="Password">
+      <input type="password" id="login-pass" placeholder="Password" autocomplete="new-password" readonly onfocus="this.removeAttribute('readonly')">
       <button class="pass-toggle" type="button" onclick="togglePass('login-pass',this)" title="Show/hide password"><i class="fas fa-eye"></i></button>
     </div>
     <span class="forgot-link" onclick="toggleForgotAdmin()"><i class="fas fa-question-circle"></i> Forgot password?</span>
