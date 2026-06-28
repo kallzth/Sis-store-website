@@ -745,7 +745,9 @@ const db = getFirestore(app);
 
 // ── CONFIG ── update this to your brother's WhatsApp number
 const WA_NUMBER = '251912345678';
-const TELEGRAM_USERNAME = 'Sisaystore'; // no @ symbol — used in https://t.me/Sisaystore
+const TELEGRAM_USERNAME = 'Sisaystore'; // ⚠️ Must be a PERSONAL or BUSINESS account username, NOT a group.
+// Groups use invite links like t.me/+AbCdEfGh and don't reliably support pre-filled text.
+// Set this to your personal Telegram account's @username for orders to work properly.
 
 // ── STATE ──
 let allProducts = [], filtered = [];
@@ -926,6 +928,9 @@ function buyNowWA(){
 function buyNowTelegram(){
   if(!modalProduct) return;
   const msg=`Hi! I want to buy:\n\n${modalProduct.name}${selSize?' (Size: '+selSize+')':''}\nPrice: ETB ${parseFloat(modalProduct.price).toFixed(2)}\n\nPlease confirm availability!`;
+  navigator.clipboard.writeText(msg).then(()=>{
+    toast('📋 Order copied! Paste it in the Telegram chat that opens.');
+  }).catch(()=>{});
   window.open(`https://t.me/${TELEGRAM_USERNAME}?text=${encodeURIComponent(msg)}`, '_blank');
 }
 document.getElementById('product-modal').addEventListener('click',function(e){if(e.target===this)closeModal();});
@@ -998,6 +1003,10 @@ function checkoutTelegram(){
   const lines=cart.map(i=>`• ${i.name}${i.size?' ('+i.size+')':''} ×${i.qty} = ETB ${(i.price*i.qty).toFixed(2)}`).join('\n');
   const discLine=discount>0?`\nDiscount (${appliedDiscount.code}): -ETB ${discount.toFixed(2)}`:'';
   const msg=`Hello! I'd like to place an order:\n\n${lines}${discLine}\n\nTotal: ETB ${total.toFixed(2)}\n\nPlease confirm and send delivery info. Thank you!`;
+  // Copy to clipboard as a fallback in case Telegram doesn't pre-fill the text
+  navigator.clipboard.writeText(msg).then(()=>{
+    toast('📋 Order copied! Paste it in the Telegram chat that opens.');
+  }).catch(()=>{});
   window.open(`https://t.me/${TELEGRAM_USERNAME}?text=${encodeURIComponent(msg)}`, '_blank');
   addDoc(collection(db,'orders'),{items:cart,amount:total,status:'pending',orderChannel:'telegram',createdAt:new Date().toISOString()}).catch(()=>{});
 }
