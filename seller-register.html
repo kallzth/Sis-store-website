@@ -296,7 +296,7 @@ select option{background:var(--card2);}
         <div class="form-grid">
           <div class="form-group"><label>First Name <span class="req">*</span></label><input type="text" id="r-fname" placeholder="Abebe" autocomplete="given-name"></div>
           <div class="form-group"><label>Last Name <span class="req">*</span></label><input type="text" id="r-lname" placeholder="Kebede" autocomplete="family-name"></div>
-          <div class="form-group"><label>Phone / WhatsApp <span class="req">*</span></label><input type="tel" id="r-phone" placeholder="+251912345678" autocomplete="off"><div class="input-hint">We'll contact you on this number to confirm</div></div>
+          <div class="form-group"><label>Phone / WhatsApp <span class="req">*</span></label><input type="tel" id="r-phone" placeholder="+251982602264" autocomplete="off"><div class="input-hint">We'll contact you on this number to confirm</div></div>
           <div class="form-group"><label>Email Address</label><input type="email" id="r-email" placeholder="your@email.com" autocomplete="off"></div>
           <div class="form-group full"><label>City / Location <span class="req">*</span></label><input type="text" id="r-city" placeholder="e.g. Addis Ababa, Bole" autocomplete="off"></div>
           <div class="form-group full"><label>Create a Password <span class="req">*</span></label><div class="pass-wrap" style="margin-bottom:0"><input type="password" id="r-password" placeholder="Min 6 characters" autocomplete="new-password"><button class="pass-toggle" type="button" onclick="toggleSellerPass('r-password',this)"><i class="fas fa-eye"></i></button></div><div class="input-hint">You'll use this to log into your seller dashboard</div></div>
@@ -383,7 +383,7 @@ select option{background:var(--card2);}
       <div style="font-size:36px;margin-bottom:16px">🏪</div>
       <h2>Seller Login</h2>
       <p>Log in to your seller dashboard using your registered phone number and password.</p>
-      <input type="tel" id="sl-phone" placeholder="Phone number e.g. +251912345678" autocomplete="off">
+      <input type="tel" id="sl-phone" placeholder="Phone number e.g. +251982602264" autocomplete="off">
       <div class="pass-wrap">
         <input type="password" id="sl-pass" placeholder="Password" autocomplete="new-password">
         <button class="pass-toggle" type="button" onclick="toggleSellerPass('sl-pass',this)" title="Show/hide password"><i class="fas fa-eye"></i></button>
@@ -394,7 +394,7 @@ select option{background:var(--card2);}
         <div class="forgot-step"><div class="forgot-step-num">1</div><span>Contact Sisay Store admin via WhatsApp — tell them your registered shop name and phone number</span></div>
         <div class="forgot-step"><div class="forgot-step-num">2</div><span>Admin will verify your identity and reset your password in Firebase</span></div>
         <div class="forgot-step"><div class="forgot-step-num">3</div><span>You'll receive your new temporary password on WhatsApp — log in and change it from your dashboard</span></div>
-        <a href="https://wa.me/251912345678?text=${encodeURIComponent('Hi! I forgot my Sisay Store seller password. My shop name is: ')}" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:#25D366;color:#fff;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:700;text-decoration:none;margin-top:8px"><i class="fab fa-whatsapp"></i> Contact Admin on WhatsApp</a>
+        <a href="https://wa.me/251982602264?text=${encodeURIComponent('Hi! I forgot my Sisay Store seller password. My shop name is: ')}" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:#25D366;color:#fff;padding:10px 20px;border-radius:10px;font-size:13px;font-weight:700;text-decoration:none;margin-top:8px"><i class="fab fa-whatsapp"></i> Contact Admin on WhatsApp</a>
       </div>
       <button class="btn btn-primary" onclick="sellerLogin()" style="margin-top:4px"><i class="fas fa-sign-in-alt"></i> Sign In</button>
       <div class="login-error" id="login-err">❌ Phone number or password incorrect. Check your details or contact admin.</div>
@@ -487,7 +487,7 @@ select option{background:var(--card2);}
           <div class="prod-form-grid">
             <div class="prod-form-group"><div class="prod-form-label">Shop Name</div><input type="text" id="prof-shopname" placeholder="Your shop name"></div>
             <div class="prod-form-group"><div class="prod-form-label">Owner Name</div><input type="text" id="prof-owner" placeholder="Full name"></div>
-            <div class="prod-form-group"><div class="prod-form-label">WhatsApp Number</div><input type="tel" id="prof-phone" placeholder="+251912345678"></div>
+            <div class="prod-form-group"><div class="prod-form-label">WhatsApp Number</div><input type="tel" id="prof-phone" placeholder="+251982602264"></div>
             <div class="prod-form-group"><div class="prod-form-label">City</div><input type="text" id="prof-city" placeholder="Addis Ababa"></div>
             <div class="prod-form-group"><div class="prod-form-label">Email</div><input type="email" id="prof-email" placeholder="your@email.com"></div>
             <div class="prod-form-group"><div class="prod-form-label">Instagram / Facebook</div><input type="text" id="prof-social" placeholder="@yourshop"></div>
@@ -499,7 +499,7 @@ select option{background:var(--card2);}
         <div class="dash-card" style="border-color:rgba(231,76,60,0.2)">
           <div class="dash-card-title" style="color:#e74c3c">⚠️ Need Help?</div>
           <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Contact the Sisay Store admin team for support with your account, products or orders.</p>
-          <a href="https://wa.me/251912345678" target="_blank" class="btn btn-ghost" style="text-decoration:none;width:auto;display:inline-flex"><i class="fab fa-whatsapp" style="color:#25D366"></i> WhatsApp Admin</a>
+          <a href="https://wa.me/251982602264" target="_blank" class="btn btn-ghost" style="text-decoration:none;width:auto;display:inline-flex"><i class="fab fa-whatsapp" style="color:#25D366"></i> WhatsApp Admin</a>
         </div>
       </div>
 
@@ -519,7 +519,7 @@ select option{background:var(--card2);}
         <i class="fas fa-info-circle"></i>
         <div>
           <div class="commission-alert-title">How to pay commission</div>
-          <div class="commission-alert-desc">Send your commission amount to our Telebirr: <strong style="color:var(--text)">+251912345678</strong>. Then enter your Telebirr transaction ID below so we can verify your payment.</div>
+          <div class="commission-alert-desc">Send your commission amount to our Telebirr: <strong style="color:var(--text)">+251982602264</strong>. Then enter your Telebirr transaction ID below so we can verify your payment.</div>
         </div>
       </div>
       <div class="prod-form-grid">
