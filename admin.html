@@ -1905,7 +1905,7 @@
             <i class="fab fa-whatsapp"></i> Reply on WhatsApp
           </a>` : ''}
         ${m.contact && m.contact.includes('@') ?
-          `<a href="mailto:${m.contact}" class="btn btn-ghost btn-sm" style="text-decoration:none">
+          `<a href="https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(m.contact)}&su=${encodeURIComponent('Re: ' + (m.subject || 'Your message to Sisay Store'))}&body=${encodeURIComponent('Hello ' + (m.name||'') + ',\n\nThank you for reaching out to Sisay Store.\n\n---\nYour message: ' + (m.message||'') + '\n---\n\n')}" target="_blank" class="btn btn-ghost btn-sm" style="text-decoration:none">
             <i class="fas fa-envelope"></i> Reply by Email
           </a>` : ''}
         <button class="btn btn-danger btn-sm" onclick="deleteMessage('${m.id}')">
