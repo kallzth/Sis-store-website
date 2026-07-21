@@ -2,7 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0f0f13">
 <title>Sisay Store | Trendy Fashion Clothing</title>
 <meta name="description" content="Shop the latest fashion trends at Sisay Store — Men's, Women's, Accessories and Shoes.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -323,7 +326,17 @@ footer { padding: 48px 40px 24px; border-top: 1px solid var(--border); }
   .contact-modal { padding: 20px; }
 }
 
-/* TOAST */
+.navbar {
+  padding: env(safe-area-inset-top, 0) 40px 0;
+  padding-top: max(env(safe-area-inset-top), 0px);
+}
+.chat-bubble {
+  bottom: max(24px, env(safe-area-inset-bottom, 24px));
+  right: max(24px, env(safe-area-inset-right, 24px));
+}
+.cart-foot {
+  padding-bottom: max(16px, env(safe-area-inset-bottom, 16px));
+}
 #toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--card2); border: 1px solid var(--border); color: var(--text); padding: 13px 22px; border-radius: 12px; font-size: 14px; z-index: 9999; opacity: 0; transition: all 0.3s; display: flex; align-items: center; gap: 10px; white-space: nowrap; box-shadow: 0 20px 40px rgba(0,0,0,0.5); pointer-events: none; }
 #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
@@ -335,7 +348,7 @@ footer { padding: 48px 40px 24px; border-top: 1px solid var(--border); }
 .ad-slot-inner { border-radius:14px; overflow:hidden; background:var(--card); border:1px solid var(--border); min-height:90px; display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:13px; }
 .ad-label { font-size:10px; color:var(--muted); text-align:center; margin-bottom:4px; text-transform:uppercase; letter-spacing:1px; }
 
-/* RESPONSIVE */
+/* ─── RESPONSIVE — Tablet ─── */
 @media (max-width: 900px) {
   .navbar { padding: 0 16px; }
   .nav-links { display: none; }
@@ -351,11 +364,119 @@ footer { padding: 48px 40px 24px; border-top: 1px solid var(--border); }
   .modal-right { padding: 20px; }
   .cart-drawer { width: 100vw; right: -100vw; }
   .nl-form { flex-direction: column; }
+  .ad-slot { padding: 0 16px; }
+  .coupons-section { padding: 40px 20px; }
+  .coupons-grid { grid-template-columns: repeat(2,1fr); }
 }
-@media (max-width: 600px) {
-  .hero h1 { font-size: 28px; }
-  .products-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
-  .footer-grid { grid-template-columns: 1fr; }
+
+/* ─── RESPONSIVE — iPhone Plus / Pro Max (430px) ─── */
+@media (max-width: 480px) {
+  .navbar { padding: 0 12px; height: 56px; }
+  .nav-logo { font-size: 18px; }
+  .nav-search { display: none; }
+  .nav-right { gap: 4px; }
+  .nav-icon-btn { width: 36px; height: 36px; }
+
+  .flash-banner { font-size: 11px; padding: 8px 12px; gap: 8px; flex-wrap: wrap; justify-content: center; }
+  .flash-sep { display: none; }
+  .flash-free { width: 100%; text-align: center; }
+
+  .hero { padding: 32px 16px; }
+  .hero h1 { font-size: 30px; }
+  .hero p { font-size: 14px; }
+  .hero-tag { font-size: 11px; padding: 6px 12px; }
+  .hero-btns { flex-direction: column; gap: 10px; }
+  .hero-btns a, .hero-btns button { width: 100%; justify-content: center; }
+  .hero-stats { gap: 16px; }
+  .hero-stat-num { font-size: 22px; }
+
+  .section { padding: 32px 16px; }
+  .section h2, .section-title { font-size: 22px; }
+
+  .cat-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .cat-card { border-radius: 12px; height: 160px; }
+  .cat-name { font-size: 13px; padding: 10px; }
+
+  .products-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 0; }
+  .product-card { border-radius: 12px; }
+  .product-img { height: 180px; }
+  .product-info { padding: 10px; }
+  .product-name { font-size: 13px; }
+  .product-price { font-size: 14px; }
+
+  .filter-tabs { gap: 6px; padding-bottom: 12px; }
+  .filter-tab { padding: 7px 14px; font-size: 12px; }
+  .sort-bar { flex-direction: column; gap: 8px; align-items: stretch; }
+  .sort-bar select { width: 100%; }
+
+  .deal-inner { padding: 24px 16px; gap: 20px; }
+  .deal-timer { gap: 6px; }
+  .timer-box { min-width: 48px; padding: 8px 10px; }
+  .timer-box .timer-num { font-size: 22px; }
+  .deal-title { font-size: 22px; }
+  .deal-price { font-size: 28px; }
+
+  .p-modal { border-radius: 16px 16px 0 0; width: 100%; position: fixed; bottom: 0; top: auto; max-height: 90vh; }
+  .modal-img { height: 220px; }
+  .modal-right { padding: 16px; }
+  .modal-name { font-size: 18px; }
+  .modal-price { font-size: 22px; }
+  .size-grid { grid-template-columns: repeat(4,1fr); gap: 6px; }
+  .size-btn { padding: 8px 4px; font-size: 12px; }
+  .btn-wa, .btn-tg { font-size: 13px; padding: 12px; }
+
+  .cart-drawer { width: 100vw; right: -100vw; }
+  .cart-header { padding: 16px; }
+  .cart-items { padding: 0 12px; }
+  .cart-foot { padding: 12px; }
+  .cart-total-row { font-size: 15px; }
+  .discount-row { gap: 6px; }
+  .discount-input { font-size: 12px; padding: 9px 10px; }
+  .discount-apply-btn { padding: 9px 12px; font-size: 12px; }
+
+  .newsletter-inner { padding: 40px 16px; }
+  .newsletter-inner h2 { font-size: 22px; }
+  .newsletter-inner p { font-size: 13px; }
+
+  .coupons-section { padding: 32px 16px; }
+  .coupons-grid { grid-template-columns: 1fr; }
+  .coupon-code { font-size: 18px; }
+
+  .footer-inner { padding: 40px 16px 24px; }
+  .footer-grid { grid-template-columns: 1fr; gap: 28px; }
+  .footer-bottom { flex-direction: column; text-align: center; gap: 12px; }
+  .footer-logo { font-size: 20px; }
+  .footer-desc { font-size: 13px; }
+  .footer-links-title { font-size: 11px; }
+  .footer-links a { font-size: 13px; }
+  .footer-copy { font-size: 11px; }
+  .payment-icons { justify-content: center; }
+
+  .contact-modal { width: calc(100vw - 24px) !important; max-width: 100%; border-radius: 16px; padding: 20px 16px; }
+  .contact-channels { grid-template-columns: repeat(3,1fr); gap: 8px; }
+  .channel-icon { width: 36px; height: 36px; font-size: 16px; }
+  .channel-label { font-size: 10px; }
+
+  .wishlist-grid { grid-template-columns: repeat(2,1fr); gap: 10px; padding: 16px; }
+
+  #toast { font-size: 12px; padding: 10px 14px; max-width: calc(100vw - 32px); white-space: normal; text-align:center; }
+
+  .chat-bubble { bottom: 16px; right: 12px; width: 48px; height: 48px; }
+  .chat-window { width: calc(100vw - 16px); right: 8px; bottom: 76px; }
+  .announcement-bar { font-size: 12px; padding: 10px 36px 10px 16px; }
+}
+
+/* ─── RESPONSIVE — iPhone SE / small (375px) ─── */
+@media (max-width: 390px) {
+  .hero h1 { font-size: 26px; }
+  .cat-card { height: 140px; }
+  .product-img { height: 160px; }
+  .products-grid { gap: 8px; }
+  .timer-box { min-width: 42px; }
+  .timer-box .timer-num { font-size: 18px; }
+  .contact-channels { grid-template-columns: repeat(2,1fr); }
+  .hero-stats { flex-wrap: wrap; justify-content: center; }
+  .filter-tab { padding: 6px 10px; font-size: 11px; }
 }
 </style>
 </head>
