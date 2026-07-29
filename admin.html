@@ -405,6 +405,7 @@
     <div class="nav-item" onclick="showPage('discounts')"><i class="fas fa-tag"></i> Discounts</div>
     <div class="nav-item" onclick="showPage('bulk')"><i class="fas fa-file-csv"></i> Bulk Import</div>
     <div class="nav-item" onclick="showPage('announcements')"><i class="fas fa-bullhorn"></i> Announcements</div>
+    <div class="nav-item" onclick="showPage('quickreplies')"><i class="fab fa-telegram"></i> Quick Replies</div>
     <div class="nav-section">Settings</div>
     <div class="nav-item" onclick="showPage('subscribers')"><i class="fas fa-users"></i> Subscribers <span id="sub-badge" style="display:none;background:var(--green);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;margin-left:auto">0</span></div>
     <div class="nav-item" onclick="showPage('messages')"><i class="fas fa-envelope"></i> Messages <span id="msg-badge" style="display:none;background:var(--pink);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;margin-left:auto">0</span></div>
@@ -716,6 +717,96 @@
       <!-- SELLER SUMMARY TAB -->
       <div id="tab-summary" style="display:none">
         <div id="payouts-container"><div class="loading"><div class="spinner"></div><p>Calculating payouts...</p></div></div>
+      </div>
+    </div>
+
+    <!-- QUICK REPLIES PAGE -->
+    <div class="page" id="page-quickreplies">
+      <div class="topbar">
+        <h1>📱 Quick Telegram Replies</h1>
+        <div class="topbar-actions">
+          <a href="https://t.me/SisayStoreBot" target="_blank" class="btn btn-pink" style="text-decoration:none"><i class="fab fa-telegram"></i> Open Telegram</a>
+        </div>
+      </div>
+
+      <div style="background:rgba(0,136,204,0.08);border:1px solid rgba(0,136,204,0.25);border-radius:14px;padding:16px 20px;margin-bottom:24px;display:flex;align-items:center;gap:12px">
+        <i class="fab fa-telegram" style="color:#0088cc;font-size:24px;flex-shrink:0"></i>
+        <div>
+          <div style="font-weight:700;font-size:14px;margin-bottom:3px">How to use</div>
+          <div style="font-size:13px;color:var(--muted)">Click <strong style="color:var(--text)">Copy</strong> on any template below → Open Telegram → paste and send. You can edit the text before sending.</div>
+        </div>
+      </div>
+
+      <!-- CUSTOMIZE FIELDS -->
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-header"><div class="card-title"><i class="fas fa-sliders-h" style="color:var(--pink);margin-right:8px"></i> Customize Reply Details</div></div>
+        <div class="form-grid">
+          <div class="form-group"><label>Customer Name</label><input type="text" id="qr-name" placeholder="e.g. Abebe" oninput="updateReplies()"></div>
+          <div class="form-group"><label>Product Name</label><input type="text" id="qr-product" placeholder="e.g. Women's dress" oninput="updateReplies()"></div>
+          <div class="form-group"><label>Price (ETB)</label><input type="text" id="qr-price" placeholder="e.g. 20000" oninput="updateReplies()"></div>
+          <div class="form-group"><label>Delivery Time</label><input type="text" id="qr-delivery" placeholder="e.g. 1-2 business days" oninput="updateReplies()"></div>
+          <div class="form-group"><label>Your Payment (Telebirr)</label><input type="text" id="qr-telebirr" placeholder="e.g. +251982602264" value="+251982602264" oninput="updateReplies()"></div>
+          <div class="form-group"><label>Delivery Fee (ETB)</label><input type="text" id="qr-fee" placeholder="e.g. 100" oninput="updateReplies()"></div>
+        </div>
+      </div>
+
+      <!-- REPLY TEMPLATES -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px" id="qr-grid">
+
+        <!-- AVAILABLE -->
+        <div class="card" style="border-color:rgba(46,204,113,0.3)">
+          <div class="card-header">
+            <div class="card-title" style="color:var(--green)"><i class="fas fa-check-circle"></i> Item Available</div>
+            <button class="btn btn-success btn-sm" onclick="copyReply('qr-available')"><i class="fas fa-copy"></i> Copy</button>
+          </div>
+          <div id="qr-available" style="font-size:13px;color:var(--muted);line-height:1.8;background:var(--card2);border-radius:10px;padding:14px;white-space:pre-wrap;word-break:break-word"></div>
+        </div>
+
+        <!-- NOT AVAILABLE -->
+        <div class="card" style="border-color:rgba(231,76,60,0.3)">
+          <div class="card-header">
+            <div class="card-title" style="color:#e74c3c"><i class="fas fa-times-circle"></i> Item Not Available</div>
+            <button class="btn btn-danger btn-sm" onclick="copyReply('qr-unavailable')"><i class="fas fa-copy"></i> Copy</button>
+          </div>
+          <div id="qr-unavailable" style="font-size:13px;color:var(--muted);line-height:1.8;background:var(--card2);border-radius:10px;padding:14px;white-space:pre-wrap;word-break:break-word"></div>
+        </div>
+
+        <!-- ORDER CONFIRMED -->
+        <div class="card" style="border-color:rgba(95,39,205,0.3)">
+          <div class="card-header">
+            <div class="card-title" style="color:#a78bfa"><i class="fas fa-shopping-bag"></i> Order Confirmed</div>
+            <button class="btn btn-ghost btn-sm" onclick="copyReply('qr-confirmed')"><i class="fas fa-copy"></i> Copy</button>
+          </div>
+          <div id="qr-confirmed" style="font-size:13px;color:var(--muted);line-height:1.8;background:var(--card2);border-radius:10px;padding:14px;white-space:pre-wrap;word-break:break-word"></div>
+        </div>
+
+        <!-- PAYMENT RECEIVED -->
+        <div class="card" style="border-color:rgba(243,156,18,0.3)">
+          <div class="card-header">
+            <div class="card-title" style="color:#f39c12"><i class="fas fa-coins"></i> Payment Received</div>
+            <button class="btn btn-ghost btn-sm" onclick="copyReply('qr-payment')"><i class="fas fa-copy"></i> Copy</button>
+          </div>
+          <div id="qr-payment" style="font-size:13px;color:var(--muted);line-height:1.8;background:var(--card2);border-radius:10px;padding:14px;white-space:pre-wrap;word-break:break-word"></div>
+        </div>
+
+        <!-- SHIPPED -->
+        <div class="card" style="border-color:rgba(0,136,204,0.3)">
+          <div class="card-header">
+            <div class="card-title" style="color:#0088cc"><i class="fas fa-truck"></i> Item Shipped</div>
+            <button class="btn btn-ghost btn-sm" onclick="copyReply('qr-shipped')"><i class="fas fa-copy"></i> Copy</button>
+          </div>
+          <div id="qr-shipped" style="font-size:13px;color:var(--muted);line-height:1.8;background:var(--card2);border-radius:10px;padding:14px;white-space:pre-wrap;word-break:break-word"></div>
+        </div>
+
+        <!-- ASK FOR ADDRESS -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><i class="fas fa-map-marker-alt" style="color:var(--pink)"></i> Request Delivery Address</div>
+            <button class="btn btn-ghost btn-sm" onclick="copyReply('qr-address')"><i class="fas fa-copy"></i> Copy</button>
+          </div>
+          <div id="qr-address" style="font-size:13px;color:var(--muted);line-height:1.8;background:var(--card2);border-radius:10px;padding:14px;white-space:pre-wrap;word-break:break-word"></div>
+        </div>
+
       </div>
     </div>
 
@@ -1236,6 +1327,7 @@
   function runBulkImport() { if(window._runBulkImport) window._runBulkImport(); }
   function clearBulk() { if(window._clearBulk) window._clearBulk(); }
   function markSellerPaid(id,n,p,a) { if(window._markSellerPaid) window._markSellerPaid(id,n,p,a); }
+  function copyReply(id) { if(window._copyReply) window._copyReply(id); }
   function saveAnnouncement() { if(window._saveAnnouncement) window._saveAnnouncement(); }
   function switchPayoutsTab(v) { if(window._switchPayoutsTab) window._switchPayoutsTab(v); }
   function verifyCommission(id,orderId) { if(window._verifyCommission) window._verifyCommission(id,orderId); }
@@ -2918,6 +3010,51 @@ Please resubmit via your seller dashboard. — Sisay Store`;
     } catch(e) { showToast('Error: ' + e.message, 'error'); }
   };
 
+  // ── QUICK TELEGRAM REPLIES ──
+  function getQR() {
+    return {
+      name:     document.getElementById('qr-name')?.value.trim()     || 'Customer',
+      product:  document.getElementById('qr-product')?.value.trim()  || 'the item',
+      price:    document.getElementById('qr-price')?.value.trim()    || '—',
+      delivery: document.getElementById('qr-delivery')?.value.trim() || '1-2 business days',
+      telebirr: document.getElementById('qr-telebirr')?.value.trim() || '+251982602264',
+      fee:      document.getElementById('qr-fee')?.value.trim()      || '100',
+    };
+  }
+
+  window.updateReplies = function() {
+    const d = getQR();
+    const total = (parseFloat(d.price)||0) + (parseFloat(d.fee)||0);
+    const templates = {
+      'qr-available': `✅ Hello ${d.name}!\n\nGreat news — ${d.product} is available! 🎉\n\n📦 Product: ${d.product}\n💰 Price: ETB ${d.price}\n🚚 Delivery: ${d.delivery}\n📍 Delivery fee: ETB ${d.fee}\n\nPlease send your full delivery address to confirm your order.\n\nThank you for shopping at Sisay Store! 🛍️`,
+      'qr-unavailable': `❌ Hello ${d.name},\n\nUnfortunately ${d.product} is currently out of stock. We apologize!\n\n✨ We will restock soon — would you like us to notify you?\n\nBrowse our other products:\n🌐 https://kallzth.github.io/Sis-store-website/\n\nThank you for your interest in Sisay Store! 🙏`,
+      'qr-confirmed': `🎉 Hello ${d.name}!\n\nYour order is confirmed!\n\n📦 Product: ${d.product}\n💰 Price: ETB ${d.price}\n🚚 Delivery fee: ETB ${d.fee}\n💳 Total: ETB ${total}\n\nPlease pay via:\n📱 Telebirr: ${d.telebirr} (Sisay Store)\n\nAfter payment send us:\n1️⃣ Telebirr transaction ID\n2️⃣ Full delivery address\n3️⃣ Your phone number\n\nDelivery within ${d.delivery}. Thank you! 🙏`,
+      'qr-payment': `✅ Hello ${d.name}!\n\nPayment received — thank you! 🙏\n\n💰 Amount: ETB ${d.price}\n📦 Product: ${d.product}\n\nYour order is being prepared.\n🚚 Estimated delivery: ${d.delivery}\n\nWe will notify you once dispatched!\n\n— Sisay Store Team`,
+      'qr-shipped': `🚚 Hello ${d.name}!\n\nYour order has been shipped! 📦\n\n📦 Product: ${d.product}\n⏱️ Estimated arrival: ${d.delivery}\n\nPlease ensure someone is available to receive the delivery.\n\nThank you for shopping at Sisay Store! 🛍️❤️`,
+      'qr-address': `📍 Hello ${d.name}!\n\nTo complete your order for ${d.product}, we need:\n\n1️⃣ Full address (Kebele, area, landmark)\n2️⃣ Your city\n3️⃣ Phone number for delivery\n\nDelivery fee: ETB ${d.fee}\nDelivery time: ${d.delivery}\n\nReply with the above and we will confirm immediately! 😊`,
+    };
+    Object.entries(templates).forEach(([id, text]) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = text;
+    });
+  };
+
+  window._copyReply = function(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    navigator.clipboard.writeText(el.textContent).then(() => {
+      showToast('Copied! Paste it in Telegram ✓', 'success');
+    }).catch(() => {
+      const ta = document.createElement('textarea');
+      ta.value = el.textContent;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      showToast('Copied! Paste it in Telegram ✓', 'success');
+    });
+  };
+
   // Hook page loads
   const _origShowPage = window._showPage;
   window._showPage = function(page) {
@@ -2925,6 +3062,7 @@ Please resubmit via your seller dashboard. — Sisay Store`;
     if (page === 'messages') loadMessages();
     if (page === 'subscribers') loadSubscribers();
     if (page === 'overview') setTimeout(() => buildCharts(), 200);
+    if (page === 'quickreplies') setTimeout(() => window.updateReplies(), 100);
   };
 
   // Expose message functions to window so onclick handlers work
