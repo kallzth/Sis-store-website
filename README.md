@@ -122,6 +122,14 @@
 - Supports: Image ad, Text/Link ad, Google AdSense
 - Active ads table with delete
 
+#### 📱 Quick Telegram Replies 
+- 6 professional pre-written response templates
+- Fill in customer name, product, price, delivery time once → all templates update instantly
+- One-click Copy → paste directly into Telegram
+- Templates: Item Available, Not Available, Order Confirmed, Payment Received, Item Shipped, Request Address
+- Direct Open Telegram button to switch instantly
+
+
 #### Settings
 - Store name, WhatsApp number, email, city, description
 - Admin username + password change
