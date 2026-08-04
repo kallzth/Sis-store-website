@@ -194,6 +194,12 @@
 
 ---
 
+### 📱 Ordering Channels
+Channel	      How it works
+WhatsApp	Full cart sent via wa.me deep link with pre-filled message
+Telegram	Full cart sent via t.me deep link + clipboard copy fallback
+---
+
 ## 🔐 Security
 
 - Admin dashboard protected by username + password
