@@ -856,6 +856,38 @@
     <div class="page" id="page-announcements">
       <div class="topbar"><h1>Announcements & Ads</h1></div>
 
+      <!-- FLASH SALE CONTROL -->
+      <div class="card" style="margin-bottom:20px;border-color:rgba(255,107,152,0.3)">
+        <div class="card-header"><div class="card-title"><i class="fas fa-bolt" style="color:var(--pink);margin-right:8px"></i> Flash Sale Banner</div></div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:20px">Control the flash sale banner on the store. Set a real end time — the countdown stops automatically when time is up and the banner disappears.</p>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Banner Label</label>
+            <input type="text" id="fs-label" placeholder="FLASH SALE" value="FLASH SALE">
+          </div>
+          <div class="form-group">
+            <label>Message Text</label>
+            <input type="text" id="fs-message" placeholder="50% OFF selected items — ends in">
+          </div>
+          <div class="form-group">
+            <label>Sale End Date & Time <span style="color:var(--pink)">*</span></label>
+            <input type="datetime-local" id="fs-endtime">
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <select id="fs-active">
+              <option value="true">Active — show on store</option>
+              <option value="false">Inactive — hide banner</option>
+            </select>
+          </div>
+        </div>
+        <div style="margin-top:16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+          <button class="btn btn-pink" onclick="saveFlashSale()"><i class="fas fa-bolt"></i> Save Flash Sale</button>
+          <button class="btn btn-danger btn-sm" onclick="stopFlashSale()"><i class="fas fa-stop"></i> Stop & Hide Now</button>
+          <div id="fs-status" style="font-size:13px;color:var(--muted)"></div>
+        </div>
+      </div>
+
       <!-- ANNOUNCEMENT BANNER -->
       <div class="card" style="margin-bottom:20px">
         <div class="card-header"><div class="card-title"><i class="fas fa-bullhorn" style="color:var(--pink);margin-right:8px"></i> Store Announcement Banner</div></div>
@@ -1336,6 +1368,8 @@
   function saveAd() { if(window._saveAd) window._saveAd(); }
   function toggleAdFields() { if(window._toggleAdFields) window._toggleAdFields(); }
   function deleteAd(id,col) { if(window._deleteAd) window._deleteAd(id,col); }
+  function saveFlashSale() { if(window._saveFlashSale) window._saveFlashSale(); }
+  function stopFlashSale() { if(window._stopFlashSale) window._stopFlashSale(); }
 </script>
 
 <!-- FIREBASE MODULE -->
@@ -2825,6 +2859,77 @@
     loadAdsPage();
   };
 
+  // ── FLASH SALE ADMIN CONTROL ──
+  async function loadFlashSaleAdmin() {
+    try {
+      const snap = await getDocs(collection(db, 'flashSales'));
+      if (snap.empty) return;
+      const d = snap.docs[0].data();
+      const id = snap.docs[0].id;
+      document.getElementById('fs-label').value   = d.label   || 'FLASH SALE';
+      document.getElementById('fs-message').value = d.message || '';
+      document.getElementById('fs-active').value  = String(d.active);
+      // Convert ISO to datetime-local format
+      if (d.endTime) {
+        const dt = new Date(d.endTime);
+        const local = new Date(dt.getTime() - dt.getTimezoneOffset()*60000)
+          .toISOString().slice(0,16);
+        document.getElementById('fs-endtime').value = local;
+      }
+      // Show current status
+      const statusEl = document.getElementById('fs-status');
+      if (statusEl) {
+        const now = new Date();
+        const end = d.endTime ? new Date(d.endTime) : null;
+        if (!d.active) statusEl.textContent = '⏸ Flash sale is inactive';
+        else if (end && end > now) {
+          const diff = end - now;
+          const h = Math.floor(diff/3600000);
+          const m = Math.floor(diff%3600000/60000);
+          statusEl.textContent = `⚡ Active — ${h}h ${m}m remaining`;
+          statusEl.style.color = 'var(--green)';
+        } else {
+          statusEl.textContent = '⌛ Flash sale has ended';
+          statusEl.style.color = '#f39c12';
+        }
+      }
+      window._flashSaleDocId = snap.docs[0].id;
+    } catch(e) {}
+  }
+
+  window._saveFlashSale = async function() {
+    const endVal = document.getElementById('fs-endtime').value;
+    if (!endVal) { showToast('Please set an end date and time', 'error'); return; }
+    const endISO = new Date(endVal).toISOString();
+    if (new Date(endISO) <= new Date()) { showToast('End time must be in the future!', 'error'); return; }
+    const data = {
+      label:   document.getElementById('fs-label').value   || 'FLASH SALE',
+      message: document.getElementById('fs-message').value || '50% OFF selected items — ends in',
+      endTime: endISO,
+      active:  document.getElementById('fs-active').value === 'true',
+      updatedAt: new Date().toISOString()
+    };
+    try {
+      // Delete existing and create fresh (only one flash sale at a time)
+      const snap = await getDocs(collection(db, 'flashSales'));
+      await Promise.all(snap.docs.map(d => deleteDoc(doc(db, 'flashSales', d.id))));
+      await addDoc(collection(db, 'flashSales'), data);
+      showToast('Flash sale saved! ⚡ It is now live on the store.', 'success');
+      loadFlashSaleAdmin();
+    } catch(e) { showToast('Error: ' + e.message, 'error'); }
+  };
+
+  window._stopFlashSale = async function() {
+    if (!confirm('Stop the flash sale and hide the banner now?')) return;
+    try {
+      const snap = await getDocs(collection(db, 'flashSales'));
+      await Promise.all(snap.docs.map(d => updateDoc(doc(db, 'flashSales', d.id), {active: false})));
+      document.getElementById('fs-active').value = 'false';
+      showToast('Flash sale stopped and hidden from store.', 'success');
+      loadFlashSaleAdmin();
+    } catch(e) { showToast('Error: ' + e.message, 'error'); }
+  };
+
   async function loadAdsPage() {
     const container = document.getElementById('ads-list');
     if (!container) return;
@@ -2981,7 +3086,7 @@ Please resubmit via your seller dashboard. — Sisay Store`;
     _origShowPage3(page);
     if (page === 'customers') buildCustomers();
     if (page === 'discounts') loadDiscounts();
-    if (page === 'announcements') loadAdsPage();
+    if (page === 'announcements') { loadAdsPage(); loadFlashSaleAdmin(); }
     if (page === 'payouts') loadCommissions();
   };
   // Bridge

@@ -54,27 +54,42 @@ img { max-width: 100%; display: block; }
 /* FLASH BANNER — sticky below navbar */
 .flash-banner {
   position: sticky; top: 64px; z-index: 490;
-  background: linear-gradient(90deg, #1a0030 0%, #2d0050 40%, #1a0030 100%);
-  border-bottom: 1px solid rgba(255,107,152,0.25);
+  background: var(--card);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
   padding: 11px 24px;
   display: flex; align-items: center; justify-content: center; gap: 20px;
   font-size: 13px; font-weight: 600; letter-spacing: 0.4px;
-  color: rgba(255,255,255,0.9); flex-wrap: wrap;
+  color: var(--text); flex-wrap: wrap;
 }
 .flash-pill {
   display: inline-flex; align-items: center; gap: 8px;
-  background: rgba(255,107,152,0.15); border: 1px solid rgba(255,107,152,0.35);
-  padding: 4px 14px; border-radius: 20px;
-  color: var(--primary); font-weight: 800; font-size: 12px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  padding: 5px 14px; border-radius: 20px;
+  color: #fff; font-weight: 800; font-size: 12px;
   letter-spacing: 0.5px; text-transform: uppercase;
 }
 .flash-dot {
-  width: 7px; height: 7px; background: var(--primary); border-radius: 50%;
-  box-shadow: 0 0 6px var(--primary); animation: dotBlink 1.2s ease-in-out infinite;
+  width: 7px; height: 7px; background: #fff; border-radius: 50%;
+  animation: dotBlink 1.2s ease-in-out infinite;
 }
-.flash-sep { color: rgba(255,255,255,0.2); font-size: 16px; }
-.flash-time { color: var(--primary); font-weight: 800; font-family: 'Syne', sans-serif; font-size: 14px; }
-.flash-free { color: rgba(255,255,255,0.6); font-size: 12px; font-weight: 500; }
+.flash-sep { color: var(--border); font-size: 16px; }
+.flash-time {
+  color: var(--primary); font-weight: 800;
+  font-family: 'Syne', sans-serif; font-size: 15px;
+  letter-spacing: 2px;
+  background: rgba(255,107,152,0.08);
+  border: 1px solid rgba(255,107,152,0.2);
+  padding: 2px 12px; border-radius: 8px;
+}
+.flash-msg { color: var(--muted); font-size: 13px; font-weight: 500; }
+.flash-free { color: var(--muted); font-size: 12px; font-weight: 500; }
+.flash-close {
+  background: none; border: none; color: var(--muted);
+  cursor: pointer; font-size: 16px; margin-left: auto;
+  padding: 2px 6px; transition: color 0.2s;
+}
+.flash-close:hover { color: var(--text); }
 @keyframes dotBlink { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
 /* HERO */
@@ -888,17 +903,8 @@ async function loadProducts() {
     document.getElementById('stat-p').textContent = allProducts.length;
     document.getElementById('stat-s').textContent = sSnap.size;
     const flash = allProducts.find(p => p.flashSale === 'true' || p.flashSale === true);
-    if (flash) {
-      showDeal(flash);
-      // Show flash banner only if flash sale products exist
-      const flashBanner = document.getElementById('flash-banner');
-      if (flashBanner) flashBanner.style.display = 'flex';
-      startCountdown();
-    } else {
-      // No flash sale products — hide banner completely
-      const flashBanner = document.getElementById('flash-banner');
-      if (flashBanner) flashBanner.style.display = 'none';
-    }
+    if (flash) showDeal(flash);
+    // Flash banner is controlled by Firebase flashSales collection — see loadFlashSale()
     renderProducts(filtered);
   } catch(e) {
     document.getElementById('products-grid').innerHTML = `<div class="empty-state"><i class="fas fa-tshirt"></i><p>New products are coming soon — check back shortly!</p></div>`;
@@ -1291,19 +1297,31 @@ function checkSubscriberStatus(){
 }
 
 // ── COUNTDOWN ──
-function startCountdown(){
-  let end=localStorage.getItem('ss_flash');
-  if(!end||Date.now()>+end){end=Date.now()+24*3600000;localStorage.setItem('ss_flash',end);}
-  function tick(){
-    const diff=Math.max(0,+end-Date.now());
-    const h=Math.floor(diff/3600000).toString().padStart(2,'0');
-    const m=Math.floor(diff%3600000/60000).toString().padStart(2,'0');
-    const s=Math.floor(diff%60000/1000).toString().padStart(2,'0');
-    document.getElementById('countdown').textContent=`${h}:${m}:${s}`;
-    const th=document.getElementById('t-h');
-    if(th){th.textContent=h;document.getElementById('t-m').textContent=m;document.getElementById('t-s').textContent=s;}
+let _flashInterval = null;
+
+function startCountdown(endTimeISO) {
+  if (_flashInterval) clearInterval(_flashInterval);
+  const end = new Date(endTimeISO).getTime();
+
+  function tick() {
+    const diff = end - Date.now();
+    if (diff <= 0) {
+      // Flash sale ended — hide banner
+      clearInterval(_flashInterval);
+      document.getElementById('flash-banner').style.display = 'none';
+      document.getElementById('countdown').textContent = '00:00:00';
+      return;
+    }
+    const h = Math.floor(diff / 3600000).toString().padStart(2,'0');
+    const m = Math.floor(diff % 3600000 / 60000).toString().padStart(2,'0');
+    const s = Math.floor(diff % 60000 / 1000).toString().padStart(2,'0');
+    document.getElementById('countdown').textContent = `${h}:${m}:${s}`;
+    // Also update deal timer if visible
+    const th = document.getElementById('t-h');
+    if (th) { th.textContent=h; document.getElementById('t-m').textContent=m; document.getElementById('t-s').textContent=s; }
   }
-  tick(); setInterval(tick,1000);
+  tick();
+  _flashInterval = setInterval(tick, 1000);
 }
 
 // ── TOAST ──
@@ -1353,6 +1371,33 @@ document.getElementById('contact-modal').addEventListener('click', function(e) {
   if (e.target === this) closeContact();
 });
 
+// ── FLASH SALE (Firebase-controlled) ──
+async function loadFlashSale() {
+  try {
+    const snap = await getDocs(query(collection(db,'flashSales'),where('active','==',true)));
+    if (snap.empty) {
+      document.getElementById('flash-banner').style.display = 'none';
+      return;
+    }
+    const sale = snap.docs[0].data();
+    const endTime = sale.endTime; // ISO string e.g. "2025-09-01T18:00:00"
+    if (!endTime || new Date(endTime) <= new Date()) {
+      document.getElementById('flash-banner').style.display = 'none';
+      return;
+    }
+    // Show banner with custom message
+    const banner = document.getElementById('flash-banner');
+    const msgEl  = document.getElementById('flash-msg');
+    const lblEl  = document.getElementById('flash-label');
+    if (lblEl) lblEl.textContent = sale.label || 'FLASH SALE';
+    if (msgEl) msgEl.textContent = (sale.message || 'Special offer — ends in');
+    banner.style.display = 'flex';
+    startCountdown(endTime);
+  } catch(e) {
+    document.getElementById('flash-banner').style.display = 'none';
+  }
+}
+
 // ── LOAD ANNOUNCEMENTS & ADS ──
 async function loadAnnouncements() {
   try {
@@ -1395,6 +1440,7 @@ const wb=document.getElementById('wishlist-badge');
 wb.style.display=wishlist.length>0?'flex':'none'; wb.textContent=wishlist.length;
 loadProducts();
 loadAnnouncements();
+loadFlashSale();
 loadCoupons();
 checkSubscriberStatus();
 
@@ -1491,6 +1537,7 @@ window.toggleWishlistView = toggleWishlistView;
 window.subscribe        = subscribe;
 window.applyDiscount    = applyDiscount;
 window.loadAnnouncements = loadAnnouncements;
+window.loadFlashSale = loadFlashSale;
 window.removeDiscount   = removeDiscount;
 window.addDealToCart    = addDealToCart;
 window.openContact      = openContact;
