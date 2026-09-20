@@ -1405,12 +1405,41 @@
   // ---- AUTH ----
   const ADMIN_CREDS = { user: 'sisay-admin', pass: 'sisay2025' };
 
-  window._doLogin = function() {
+  window._doLogin = async function() {
     const u = document.getElementById('login-user').value.trim();
     const p = document.getElementById('login-pass').value.trim();
+    if (!u || !p) { document.getElementById('login-error').style.display='block'; return; }
+
+    // 1. Check Firebase for admin credentials (works on any browser/device)
+    try {
+      const snap = await getDocs(collection(db, 'adminSettings'));
+      if (!snap.empty) {
+        const adminData = snap.docs[0].data();
+        if (u === adminData.username && p === adminData.password) {
+          document.getElementById('login-error').style.display='none';
+          document.getElementById('login-screen').style.display='none';
+          document.getElementById('dashboard').style.display='flex';
+          loadAll(); showPage('overview'); loadSettings();
+          return;
+        } else {
+          document.getElementById('login-error').style.display='block';
+          return;
+        }
+      }
+    } catch(e) {}
+
+    // 2. Fall back to localStorage / hardcoded defaults
     const savedUser = localStorage.getItem('sisay_admin_user') || ADMIN_CREDS.user;
     const savedPass = localStorage.getItem('sisay_admin_pass') || ADMIN_CREDS.pass;
     if (u === savedUser && p === savedPass) {
+      document.getElementById('login-error').style.display='none';
+      document.getElementById('login-screen').style.display='none';
+      document.getElementById('dashboard').style.display='flex';
+      loadAll(); showPage('overview'); loadSettings();
+    } else {
+      document.getElementById('login-error').style.display='block';
+    }
+  };
       document.getElementById('login-screen').style.display = 'none';
       document.getElementById('dashboard').style.display = 'flex';
       loadAll();
@@ -1923,6 +1952,19 @@
       localStorage.setItem('sisay_admin_pass', newPass);
       document.getElementById('setting-password').value = '';
     }
+    // Also save to Firebase so credentials work on any browser
+    const adminCreds = {
+      username: newUser || localStorage.getItem('sisay_admin_user') || ADMIN_CREDS.user,
+      password: newPass || localStorage.getItem('sisay_admin_pass') || ADMIN_CREDS.pass,
+      updatedAt: new Date().toISOString()
+    };
+    getDocs(collection(db, 'adminSettings')).then(snap => {
+      if (snap.empty) {
+        addDoc(collection(db, 'adminSettings'), adminCreds);
+      } else {
+        updateDoc(doc(db, 'adminSettings', snap.docs[0].id), adminCreds);
+      }
+    }).catch(()=>{});
     showToast('Settings saved successfully!', 'success');
   };
 
