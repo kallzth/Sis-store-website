@@ -228,9 +228,9 @@
   .pass-toggle:hover { color:var(--text); }
   .forgot-link { display:block; text-align:right; font-size:12px; color:var(--muted); margin-top:6px; cursor:pointer; transition:color 0.2s; }
   .forgot-link:hover { color:var(--pink); }
-  .forgot-modal { background:var(--card2); border:1px solid var(--border); border-radius:14px; padding:24px; margin-top:16px; display:none; animation:fadeIn 0.3s ease; }
-  .forgot-modal h3 { font-family:'Syne',sans-serif; font-size:16px; font-weight:700; margin-bottom:8px; }
-  .forgot-modal p { font-size:13px; color:var(--muted); line-height:1.6; margin-bottom:14px; }
+  .forgot-modal { background:var(--card2); border:1px solid var(--border); border-radius:10px; padding:14px 16px; margin-top:8px; display:none; animation:fadeIn 0.3s ease; width:100%; box-sizing:border-box; }
+  .forgot-modal h3 { font-family:'Syne',sans-serif; font-size:13px; font-weight:700; margin-bottom:6px; text-align:center; }
+  .forgot-modal p { font-size:11px; color:var(--muted); line-height:1.5; margin-bottom:10px; text-align:center; }
   @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
 
   /* MESSAGES */
@@ -372,14 +372,12 @@
     <span class="forgot-link" onclick="toggleForgotAdmin()"><i class="fas fa-question-circle"></i> Forgot password?</span>
     <div class="forgot-modal" id="forgot-admin">
       <h3>🔑 Reset Admin Password</h3>
-      <p>Since this is a private admin panel, your password is stored locally in your browser. To reset it:</p>
-      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px">
-        <div style="display:flex;align-items:flex-start;gap:10px;font-size:13px"><span style="color:var(--pink);font-weight:700;flex-shrink:0">1.</span><span>Open browser Console (F12 → Console tab)</span></div>
-        <div style="display:flex;align-items:flex-start;gap:10px;font-size:13px"><span style="color:var(--pink);font-weight:700;flex-shrink:0">2.</span><span>Type: <code style="background:var(--card);padding:2px 6px;border-radius:4px;font-size:12px">localStorage.setItem('sisay_admin_pass','yournewpassword')</code></span></div>
-        <div style="display:flex;align-items:flex-start;gap:10px;font-size:13px"><span style="color:var(--pink);font-weight:700;flex-shrink:0">3.</span><span>Press Enter → then try logging in with the new password</span></div>
+      <p>Open browser Console (F12) and paste:</p>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:10px;font-family:monospace;color:var(--green);word-break:break-all;margin-bottom:10px">
+        localStorage.setItem('sisay_admin_pass','yournewpassword')
       </div>
-      <p style="margin-bottom:10px">Or contact your developer to reset it directly.</p>
-      <a href="https://wa.me/251982602264" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:#25D366;color:#fff;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none"><i class="fab fa-whatsapp"></i> WhatsApp Admin</a>
+      <p style="margin-bottom:10px">Then refresh and login with the new password. Or contact your developer:</p>
+      <a href="https://wa.me/251982602264" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:8px;background:#25D366;color:#fff;padding:8px;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none;width:100%"><i class="fab fa-whatsapp"></i> WhatsApp Admin</a>
     </div>
     <button class="btn-primary" onclick="doLogin()" style="margin-top:16px">Sign In</button>
     <div class="login-error" id="login-error">❌ Wrong username or password</div>
