@@ -228,9 +228,9 @@
   .pass-toggle:hover { color:var(--text); }
   .forgot-link { display:block; text-align:right; font-size:12px; color:var(--muted); margin-top:6px; cursor:pointer; transition:color 0.2s; }
   .forgot-link:hover { color:var(--pink); }
-  .forgot-modal { background:var(--card2); border:1px solid var(--border); border-radius:14px; padding:24px; margin-top:16px; display:none; animation:fadeIn 0.3s ease; }
-  .forgot-modal h3 { font-family:'Syne',sans-serif; font-size:16px; font-weight:700; margin-bottom:8px; }
-  .forgot-modal p { font-size:13px; color:var(--muted); line-height:1.6; margin-bottom:14px; }
+  .forgot-modal { background:var(--card2); border:1px solid var(--border); border-radius:10px; padding:14px 16px; margin-top:8px; display:none; animation:fadeIn 0.3s ease; width:100%; box-sizing:border-box; }
+  .forgot-modal h3 { font-family:'Syne',sans-serif; font-size:13px; font-weight:700; margin-bottom:6px; text-align:center; }
+  .forgot-modal p { font-size:11px; color:var(--muted); line-height:1.5; margin-bottom:10px; text-align:center; }
   @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
 
   /* MESSAGES */
@@ -372,14 +372,12 @@
     <span class="forgot-link" onclick="toggleForgotAdmin()"><i class="fas fa-question-circle"></i> Forgot password?</span>
     <div class="forgot-modal" id="forgot-admin">
       <h3>🔑 Reset Admin Password</h3>
-      <p>Since this is a private admin panel, your password is stored locally in your browser. To reset it:</p>
-      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px">
-        <div style="display:flex;align-items:flex-start;gap:10px;font-size:13px"><span style="color:var(--pink);font-weight:700;flex-shrink:0">1.</span><span>Open browser Console (F12 → Console tab)</span></div>
-        <div style="display:flex;align-items:flex-start;gap:10px;font-size:13px"><span style="color:var(--pink);font-weight:700;flex-shrink:0">2.</span><span>Type: <code style="background:var(--card);padding:2px 6px;border-radius:4px;font-size:12px">localStorage.setItem('sisay_admin_pass','yournewpassword')</code></span></div>
-        <div style="display:flex;align-items:flex-start;gap:10px;font-size:13px"><span style="color:var(--pink);font-weight:700;flex-shrink:0">3.</span><span>Press Enter → then try logging in with the new password</span></div>
+      <p>Open browser Console (F12) and paste:</p>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:10px;font-family:monospace;color:var(--green);word-break:break-all;margin-bottom:10px">
+        localStorage.setItem('sisay_admin_pass','yournewpassword')
       </div>
-      <p style="margin-bottom:10px">Or contact your developer to reset it directly.</p>
-      <a href="https://wa.me/251982602264" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:#25D366;color:#fff;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none"><i class="fab fa-whatsapp"></i> WhatsApp Admin</a>
+      <p style="margin-bottom:10px">Then refresh and login with the new password. Or contact your developer:</p>
+      <a href="https://wa.me/251982602264" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:8px;background:#25D366;color:#fff;padding:8px;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none;width:100%"><i class="fab fa-whatsapp"></i> WhatsApp Admin</a>
     </div>
     <button class="btn-primary" onclick="doLogin()" style="margin-top:16px">Sign In</button>
     <div class="login-error" id="login-error">❌ Wrong username or password</div>
@@ -855,6 +853,38 @@
     <!-- ANNOUNCEMENTS PAGE -->
     <div class="page" id="page-announcements">
       <div class="topbar"><h1>Announcements & Ads</h1></div>
+
+      <!-- FLASH SALE CONTROL -->
+      <div class="card" style="margin-bottom:20px;border-color:rgba(255,107,152,0.3)">
+        <div class="card-header"><div class="card-title"><i class="fas fa-bolt" style="color:var(--pink);margin-right:8px"></i> Flash Sale Banner</div></div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:20px">Control the flash sale banner on the store. Set a real end time — the countdown stops automatically when time is up and the banner disappears.</p>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Banner Label</label>
+            <input type="text" id="fs-label" placeholder="FLASH SALE" value="FLASH SALE">
+          </div>
+          <div class="form-group">
+            <label>Message Text</label>
+            <input type="text" id="fs-message" placeholder="50% OFF selected items — ends in">
+          </div>
+          <div class="form-group">
+            <label>Sale End Date & Time <span style="color:var(--pink)">*</span></label>
+            <input type="datetime-local" id="fs-endtime">
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <select id="fs-active">
+              <option value="true">Active — show on store</option>
+              <option value="false">Inactive — hide banner</option>
+            </select>
+          </div>
+        </div>
+        <div style="margin-top:16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+          <button class="btn btn-pink" onclick="saveFlashSale()"><i class="fas fa-bolt"></i> Save Flash Sale</button>
+          <button class="btn btn-danger btn-sm" onclick="stopFlashSale()"><i class="fas fa-stop"></i> Stop & Hide Now</button>
+          <div id="fs-status" style="font-size:13px;color:var(--muted)"></div>
+        </div>
+      </div>
 
       <!-- ANNOUNCEMENT BANNER -->
       <div class="card" style="margin-bottom:20px">
@@ -1336,6 +1366,8 @@
   function saveAd() { if(window._saveAd) window._saveAd(); }
   function toggleAdFields() { if(window._toggleAdFields) window._toggleAdFields(); }
   function deleteAd(id,col) { if(window._deleteAd) window._deleteAd(id,col); }
+  function saveFlashSale() { if(window._saveFlashSale) window._saveFlashSale(); }
+  function stopFlashSale() { if(window._stopFlashSale) window._stopFlashSale(); }
 </script>
 
 <!-- FIREBASE MODULE -->
@@ -1371,17 +1403,39 @@
   // ---- AUTH ----
   const ADMIN_CREDS = { user: 'sisay-admin', pass: 'sisay2025' };
 
-  window._doLogin = function() {
+  window._doLogin = async function() {
     const u = document.getElementById('login-user').value.trim();
     const p = document.getElementById('login-pass').value.trim();
+    if (!u || !p) { document.getElementById('login-error').style.display='block'; return; }
+
+    // 1. Check Firebase for admin credentials (works on any browser/device)
+    try {
+      const snap = await getDocs(collection(db, 'adminSettings'));
+      if (!snap.empty) {
+        const adminData = snap.docs[0].data();
+        if (u === adminData.username && p === adminData.password) {
+          document.getElementById('login-error').style.display='none';
+          document.getElementById('login-screen').style.display='none';
+          document.getElementById('dashboard').style.display='flex';
+          loadAll(); showPage('overview'); loadSettings();
+          return;
+        } else {
+          document.getElementById('login-error').style.display='block';
+          return;
+        }
+      }
+    } catch(e) {}
+
+    // 2. Fall back to localStorage / hardcoded defaults
     const savedUser = localStorage.getItem('sisay_admin_user') || ADMIN_CREDS.user;
     const savedPass = localStorage.getItem('sisay_admin_pass') || ADMIN_CREDS.pass;
     if (u === savedUser && p === savedPass) {
-      document.getElementById('login-screen').style.display = 'none';
-      document.getElementById('dashboard').style.display = 'flex';
-      loadAll();
+      document.getElementById('login-error').style.display='none';
+      document.getElementById('login-screen').style.display='none';
+      document.getElementById('dashboard').style.display='flex';
+      loadAll(); showPage('overview'); loadSettings();
     } else {
-      document.getElementById('login-error').style.display = 'block';
+      document.getElementById('login-error').style.display='block';
     }
   };
 
@@ -1889,6 +1943,19 @@
       localStorage.setItem('sisay_admin_pass', newPass);
       document.getElementById('setting-password').value = '';
     }
+    // Also save to Firebase so credentials work on any browser
+    const adminCreds = {
+      username: newUser || localStorage.getItem('sisay_admin_user') || ADMIN_CREDS.user,
+      password: newPass || localStorage.getItem('sisay_admin_pass') || ADMIN_CREDS.pass,
+      updatedAt: new Date().toISOString()
+    };
+    getDocs(collection(db, 'adminSettings')).then(snap => {
+      if (snap.empty) {
+        addDoc(collection(db, 'adminSettings'), adminCreds);
+      } else {
+        updateDoc(doc(db, 'adminSettings', snap.docs[0].id), adminCreds);
+      }
+    }).catch(()=>{});
     showToast('Settings saved successfully!', 'success');
   };
 
@@ -2825,6 +2892,77 @@
     loadAdsPage();
   };
 
+  // ── FLASH SALE ADMIN CONTROL ──
+  async function loadFlashSaleAdmin() {
+    try {
+      const snap = await getDocs(collection(db, 'flashSales'));
+      if (snap.empty) return;
+      const d = snap.docs[0].data();
+      const id = snap.docs[0].id;
+      document.getElementById('fs-label').value   = d.label   || 'FLASH SALE';
+      document.getElementById('fs-message').value = d.message || '';
+      document.getElementById('fs-active').value  = String(d.active);
+      // Convert ISO to datetime-local format
+      if (d.endTime) {
+        const dt = new Date(d.endTime);
+        const local = new Date(dt.getTime() - dt.getTimezoneOffset()*60000)
+          .toISOString().slice(0,16);
+        document.getElementById('fs-endtime').value = local;
+      }
+      // Show current status
+      const statusEl = document.getElementById('fs-status');
+      if (statusEl) {
+        const now = new Date();
+        const end = d.endTime ? new Date(d.endTime) : null;
+        if (!d.active) statusEl.textContent = '⏸ Flash sale is inactive';
+        else if (end && end > now) {
+          const diff = end - now;
+          const h = Math.floor(diff/3600000);
+          const m = Math.floor(diff%3600000/60000);
+          statusEl.textContent = `⚡ Active — ${h}h ${m}m remaining`;
+          statusEl.style.color = 'var(--green)';
+        } else {
+          statusEl.textContent = '⌛ Flash sale has ended';
+          statusEl.style.color = '#f39c12';
+        }
+      }
+      window._flashSaleDocId = snap.docs[0].id;
+    } catch(e) {}
+  }
+
+  window._saveFlashSale = async function() {
+    const endVal = document.getElementById('fs-endtime').value;
+    if (!endVal) { showToast('Please set an end date and time', 'error'); return; }
+    const endISO = new Date(endVal).toISOString();
+    if (new Date(endISO) <= new Date()) { showToast('End time must be in the future!', 'error'); return; }
+    const data = {
+      label:   document.getElementById('fs-label').value   || 'FLASH SALE',
+      message: document.getElementById('fs-message').value || '50% OFF selected items — ends in',
+      endTime: endISO,
+      active:  document.getElementById('fs-active').value === 'true',
+      updatedAt: new Date().toISOString()
+    };
+    try {
+      // Delete existing and create fresh (only one flash sale at a time)
+      const snap = await getDocs(collection(db, 'flashSales'));
+      await Promise.all(snap.docs.map(d => deleteDoc(doc(db, 'flashSales', d.id))));
+      await addDoc(collection(db, 'flashSales'), data);
+      showToast('Flash sale saved! ⚡ It is now live on the store.', 'success');
+      loadFlashSaleAdmin();
+    } catch(e) { showToast('Error: ' + e.message, 'error'); }
+  };
+
+  window._stopFlashSale = async function() {
+    if (!confirm('Stop the flash sale and hide the banner now?')) return;
+    try {
+      const snap = await getDocs(collection(db, 'flashSales'));
+      await Promise.all(snap.docs.map(d => updateDoc(doc(db, 'flashSales', d.id), {active: false})));
+      document.getElementById('fs-active').value = 'false';
+      showToast('Flash sale stopped and hidden from store.', 'success');
+      loadFlashSaleAdmin();
+    } catch(e) { showToast('Error: ' + e.message, 'error'); }
+  };
+
   async function loadAdsPage() {
     const container = document.getElementById('ads-list');
     if (!container) return;
@@ -2981,7 +3119,7 @@ Please resubmit via your seller dashboard. — Sisay Store`;
     _origShowPage3(page);
     if (page === 'customers') buildCustomers();
     if (page === 'discounts') loadDiscounts();
-    if (page === 'announcements') loadAdsPage();
+    if (page === 'announcements') { loadAdsPage(); loadFlashSaleAdmin(); }
     if (page === 'payouts') loadCommissions();
   };
   // Bridge
