@@ -384,6 +384,18 @@ footer { padding: 48px 40px 24px; border-top: 1px solid var(--border); }
   .coupons-grid { grid-template-columns: repeat(2,1fr); }
 }
 
+@media (max-width: 760px) {
+  #after-deal-section > div > div > div:last-child {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+@media (max-width: 480px) {
+  #after-deal-section > div > div > div:last-child {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 12px !important;
+  }
+  #after-deal-section { padding: 40px 16px !important; }
+}
 /* ─── RESPONSIVE — iPhone Plus / Pro Max (430px) ─── */
 @media (max-width: 480px) {
   .navbar { padding: 0 12px; height: 56px; }
@@ -587,15 +599,50 @@ footer { padding: 48px 40px 24px; border-top: 1px solid var(--border); }
       </div>
       <div class="deal-desc" id="deal-desc"></div>
       <div class="deal-timer">
-        <div class="timer-box"><div class="timer-num" id="t-h">--</div><div class="timer-lbl">Hours</div></div>
-        <div class="timer-box"><div class="timer-num" id="t-m">--</div><div class="timer-lbl">Mins</div></div>
-        <div class="timer-box"><div class="timer-num" id="t-s">--</div><div class="timer-lbl">Secs</div></div>
+        <div class="timer-box"><div class="timer-num" id="t-h">00</div><div class="timer-lbl">Hours</div></div>
+        <div class="timer-box"><div class="timer-num" id="t-m">00</div><div class="timer-lbl">Mins</div></div>
+        <div class="timer-box"><div class="timer-num" id="t-s">00</div><div class="timer-lbl">Secs</div></div>
       </div>
       <button class="btn btn-primary" onclick="addDealToCart()"><i class="fas fa-cart-plus"></i> Add to Cart</button>
     </div>
     <div class="deal-img">
       <img id="deal-img" src="" alt="Deal">
       <div class="deal-img-badge" id="deal-disc-badge"></div>
+    </div>
+  </div>
+</div>
+
+<!-- AFTER DEAL — appears when deal ends -->
+<div id="after-deal-section" style="display:none">
+  <div style="background:var(--card);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:56px 40px">
+    <div style="max-width:1200px;margin:0 auto">
+      <div style="text-align:center;margin-bottom:40px">
+        <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,107,152,0.1);border:1px solid rgba(255,107,152,0.25);color:var(--primary);padding:6px 16px;border-radius:20px;font-size:12px;font-weight:700;margin-bottom:14px;text-transform:uppercase;letter-spacing:1px"><i class="fas fa-star"></i> Why Shop With Us</div>
+        <div style="font-family:'Syne',sans-serif;font-size:clamp(24px,4vw,36px);font-weight:800;margin-bottom:10px">Ethiopia's Fashion Destination</div>
+        <div style="color:var(--muted);font-size:15px;max-width:480px;margin:0 auto">From traditional Habesha to modern street style — all in one place, delivered to your door.</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px">
+        <div style="background:var(--card2);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;transition:border-color 0.2s" onmouseover="this.style.borderColor='rgba(255,107,152,0.4)'" onmouseout="this.style.borderColor='var(--border)'">
+          <div style="font-size:32px;margin-bottom:14px">🛍️</div>
+          <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:8px">Curated Fashion</div>
+          <div style="font-size:13px;color:var(--muted);line-height:1.6">Hand-picked products from trusted Ethiopian sellers across all styles.</div>
+        </div>
+        <div style="background:var(--card2);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;transition:border-color 0.2s" onmouseover="this.style.borderColor='rgba(255,107,152,0.4)'" onmouseout="this.style.borderColor='var(--border)'">
+          <div style="font-size:32px;margin-bottom:14px">⚡</div>
+          <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:8px">Fast Ordering</div>
+          <div style="font-size:13px;color:var(--muted);line-height:1.6">Order in seconds via WhatsApp or Telegram — no account needed.</div>
+        </div>
+        <div style="background:var(--card2);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;transition:border-color 0.2s" onmouseover="this.style.borderColor='rgba(255,107,152,0.4)'" onmouseout="this.style.borderColor='var(--border)'">
+          <div style="font-size:32px;margin-bottom:14px">🚚</div>
+          <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:8px">Nationwide Delivery</div>
+          <div style="font-size:13px;color:var(--muted);line-height:1.6">Free delivery over ETB 10,000. We ship to Addis and all major cities.</div>
+        </div>
+        <div style="background:var(--card2);border:1px solid var(--border);border-radius:16px;padding:24px;text-align:center;transition:border-color 0.2s" onmouseover="this.style.borderColor='rgba(255,107,152,0.4)'" onmouseout="this.style.borderColor='var(--border)'">
+          <div style="font-size:32px;margin-bottom:14px">↩️</div>
+          <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:8px">Easy Returns</div>
+          <div style="font-size:13px;color:var(--muted);line-height:1.6">7-day return policy. Wrong size? We swap it free of charge.</div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -973,26 +1020,97 @@ function renderProducts(list) {
 
 // ── DEAL ──
 let _deal = null;
+let _dealInterval = null;
+
 function showDeal(p) {
   _deal = p;
   document.getElementById('deal-section').style.display = 'block';
+  document.getElementById('after-deal-section').style.display = 'none';
   document.getElementById('deal-name').textContent = p.name;
-  document.getElementById('deal-price').textContent = 'ETB '+parseFloat(p.price).toFixed(2);
+  document.getElementById('deal-price').textContent = 'ETB ' + parseFloat(p.price).toFixed(2);
   document.getElementById('deal-img').src = p.image || '';
   document.getElementById('deal-desc').textContent = p.description || 'Limited time offer — grab it before it\'s gone!';
   if (p.originalPrice && parseFloat(p.originalPrice) > parseFloat(p.price)) {
-    const d = Math.round((1-p.price/p.originalPrice)*100);
-    document.getElementById('deal-old').textContent = 'ETB '+parseFloat(p.originalPrice).toFixed(2);
-    document.getElementById('deal-disc').textContent = '-'+d+'%';
+    const d = Math.round((1 - p.price / p.originalPrice) * 100);
+    document.getElementById('deal-old').textContent = 'ETB ' + parseFloat(p.originalPrice).toFixed(2);
+    document.getElementById('deal-disc').textContent = '-' + d + '%';
     document.getElementById('deal-disc').style.display = 'inline-block';
-    document.getElementById('deal-disc-badge').textContent = '-'+d+'%';
+    document.getElementById('deal-disc-badge').textContent = '-' + d + '%';
     document.getElementById('deal-disc-badge').style.display = 'block';
   } else {
     document.getElementById('deal-disc').style.display = 'none';
     document.getElementById('deal-disc-badge').style.display = 'none';
     document.getElementById('deal-old').textContent = '';
   }
+  // Use Firebase flash sale end time if available, otherwise 24h from now
+  startDealCountdown(p);
 }
+
+function startDealCountdown(p) {
+  if (_dealInterval) clearInterval(_dealInterval);
+  // Use the flash sale end time from Firebase if set
+  const flashEnd = window._flashSaleEnd || null;
+  // If no flash end time, use 24h stored per product in localStorage
+  let end;
+  if (flashEnd && new Date(flashEnd) > new Date()) {
+    end = new Date(flashEnd).getTime();
+  } else {
+    const key = 'deal_end_' + (p.id || p.name);
+    let stored = localStorage.getItem(key);
+    if (!stored || Date.now() > +stored) {
+      stored = Date.now() + 24 * 3600000;
+      localStorage.setItem(key, stored);
+    }
+    end = +stored;
+  }
+
+  function tick() {
+    const diff = end - Date.now();
+    if (diff <= 0) {
+      clearInterval(_dealInterval);
+      endDeal(p);
+      return;
+    }
+    const h = Math.floor(diff / 3600000).toString().padStart(2, '0');
+    const m = Math.floor(diff % 3600000 / 60000).toString().padStart(2, '0');
+    const s = Math.floor(diff % 60000 / 1000).toString().padStart(2, '0');
+    document.getElementById('t-h').textContent = h;
+    document.getElementById('t-m').textContent = m;
+    document.getElementById('t-s').textContent = s;
+    // Also update flash banner countdown if same end time
+    const cdEl = document.getElementById('countdown');
+    if (cdEl && flashEnd) cdEl.textContent = h + ':' + m + ':' + s;
+  }
+  tick();
+  _dealInterval = setInterval(tick, 1000);
+}
+
+function endDeal(p) {
+  // Hide deal section with fade
+  const dealEl = document.getElementById('deal-section');
+  dealEl.style.transition = 'opacity 0.8s ease';
+  dealEl.style.opacity = '0';
+  setTimeout(() => {
+    dealEl.style.display = 'none';
+    dealEl.style.opacity = '1';
+    dealEl.style.transition = '';
+    // Show after-deal section
+    const afterEl = document.getElementById('after-deal-section');
+    afterEl.style.display = 'block';
+    afterEl.style.opacity = '0';
+    afterEl.style.transition = 'opacity 0.8s ease';
+    setTimeout(() => { afterEl.style.opacity = '1'; }, 50);
+    // Restore original price on product card
+    if (p.originalPrice && parseFloat(p.originalPrice) > parseFloat(p.price)) {
+      // Update the product in allProducts so card shows original price
+      const prod = allProducts.find(x => x.id === p.id);
+      if (prod) { prod.flashSale = false; renderProducts(filtered); }
+    }
+    // Reset localStorage so deal resets next time admin sets flash sale
+    localStorage.removeItem('deal_end_' + (p.id || p.name));
+  }, 800);
+}
+
 function addDealToCart() { if (_deal) quickAdd(_deal.id); }
 
 // ── FILTER ──
@@ -1392,6 +1510,7 @@ async function loadFlashSale() {
     if (lblEl) lblEl.textContent = sale.label || 'FLASH SALE';
     if (msgEl) msgEl.textContent = (sale.message || 'Special offer — ends in');
     banner.style.display = 'flex';
+    window._flashSaleEnd = endTime; // share with deal countdown
     startCountdown(endTime);
   } catch(e) {
     document.getElementById('flash-banner').style.display = 'none';
