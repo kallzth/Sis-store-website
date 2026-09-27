@@ -1320,7 +1320,7 @@
   function deleteSeller(id) { if(window._deleteSeller) window._deleteSeller(id); }
   function approveSeller(id) { if(window._approveSeller) window._approveSeller(id); }
   function saveSeller() { if(window._saveSeller) window._saveSeller(); }
-  window._searchSellers = function(q) { if(window._searchSellers) window._searchSellers(q); }
+  function searchSellers(q) { if(window._searchSellers) window._searchSellers(q); }
   function filterSellers(s) { if(window._filterSellers) window._filterSellers(s); }
   function updateOrderStatus(id,s) { if(window._updateOrderStatus) window._updateOrderStatus(id,s); }
   function filterOrders(s) { if(window._filterOrders) window._filterOrders(s); }
